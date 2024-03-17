@@ -1,15 +1,11 @@
-package Readers;
-
 import AutomatonElements.AutomatonData;
-import Automatons.DeterministicFiniteAutomaton;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-public class AutomatonReader {
-
-    public DeterministicFiniteAutomaton readFile(String filename) throws FileNotFoundException, AutomatonReaderException {
+public class Generator {
+    public AutomatonData readAutomatonFile(String filename) throws FileNotFoundException, AutomatonReaderException {
         Scanner sc = new Scanner(new File(filename));
         AutomatonData data = new AutomatonData();
 
@@ -33,7 +29,6 @@ public class AutomatonReader {
             throw new AutomatonReaderException();
         }
 
-        return data.getAutomaton();
+        return data;
     }
-
 }

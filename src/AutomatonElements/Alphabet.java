@@ -1,10 +1,16 @@
 package AutomatonElements;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class Alphabet {
     private Set<Character> set;
 
+    public Alphabet(){
+        set = new HashSet<>();
+    }
+
+    // String to Character
     public static Character transform(String s) throws Exception {
         if(s.length() == 1) return s.charAt(0);
         else if(s.equals("''")) return Character.MIN_VALUE;
@@ -12,6 +18,23 @@ public class Alphabet {
         else throw new Exception();
     }
 
+    //String is valid
+    public static boolean validElement(String x) {
+        return x.length() == 1
+                || x.equals("lettersLower")
+                || x.equals("lettersUpper")
+                || x.equals("numbers")
+                || x.equals("space")
+                || x.equals("''")
+                || x.equals("comma");
+    }
+
+    //Add char
+    public void add(Character c) {
+        set.add(c);
+    }
+
+    //Add elements of string
     public void addElements(String x){
         if(x.length() == 1) set.add(x.charAt(0));
         else{
@@ -24,6 +47,18 @@ public class Alphabet {
                 case "comma"        -> set.add(',');
             }
         }
+    }
+
+    public boolean contains(Character character) {
+        return set.contains(character);
+    }
+
+    public void addAll(Alphabet alphabet) {
+        set.addAll(alphabet.set);
+    }
+
+    public void removeEmpty() {
+        set.remove(Character.MIN_VALUE);
     }
 
     private void addLettersLower(){
@@ -98,4 +133,7 @@ public class Alphabet {
     }
 
 
+    public Set<Character> getSet() {
+        return set;
+    }
 }
