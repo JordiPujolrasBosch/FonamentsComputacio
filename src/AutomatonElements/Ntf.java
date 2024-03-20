@@ -1,35 +1,50 @@
 package AutomatonElements;
 
-import java.util.*;
+import java.util.Map;
+import java.util.HashMap;
+
+import java.util.Set;
+import java.util.HashSet;
+
+import java.util.List;
+import java.util.ArrayList;
 
 public class Ntf {
     private final Map<State, Map<Character, Set<State>>> rules;
+
+    //Constructor
 
     public Ntf(){
         rules = new HashMap<>();
     }
 
-    //ADD RULES
+    //Add
 
     public void add(State origin, State destiny, Character character) {
         if(!rules.containsKey(origin)) rules.put(origin, new HashMap<>());
-        Map<Character,Set<State>> part2 = rules.get(origin);
-        if(!part2.containsKey(character)) part2.put(character, new HashSet<>());
-        Set<State> part3 = part2.get(character);
-        part3.add(destiny);
+        if(!rules.get(origin).containsKey(character)) rules.get(origin).put(character, new HashSet<>());
+        rules.get(origin).get(character).add(destiny);
     }
 
-    public void addAll(Ntf tf) {
-        for(State o : tf.rules.keySet()){
-            for(Character c : tf.rules.get(o).keySet()){
-                for(State d : tf.rules.get(o).get(c)){
-                    add(o,d,c);
+    public void addRules(List<Rule> l){
+        for(Rule r : l) add(r.origin(), r.destiny(), r.character());
+    }
+
+    //Get rules
+
+    public List<Rule> getRules(){
+        List<Rule> l = new ArrayList<>();
+        for(State o : rules.keySet()){
+            for(Character c : rules.get(o).keySet()){
+                for(State d : rules.get(o).get(c)){
+                    l.add(new Rule(o,d,c));
                 }
             }
         }
+        return l;
     }
 
-    //STEP
+    //Step
 
     public Set<State> step(State o, Character c) {
         if(!rules.containsKey(o)) return new HashSet<>();
@@ -53,9 +68,4 @@ public class Ntf {
         return after;
     }
 
-    public Set<State> setStateExtended(Set<State> ss){
-        Set<State> res = new HashSet<>();
-        for(State s : ss) res.addAll(stateExtended(s));
-        return res;
-    }
 }

@@ -1,35 +1,40 @@
 package AutomatonElements;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+
+import java.util.List;
+import java.util.ArrayList;
 
 public class AutomatonData {
     private int numberStates;
     private boolean numberStatesRead;
 
-    private int startState;
-    private boolean startStateRead;
+    private int startStateNumber;
+    private boolean startStateNumberRead;
 
-    private List<Integer> finalStates;
-    private boolean finalStatesRead;
+    private List<Integer> finalStatesNumbers;
+    private boolean finalStatesNumbersRead;
 
-    private List<String> alphabet;
-    private boolean alphabetRead;
+    private List<String> alphabetElements;
+    private boolean alphabetElementsRead;
 
-    private final List<Rule> transition;
-    private Alphabet a;
+    private final List<DataRule> transition;
+    private Alphabet alphabet;
 
+    //Constructor
 
     public AutomatonData(){
         numberStatesRead = false;
-        startStateRead = false;
-        finalStatesRead = false;
-        alphabetRead = false;
+        startStateNumberRead = false;
+        finalStatesNumbersRead = false;
+        alphabetElementsRead = false;
 
         transition = new ArrayList<>();
-        a = null;
+        alphabet = new Alphabet();
     }
 
-    //READ
+    //Read
 
     public void setStates(int s) {
         numberStates = s;
@@ -37,83 +42,83 @@ public class AutomatonData {
     }
 
     public void setStart(int s) {
-        startState = s;
-        startStateRead = true;
+        startStateNumber = s;
+        startStateNumberRead = true;
     }
 
     public void setFinal(String[] finals) throws NumberFormatException {
-        finalStatesRead = true;
-        finalStates = new ArrayList<>();
-        for(String s : finals) finalStates.add(Integer.parseInt(s));
+        finalStatesNumbersRead = true;
+        finalStatesNumbers = new ArrayList<>();
+        for(String s : finals) finalStatesNumbers.add(Integer.parseInt(s));
     }
 
     public void setAlphabet(String[] tokens) {
-        alphabetRead = true;
-        alphabet = Arrays.asList(tokens);
+        alphabetElementsRead = true;
+        alphabetElements = Arrays.asList(tokens);
     }
 
     public void addRule(int o, String s, int d) throws Exception {
-        transition.add(new Rule(o,d,Alphabet.transform(s)));
+        transition.add(new DataRule(o,d,Alphabet.transform(s)));
     }
 
-    //GETTERS
+    //Getters
 
-    public int getStates(){
+    public int getNumberStates(){
         return numberStates;
     }
 
+    public Alphabet getAlphabet() {
+        return alphabet;
+    }
+
     public int getStart() {
-        return startState;
+        return startStateNumber;
     }
 
     public List<Integer> getFinalStates() {
-        return finalStates;
+        return finalStatesNumbers;
     }
 
-    public Alphabet getAlphabet() {
-        return a;
-    }
-
-    public List<Rule> getTransitions(){
+    public List<DataRule> getTransitions(){
         return transition;
     }
 
-    //CHECK
+    //Check
 
     public boolean hasBasic() {
-        return numberStatesRead && startStateRead && finalStatesRead && alphabetRead;
+        return numberStatesRead && startStateNumberRead && finalStatesNumbersRead && alphabetElementsRead;
     }
 
     public boolean check(){
         boolean ok = hasBasic();
-        ok = ok && numberStates >= 0;
-        ok = ok && validState(startState);
+        ok = ok && numberStates > 0;
+        ok = ok && validState(startStateNumber);
 
-        Iterator<Integer> it1 = finalStates.iterator();
+        Iterator<Integer> it1 = finalStatesNumbers.iterator();
         while (it1.hasNext() && ok) ok = validState(it1.next());
 
-        Iterator<String> it2 = alphabet.iterator();
+        Iterator<String> it2 = alphabetElements.iterator();
         while (it2.hasNext() && ok) ok = Alphabet.validElement(it2.next());
 
         Alphabet alp = new Alphabet();
-        if (ok) for(String x : alphabet) alp.addElement(x);
+        if (ok) for(String x : alphabetElements) alp.addElement(x);
 
-        Iterator<Rule> it3 = transition.iterator();
+        Iterator<DataRule> it3 = transition.iterator();
         while (it3.hasNext() && ok){
-            Rule r = it3.next();
+            DataRule r = it3.next();
             ok = validState(r.origin()) && validState(r.destiny()) && alp.contains(r.character());
         }
 
-        if(ok) a = alp;
+        if(ok) alphabet = alp;
         return ok;
     }
 
     public boolean isDeterministic(){
-        boolean det = ! alphabet.contains("''");
+        boolean det = ! alphabet.contains(Alphabet.getEmptyChar());
 
         if(det){
             int i = 0;
-            while (i<numberStates && det){
+            while (i<numberStates-1 && det){
                 int j = i+1;
                 while (j<numberStates && det){
                     det = !(transition.get(i).origin() == transition.get(j).origin() && transition.get(i).character() == transition.get(j).character());
@@ -127,10 +132,11 @@ public class AutomatonData {
     }
 
     public boolean isComplete(){
-        return transition.size() == numberStates * a.size();
+        return transition.size() == numberStates * alphabet.size();
     }
 
     private boolean validState(int x){
         return x >= 0 && x < numberStates;
     }
+
 }

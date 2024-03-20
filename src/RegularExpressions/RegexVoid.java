@@ -1,9 +1,9 @@
-package RegularExpresions;
+package RegularExpressions;
 
-import Automatons.AutomatonFactory;
+import Factory.AutomatonFactory;
 import Automatons.Nfa;
 
-public class RegexVoid implements RegularExpresion {
+public class RegexVoid implements RegularExpression {
     public RegexVoid(){}
 
     public Nfa getNfa() {

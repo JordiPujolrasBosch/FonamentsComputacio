@@ -4,6 +4,8 @@ import AutomatonElements.Alphabet;
 import AutomatonElements.Gntf;
 import AutomatonElements.State;
 
+import Factory.GnfaConstructor;
+
 import java.util.Set;
 
 public class Gnfa {
@@ -21,25 +23,8 @@ public class Gnfa {
         this.transition = transition;
     }
 
-    //GETTERS
-
-    public Set<State> getStates() {
-        return states;
+    public GnfaConstructor getConstructor() {
+        return new GnfaConstructor(states, alphabet, start, accept, transition);
     }
 
-    public Alphabet getAlphabet(){
-        return alphabet;
-    }
-
-    public State getStart(){
-        return start;
-    }
-
-    public State getAccept(){
-        return accept;
-    }
-
-    public Gntf getTransition() {
-        return transition;
-    }
 }

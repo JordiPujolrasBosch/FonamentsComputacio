@@ -1,9 +1,9 @@
-package RegularExpresions;
+package RegularExpressions;
 
-import Automatons.AutomatonFactory;
+import Factory.AutomatonFactory;
 import Automatons.Nfa;
 
-public class RegexChar implements RegularExpresion {
+public class RegexChar implements RegularExpression {
     private final char c;
 
     public RegexChar(char c){

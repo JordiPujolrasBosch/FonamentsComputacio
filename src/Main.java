@@ -1,6 +1,7 @@
 import AutomatonElements.AutomatonData;
-import Automatons.AutomatonFactory;
+import Factory.AutomatonFactory;
 import Automatons.Dfa;
+import Factory.Reader;
 
 public class Main {
     public static void main(String[] args){
@@ -9,7 +10,7 @@ public class Main {
 
     private static void test1(){
         try {
-            Generator gen = new Generator();
+            Reader gen = new Reader();
             String path = "dfa1.txt";
             AutomatonData data = gen.readAutomatonFile(path);
             System.out.println(data.check());
@@ -24,7 +25,7 @@ public class Main {
 
     private static void test2(){
         try {
-            Generator gen = new Generator();
+            Reader gen = new Reader();
             String path = "dfa2.txt";
             AutomatonData data = gen.readAutomatonFile(path);
             System.out.println(data.check());

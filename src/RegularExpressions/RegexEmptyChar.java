@@ -1,9 +1,9 @@
-package RegularExpresions;
+package RegularExpressions;
 
-import Automatons.AutomatonFactory;
+import Factory.AutomatonFactory;
 import Automatons.Nfa;
 
-public class RegexEmptyChar implements RegularExpresion {
+public class RegexEmptyChar implements RegularExpression {
     public RegexEmptyChar(){}
 
     public Nfa getNfa(){

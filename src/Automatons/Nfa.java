@@ -3,7 +3,10 @@ package Automatons;
 import AutomatonElements.Alphabet;
 import AutomatonElements.Ntf;
 import AutomatonElements.State;
+import Factory.AutomatonFactory;
+import Factory.NfaConstructor;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class Nfa {
@@ -21,43 +24,24 @@ public class Nfa {
         this.transition = transition;
     }
 
+    public NfaConstructor getConstructor() {
+        return new NfaConstructor(states, alphabet, start, finalStates, transition);
+    }
+
+    //Step
+
+    public Set<State> stepWithEmptyChar(State o, Character c){
+        Set<State> res = new HashSet<>();
+        for(State s : transition.step(o,c)) res.addAll(transition.stateExtended(s));
+        return res;
+    }
+
+    public Set<State> stateExtended(State x) {
+        return transition.stateExtended(x);
+    }
+
     public Dfa toDfa(){
         return AutomatonFactory.nfaToDfa(this);
     }
 
-    //STEP
-
-    public Set<State> stepWithEmptyChar(State o, Character c){
-        return transition.setStateExtended(transition.step(o,c));
-    }
-
-    public Set<State> stateWithEmptyChar(State x) {
-        return transition.stateExtended(x);
-    }
-
-    public Set<State> setStatesWithEmptyChar(Set<State> s){
-        return transition.setStateExtended(s);
-    }
-
-    //GETTERS
-
-    public Set<State> getStates() {
-        return states;
-    }
-
-    public Alphabet getAlphabet() {
-        return alphabet;
-    }
-
-    public State getStart(){
-        return start;
-    }
-
-    public Set<State> getFinalStates() {
-        return finalStates;
-    }
-
-    public Ntf getTransition(){
-        return transition;
-    }
 }

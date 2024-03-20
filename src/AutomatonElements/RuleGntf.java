@@ -1,16 +1,18 @@
 package AutomatonElements;
 
-public class Rule {
+import RegularExpressions.RegularExpression;
+
+public class RuleGntf {
     private final State origin;
     private final State destiny;
-    private final Character character;
+    private final RegularExpression regex;
 
     //Constructor
 
-    public Rule(State o, State d, Character c){
+    public RuleGntf(State o, State d, RegularExpression r){
         origin = o;
         destiny = d;
-        character = c;
+        regex = r;
     }
 
     //Getters
@@ -23,7 +25,7 @@ public class Rule {
         return destiny;
     }
 
-    public Character character(){
-        return character;
+    public RegularExpression regex(){
+        return regex;
     }
 }

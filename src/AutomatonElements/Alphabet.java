@@ -1,9 +1,10 @@
 package AutomatonElements;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.HashMap;
+
 import java.util.Set;
+import java.util.HashSet;
 
 public class Alphabet {
     static Map<String, Set<Character>> listOfElements = buildList();
@@ -11,24 +12,23 @@ public class Alphabet {
     private final Set<Character> set;
     private boolean hasEmptyChar;
 
+    //Constructor
+
     public Alphabet(){
         set = new HashSet<>();
         hasEmptyChar = false;
     }
 
-    // ADD and REMOVE
+    //Add and remove
 
-    public void addChar(char c) {
-        set.add(c);
-    }
-
-    public void addEmptyChar() {
-        hasEmptyChar = true;
+    public void addChar(Character c) {
+        if(getEmptyChar().equals(c)) hasEmptyChar = true;
+        else set.add(c);
     }
 
     public void addAll(Alphabet alphabet) {
         set.addAll(alphabet.set);
-        hasEmptyChar = hasEmptyChar && alphabet.hasEmptyChar;
+        hasEmptyChar = hasEmptyChar || alphabet.hasEmptyChar;
     }
 
     public void addElement(String x){
@@ -37,14 +37,18 @@ public class Alphabet {
         else if(listOfElements.containsKey(x)) set.addAll(listOfElements.get(x));
     }
 
+    public void addEmptyChar() {
+        hasEmptyChar = true;
+    }
+
     public void removeEmptyChar() {
         hasEmptyChar = false;
     }
 
-    //CONSULT
+    //Consult
 
     public boolean contains(Character c) {
-        if(c.equals(Character.MIN_VALUE)) return hasEmptyChar;
+        if(getEmptyChar().equals(c)) return hasEmptyChar;
         else return set.contains(c);
     }
 
@@ -53,24 +57,28 @@ public class Alphabet {
         else return set.size();
     }
 
-    //GETTER
+    //Getter set
 
     public Set<Character> set(){
         return set;
     }
 
-    // STATIC
+    //Empty char
 
     public static Character getEmptyChar() {
         return Character.MIN_VALUE;
     }
 
+    //Transform string from rule in file
+
     public static Character transform(String s) throws Exception {
         if(s.length() == 1) return s.charAt(0);
-        else if(s.equals("''")) return Alphabet.getEmptyChar();
+        else if(s.equals("''")) return getEmptyChar();
         else if(s.equals("space")) return ' ';
         else throw new Exception();
     }
+
+    //Elements
 
     public static boolean validElement(String x) {
         return x.length() == 1 || x.equals("''") || listOfElements.containsKey(x);
@@ -101,6 +109,4 @@ public class Alphabet {
 
         return mapper;
     }
-
-
 }

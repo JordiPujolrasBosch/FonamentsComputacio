@@ -1,10 +1,13 @@
+package Factory;
+
 import AutomatonElements.AutomatonData;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-public class Generator {
+public class Reader {
+
     public AutomatonData readAutomatonFile(String filename) throws FileNotFoundException, AutomatonReaderException {
         Scanner sc = new Scanner(new File(filename));
         AutomatonData data = new AutomatonData();
@@ -31,4 +34,5 @@ public class Generator {
 
         return data;
     }
+
 }
