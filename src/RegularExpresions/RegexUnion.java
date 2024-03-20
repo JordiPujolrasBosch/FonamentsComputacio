@@ -1,6 +1,7 @@
 package RegularExpresions;
 
-import Automatons.NondeterministicFiniteAutomaton;
+import Automatons.AutomatonFactory;
+import Automatons.Nfa;
 
 public class RegexUnion implements RegularExpresion {
     private final RegularExpresion a;
@@ -11,7 +12,7 @@ public class RegexUnion implements RegularExpresion {
         this.b = b;
     }
 
-    public NondeterministicFiniteAutomaton getNfa() {
-        return NondeterministicFiniteAutomaton.union(a.getNfa(), b.getNfa());
+    public Nfa getNfa(){
+        return AutomatonFactory.union(a.getNfa(),b.getNfa());
     }
 }

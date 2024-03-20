@@ -1,139 +1,106 @@
 package AutomatonElements;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class Alphabet {
-    private Set<Character> set;
+    static Map<String, Set<Character>> listOfElements = buildList();
+
+    private final Set<Character> set;
+    private boolean hasEmptyChar;
 
     public Alphabet(){
         set = new HashSet<>();
+        hasEmptyChar = false;
     }
 
-    // String to Character
-    public static Character transform(String s) throws Exception {
-        if(s.length() == 1) return s.charAt(0);
-        else if(s.equals("''")) return Character.MIN_VALUE;
-        else if(s.equals("space")) return ' ';
-        else throw new Exception();
-    }
+    // ADD and REMOVE
 
-    //String is valid
-    public static boolean validElement(String x) {
-        return x.length() == 1
-                || x.equals("lettersLower")
-                || x.equals("lettersUpper")
-                || x.equals("numbers")
-                || x.equals("space")
-                || x.equals("''")
-                || x.equals("comma");
-    }
-
-    //Add char
-    public void add(Character c) {
+    public void addChar(char c) {
         set.add(c);
     }
 
-    //Add elements of string
-    public void addElements(String x){
-        if(x.length() == 1) set.add(x.charAt(0));
-        else{
-            switch (x){
-                case "lettersLower" -> addLettersLower();
-                case "lettersUpper" -> addLettersUpper();
-                case "numbers"      -> addNumbers();
-                case "space"        -> set.add(' ');
-                case "''"           -> set.add(Character.MIN_VALUE);
-                case "comma"        -> set.add(',');
-            }
-        }
-    }
-
-    public boolean contains(Character character) {
-        return set.contains(character);
+    public void addEmptyChar() {
+        hasEmptyChar = true;
     }
 
     public void addAll(Alphabet alphabet) {
         set.addAll(alphabet.set);
+        hasEmptyChar = hasEmptyChar && alphabet.hasEmptyChar;
     }
 
-    public void removeEmpty() {
-        set.remove(Character.MIN_VALUE);
+    public void addElement(String x){
+        if(x.length() == 1) addChar(x.charAt(0));
+        else if(x.equals("''")) hasEmptyChar = true;
+        else if(listOfElements.containsKey(x)) set.addAll(listOfElements.get(x));
     }
 
-    private void addLettersLower(){
-        set.add('a');
-        set.add('b');
-        set.add('c');
-        set.add('d');
-        set.add('e');
-        set.add('f');
-        set.add('g');
-        set.add('h');
-        set.add('i');
-        set.add('j');
-        set.add('k');
-        set.add('l');
-        set.add('m');
-        set.add('n');
-        set.add('o');
-        set.add('p');
-        set.add('q');
-        set.add('r');
-        set.add('s');
-        set.add('t');
-        set.add('u');
-        set.add('v');
-        set.add('w');
-        set.add('x');
-        set.add('y');
-        set.add('z');
+    public void removeEmptyChar() {
+        hasEmptyChar = false;
     }
 
-    private void addLettersUpper(){
-        set.add('A');
-        set.add('B');
-        set.add('C');
-        set.add('D');
-        set.add('E');
-        set.add('F');
-        set.add('G');
-        set.add('H');
-        set.add('I');
-        set.add('J');
-        set.add('K');
-        set.add('L');
-        set.add('M');
-        set.add('N');
-        set.add('O');
-        set.add('P');
-        set.add('Q');
-        set.add('R');
-        set.add('S');
-        set.add('T');
-        set.add('U');
-        set.add('V');
-        set.add('W');
-        set.add('X');
-        set.add('Y');
-        set.add('Z');
+    //CONSULT
+
+    public boolean contains(Character c) {
+        if(c.equals(Character.MIN_VALUE)) return hasEmptyChar;
+        else return set.contains(c);
     }
 
-    private void addNumbers(){
-        set.add('0');
-        set.add('1');
-        set.add('2');
-        set.add('3');
-        set.add('4');
-        set.add('5');
-        set.add('6');
-        set.add('7');
-        set.add('8');
-        set.add('9');
+    public int size() {
+        if(hasEmptyChar) return set.size() + 1;
+        else return set.size();
     }
 
+    //GETTER
 
-    public Set<Character> getSet() {
+    public Set<Character> set(){
         return set;
     }
+
+    // STATIC
+
+    public static Character getEmptyChar() {
+        return Character.MIN_VALUE;
+    }
+
+    public static Character transform(String s) throws Exception {
+        if(s.length() == 1) return s.charAt(0);
+        else if(s.equals("''")) return Alphabet.getEmptyChar();
+        else if(s.equals("space")) return ' ';
+        else throw new Exception();
+    }
+
+    public static boolean validElement(String x) {
+        return x.length() == 1 || x.equals("''") || listOfElements.containsKey(x);
+    }
+
+    private static Map<String, Set<Character>> buildList(){
+        Map<String, Set<Character>> mapper = new HashMap<>();
+
+        Set<Character> lettersLower = new HashSet<>();
+        for(char c = 'a'; c <= 'z'; c++) lettersLower.add(c);
+        mapper.put("lettersLower", lettersLower);
+
+        Set<Character> lettersUpper = new HashSet<>();
+        for(char c = 'A'; c <= 'Z'; c++) lettersUpper.add(c);
+        mapper.put("lettersUpper", lettersUpper);
+
+        Set<Character> numbers = new HashSet<>();
+        for(char c = '0'; c <= '9'; c++) numbers.add(c);
+        mapper.put("numbers", numbers);
+
+        Set<Character> space = new HashSet<>();
+        space.add(' ');
+        mapper.put("space", space);
+
+        Set<Character> comma = new HashSet<>();
+        comma.add(',');
+        mapper.put("comma", comma);
+
+        return mapper;
+    }
+
+
 }

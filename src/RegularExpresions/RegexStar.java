@@ -1,15 +1,16 @@
 package RegularExpresions;
 
-import Automatons.NondeterministicFiniteAutomaton;
+import Automatons.AutomatonFactory;
+import Automatons.Nfa;
 
 public class RegexStar implements RegularExpresion {
-    private final RegularExpresion r;
+    private final RegularExpresion x;
 
-    public RegexStar(RegularExpresion r){
-        this.r = r;
+    public RegexStar(RegularExpresion x){
+        this.x = x;
     }
 
-    public NondeterministicFiniteAutomaton getNfa() {
-        return NondeterministicFiniteAutomaton.star(r.getNfa());
+    public Nfa getNfa(){
+        return AutomatonFactory.star(x.getNfa());
     }
 }

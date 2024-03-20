@@ -1,7 +1,5 @@
 package AutomatonElements;
 
-import Automatons.DeterministicFiniteAutomaton;
-
 import java.util.*;
 
 public class AutomatonData {
@@ -18,6 +16,7 @@ public class AutomatonData {
     private boolean alphabetRead;
 
     private final List<Rule> transition;
+    private Alphabet a;
 
 
     public AutomatonData(){
@@ -27,8 +26,10 @@ public class AutomatonData {
         alphabetRead = false;
 
         transition = new ArrayList<>();
+        a = null;
     }
 
+    //READ
 
     public void setStates(int s) {
         numberStates = s;
@@ -55,6 +56,29 @@ public class AutomatonData {
         transition.add(new Rule(o,d,Alphabet.transform(s)));
     }
 
+    //GETTERS
+
+    public int getStates(){
+        return numberStates;
+    }
+
+    public int getStart() {
+        return startState;
+    }
+
+    public List<Integer> getFinalStates() {
+        return finalStates;
+    }
+
+    public Alphabet getAlphabet() {
+        return a;
+    }
+
+    public List<Rule> getTransitions(){
+        return transition;
+    }
+
+    //CHECK
 
     public boolean hasBasic() {
         return numberStatesRead && startStateRead && finalStatesRead && alphabetRead;
@@ -72,7 +96,7 @@ public class AutomatonData {
         while (it2.hasNext() && ok) ok = Alphabet.validElement(it2.next());
 
         Alphabet alp = new Alphabet();
-        if (ok) for(String x : alphabet) alp.addElements(x);
+        if (ok) for(String x : alphabet) alp.addElement(x);
 
         Iterator<Rule> it3 = transition.iterator();
         while (it3.hasNext() && ok){
@@ -80,6 +104,7 @@ public class AutomatonData {
             ok = validState(r.origin()) && validState(r.destiny()) && alp.contains(r.character());
         }
 
+        if(ok) a = alp;
         return ok;
     }
 
@@ -101,26 +126,9 @@ public class AutomatonData {
         return det;
     }
 
-    public DeterministicFiniteAutomaton getDfa(){
-        State[] array = new State[numberStates];
-        for (int i=0; i < numberStates; i++) array[i] = new State();
-
-        Set<State> setStates = new HashSet<>(Arrays.asList(array));
-
-        State start = array[startState];
-
-        Set<State> setfinalStates = new HashSet<>();
-        for(int x : finalStates) setfinalStates.add(array[x]);
-
-        Alphabet alp = new Alphabet();
-        for(String x : alphabet) alp.addElements(x);
-
-        DeterministicTransitionFunction tf = new DeterministicTransitionFunction();
-        for(Rule r : transition) tf.add(array[r.origin()],array[r.destiny()],r.character());
-
-        return new DeterministicFiniteAutomaton(setStates, alp, start, setfinalStates, tf);
+    public boolean isComplete(){
+        return transition.size() == numberStates * a.size();
     }
-
 
     private boolean validState(int x){
         return x >= 0 && x < numberStates;

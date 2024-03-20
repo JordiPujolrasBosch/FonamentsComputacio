@@ -1,5 +1,6 @@
 import AutomatonElements.AutomatonData;
-import Automatons.DeterministicFiniteAutomaton;
+import Automatons.AutomatonFactory;
+import Automatons.Dfa;
 
 public class Main {
     public static void main(String[] args){
@@ -13,7 +14,7 @@ public class Main {
             AutomatonData data = gen.readAutomatonFile(path);
             System.out.println(data.check());
             System.out.println(data.isDeterministic());
-            DeterministicFiniteAutomaton dfa = data.getDfa();
+            Dfa dfa = AutomatonFactory.dataToDfa(data);
             System.out.println(dfa.checkWord("110000"));
         }
         catch (Exception ex){
@@ -28,7 +29,7 @@ public class Main {
             AutomatonData data = gen.readAutomatonFile(path);
             System.out.println(data.check());
             System.out.println(data.isDeterministic());
-            DeterministicFiniteAutomaton dfa = data.getDfa();
+            Dfa dfa = AutomatonFactory.dataToDfa(data);
             System.out.println(dfa.checkWord(""));
         }
         catch (Exception ex){

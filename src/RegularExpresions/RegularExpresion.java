@@ -1,7 +1,7 @@
 package RegularExpresions;
 
-import Automatons.NondeterministicFiniteAutomaton;
+import Automatons.Nfa;
 
 public interface RegularExpresion {
-    NondeterministicFiniteAutomaton getNfa();
+    Nfa getNfa();
 }
