@@ -1,10 +1,6 @@
 package AutomatonElements;
 
-import java.util.Map;
-import java.util.HashMap;
-
-import java.util.Set;
-import java.util.HashSet;
+import java.util.*;
 
 public class Alphabet {
     static Map<String, Set<Character>> listOfElements = buildList();
@@ -55,6 +51,18 @@ public class Alphabet {
     public int size() {
         if(hasEmptyChar) return set.size() + 1;
         else return set.size();
+    }
+
+    public boolean equal(Alphabet b) {
+        boolean eq = set.size() == b.set.size();
+        eq = eq && ((hasEmptyChar && b.hasEmptyChar) || (!hasEmptyChar && !b.hasEmptyChar));
+
+        Iterator<Character> it = set.iterator();
+        while (eq && it.hasNext()){
+            eq = b.set.contains(it.next());
+        }
+
+        return eq;
     }
 
     //Getter set

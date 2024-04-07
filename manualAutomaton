@@ -1,0 +1,17 @@
+states: [nº states]
+start: [start state]
+final: [list states]
+alphabet: [list tokens]
+
+[transitions]
+
+************
+[nº states]
+How many states does the automaton have.
+Must be a positive number.
+Examples: [2], [3], [7], [10]...
+============
+[start state]
+Code of the start state.
+It must be between 0 and [nº states]-1, both incuded.
+[]

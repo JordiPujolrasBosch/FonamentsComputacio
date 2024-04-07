@@ -3,6 +3,18 @@ import Factory.AutomatonFactory;
 import Automatons.Dfa;
 import Factory.Reader;
 
+/*
+* TODO
+* Test all
+* Read regular expression from file
+* Implement CFG
+* Chomsky reduce
+* Pushdown automaton
+* CFL to PDA
+* PDA to CFL
+* Turing Machine ?
+* */
+
 public class Main {
     public static void main(String[] args){
         test2();
