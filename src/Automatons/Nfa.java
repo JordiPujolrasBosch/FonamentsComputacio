@@ -3,6 +3,7 @@ package Automatons;
 import AutomatonElements.Alphabet;
 import AutomatonElements.Ntf;
 import AutomatonElements.State;
+import Factory.AutomatonFactory;
 import Factory.NfaConstructor;
 
 import java.util.HashSet;
@@ -37,6 +38,14 @@ public class Nfa {
 
     public Set<State> stateExtended(State x) {
         return transition.stateExtended(x);
+    }
+
+    public Dfa toDfa(){
+        return AutomatonFactory.nfaToDfa(this);
+    }
+
+    public Gnfa toGnfa(){
+        return AutomatonFactory.nfaToGnfa(this);
     }
 
 }

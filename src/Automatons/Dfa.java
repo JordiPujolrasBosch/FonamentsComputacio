@@ -3,6 +3,7 @@ package Automatons;
 import AutomatonElements.Alphabet;
 import AutomatonElements.Dtf;
 import AutomatonElements.State;
+import Factory.AutomatonFactory;
 import Factory.DfaConstructor;
 
 import java.util.Set;
@@ -100,4 +101,11 @@ public class Dfa {
         return eq;
     }
 
+    public Nfa toNfa(){
+        return AutomatonFactory.dfaToNfa(this);
+    }
+
+    public Dfa minimize(){
+        return AutomatonFactory.minimize(this);
+    }
 }

@@ -13,4 +13,19 @@ public class RegexChar implements RegularExpression {
     public Nfa getNfa() {
         return AutomatonFactory.regexCharToNfa(c);
     }
+
+    public RegularExpression simplify() {
+        return this;
+    }
+
+    public String toString(){
+        boolean eight = (c=='(' || c==')' || c=='|' || c=='*' || c=='+' || c=='#' || c=='\\' || c=='$');
+        if(eight) return "$" + c;
+        if(c==' ') return "$s";
+        return String.valueOf(c);
+    }
+
+    public TypesRegex type() {
+        return TypesRegex.CHAR;
+    }
 }

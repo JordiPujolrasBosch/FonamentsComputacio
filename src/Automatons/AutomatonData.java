@@ -1,4 +1,9 @@
-package AutomatonElements;
+package Automatons;
+
+import AutomatonElements.Alphabet;
+import AutomatonElements.RuleData;
+import Factory.AutomatonFactory;
+import Factory.AutomatonReaderException;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -19,12 +24,13 @@ public class AutomatonData {
     private List<String> alphabetElements;
     private boolean alphabetElementsRead;
 
-    private final List<DataRule> transition;
+    private final List<RuleData> transition;
     private Alphabet alphabet;
+    private final String filename;
 
     //Constructor
 
-    public AutomatonData(){
+    public AutomatonData(String file){
         numberStatesRead = false;
         startStateNumberRead = false;
         finalStatesNumbersRead = false;
@@ -32,6 +38,7 @@ public class AutomatonData {
 
         transition = new ArrayList<>();
         alphabet = new Alphabet();
+        filename = file;
     }
 
     //Read
@@ -58,7 +65,7 @@ public class AutomatonData {
     }
 
     public void addRule(int o, String s, int d) throws Exception {
-        transition.add(new DataRule(o,d,Alphabet.transform(s)));
+        transition.add(new RuleData(o,d,Alphabet.transform(s)));
     }
 
     //Getters
@@ -76,11 +83,16 @@ public class AutomatonData {
     }
 
     public List<Integer> getFinalStates() {
+        if(finalStatesNumbers.size() == 1 && finalStatesNumbers.getFirst() < 0) return new ArrayList<>();
         return finalStatesNumbers;
     }
 
-    public List<DataRule> getTransitions(){
+    public List<RuleData> getTransitions(){
         return transition;
+    }
+
+    public String getFilename() {
+        return filename;
     }
 
     //Check
@@ -94,8 +106,11 @@ public class AutomatonData {
         ok = ok && numberStates > 0;
         ok = ok && validState(startStateNumber);
 
-        Iterator<Integer> it1 = finalStatesNumbers.iterator();
-        while (it1.hasNext() && ok) ok = validState(it1.next());
+        if(finalStatesNumbers.size() == 1 && finalStatesNumbers.getFirst() < 0) ok = true;
+        else{
+            Iterator<Integer> it1 = finalStatesNumbers.iterator();
+            while (it1.hasNext() && ok) ok = validState(it1.next());
+        }
 
         Iterator<String> it2 = alphabetElements.iterator();
         while (it2.hasNext() && ok) ok = Alphabet.validElement(it2.next());
@@ -103,9 +118,9 @@ public class AutomatonData {
         Alphabet alp = new Alphabet();
         if (ok) for(String x : alphabetElements) alp.addElement(x);
 
-        Iterator<DataRule> it3 = transition.iterator();
+        Iterator<RuleData> it3 = transition.iterator();
         while (it3.hasNext() && ok){
-            DataRule r = it3.next();
+            RuleData r = it3.next();
             ok = validState(r.origin()) && validState(r.destiny()) && alp.contains(r.character());
         }
 
@@ -139,4 +154,11 @@ public class AutomatonData {
         return x >= 0 && x < numberStates;
     }
 
+    public Dfa toDfa() throws AutomatonReaderException {
+        return AutomatonFactory.dataToDfa(this);
+    }
+
+    public Nfa toNfa() throws AutomatonReaderException {
+        return AutomatonFactory.dataToNfa(this);
+    }
 }

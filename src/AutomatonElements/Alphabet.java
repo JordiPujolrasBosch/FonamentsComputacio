@@ -3,7 +3,7 @@ package AutomatonElements;
 import java.util.*;
 
 public class Alphabet {
-    static Map<String, Set<Character>> listOfElements = buildList();
+    private static final Map<String, Set<Character>> listOfElements = buildList();
 
     private final Set<Character> set;
     private boolean hasEmptyChar;

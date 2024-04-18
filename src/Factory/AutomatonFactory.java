@@ -4,26 +4,27 @@ import Automatons.*;
 import AutomatonElements.*;
 import RegularExpressions.*;
 
-import java.util.Iterator;
-
-import java.util.List;
-import java.util.ArrayList;
-
-import java.util.Map;
-import java.util.HashMap;
-
-import java.util.Set;
-import java.util.HashSet;
+import java.util.*;
 
 public class AutomatonFactory {
 
-    //Transformation between types
+    //TRANSFORMATION BETWEEN TYPES
 
-    public static Nfa dataToNfa(AutomatonData data){
-        if(!data.check()) return null;
+    /**
+     * Generates a nfa from the data.
+     * @param data Data of the automaton.
+     * @return The nfa generated from the data.
+     * @throws AutomatonReaderException If the data is incorrect.
+     */
+    public static Nfa dataToNfa(AutomatonData data) throws AutomatonReaderException {
+        if(!data.check()){
+            throw new AutomatonReaderException(OutputMessages.automatonCheck(data.getFilename()));
+        }
 
         List<State> array = new ArrayList<>();
-        for(int i = 0; i < data.getNumberStates(); i++) array.add(new State());
+        for(int i = 0; i < data.getNumberStates(); i++) {
+            array.add(new State());
+        }
 
         NfaConstructor nc = new NfaConstructor();
 
@@ -33,22 +34,35 @@ public class AutomatonFactory {
 
         nc.start = array.get(data.getStart());
 
-        for(int x : data.getFinalStates()) nc.finalStates.add(array.get(x));
+        for(int x : data.getFinalStates()) {
+            nc.finalStates.add(array.get(x));
+        }
 
-        for(DataRule r : data.getTransitions()){
+        for(RuleData r : data.getTransitions()) {
             nc.transition.add(array.get(r.origin()), array.get(r.destiny()), r.character());
         }
 
         return nc.getNfa();
     }
 
-    public static Dfa dataToDfa(AutomatonData data){
-        if(!data.check()) return null;
-        if(!data.isDeterministic()) return null;
+    /**
+     * Generates a dfa from the data.
+     * @param data Data of the automaton.
+     * @return The dfa generated from the data.
+     * @throws AutomatonReaderException If the data is incorrect or the automaton is not deterministic.
+     */
+    public static Dfa dataToDfa(AutomatonData data) throws AutomatonReaderException {
+        if(!data.check()) {
+            throw new AutomatonReaderException(OutputMessages.automatonCheck(data.getFilename()));
+        }
+        if(!data.isDeterministic()) {
+            throw new AutomatonReaderException(OutputMessages.automatonNondeterministic(data.getFilename()));
+        }
 
-        boolean toComplete = !data.isComplete();
         List<State> array = new ArrayList<>();
-        for(int i = 0; i < data.getNumberStates(); i++) array.add(new State());
+        for(int i = 0; i < data.getNumberStates(); i++) {
+            array.add(new State());
+        }
 
         DfaConstructor dc = new DfaConstructor();
 
@@ -58,13 +72,15 @@ public class AutomatonFactory {
 
         dc.start = array.get(data.getStart());
 
-        for(int x : data.getFinalStates()) dc.finalStates.add(array.get(x));
+        for(int x : data.getFinalStates()) {
+            dc.finalStates.add(array.get(x));
+        }
 
-        for(DataRule r : data.getTransitions()){
+        for(RuleData r : data.getTransitions()) {
             dc.transition.add(array.get(r.origin()), array.get(r.destiny()), r.character());
         }
 
-        if(toComplete){
+        if(!data.isComplete()){
             State sink = new State();
             dc.states.add(sink);
 
@@ -78,27 +94,40 @@ public class AutomatonFactory {
         return dc.getDfa();
     }
 
+    /**
+     * Transforms a dfa to a nfa.
+     * @param x Dfa to transform.
+     * @return Nfa equivalent to x.
+     */
     public static Nfa dfaToNfa(Dfa x){
         NfaConstructor nc = new NfaConstructor();
         DfaConstructor dcx = x.getConstructor();
 
         nc.states.addAll(dcx.states);
+
         nc.alphabet.addAll(dcx.alphabet);
         nc.alphabet.addEmptyChar();
+
         nc.start = dcx.start;
+
         nc.finalStates.addAll(dcx.finalStates);
+
         nc.transition.addRules(dcx.transition.getRules());
 
         return nc.getNfa();
     }
 
+    /**
+     * Transforms a nfa to a dfa.
+     * @param x Nfa to transform.
+     * @return Dfa equivalent to x.
+     */
     public static Dfa nfaToDfa(Nfa x){
         NfaConstructor ncx = x.getConstructor();
-        List<Set<State>> ps = powerset(ncx.states);
+        Set<Set<State>> ps = powerset(ncx.states);
 
         Map<Set<State>, State> mapper = new HashMap<>();
         for(Set<State> ss : ps) mapper.put(ss, new State());
-
 
         DfaConstructor dc = new DfaConstructor();
 
@@ -120,15 +149,19 @@ public class AutomatonFactory {
         }
 
         deleteUnusedStates(dc);
-
         return dc.getDfa();
     }
 
+    /**
+     * Transforms a nfa to a gnfa.
+     * @param x Nfa to transform.
+     * @return Gnfa equivalent to x.
+     */
     public static Gnfa nfaToGnfa(Nfa x){
         NfaConstructor ncx = x.getConstructor();
         GnfaConstructor gc = new GnfaConstructor();
 
-        gc.start = new State();
+        gc.start  = new State();
         gc.accept = new State();
 
         gc.states.addAll(ncx.states);
@@ -138,13 +171,10 @@ public class AutomatonFactory {
         gc.alphabet.addAll(ncx.alphabet);
 
         gc.transition = new Gntf(gc.start, gc.accept, gc.states);
-
+        gc.transition.addReplace(gc.start, ncx.start, new RegexEmptyChar());
         for(State s : ncx.finalStates){
             gc.transition.addReplace(s, gc.accept, new RegexEmptyChar());
         }
-
-        gc.transition.addReplace(gc.start, ncx.start, new RegexEmptyChar());
-
         for(Rule r : ncx.transition.getRules()){
             if(r.character().equals(Alphabet.getEmptyChar())){
                 gc.transition.addUnion(r.origin(), r.destiny(), new RegexEmptyChar());
@@ -157,6 +187,11 @@ public class AutomatonFactory {
         return gc.toGnfa();
     }
 
+    /**
+     * Transforms a gnfa to a regular expression.
+     * @param x Gnfa to transform.
+     * @return Regular expression equivalent to x.
+     */
     public static RegularExpression gnfaToRegex(Gnfa x){
         GnfaConstructor gc = x.getConstructor();
 
@@ -195,8 +230,14 @@ public class AutomatonFactory {
         return gc.transition.step(gc.start, gc.accept);
     }
 
-    //Dfa transformations
+    //DFA TRANSFORMATIONS
 
+    /**
+     * Generates the complement of a dfa. The complement accept the words
+     * that the original don't.
+     * @param x Dfa original.
+     * @return Dfa complement of x.
+     */
     public static Dfa complement(Dfa x){
         DfaConstructor dc = x.getConstructor();
 
@@ -210,7 +251,12 @@ public class AutomatonFactory {
         return dc.getDfa();
     }
 
-    public static Dfa reverse(Dfa x){
+    /**
+     * Generates the reverse of a dfa. The reverse accept the words of the original in reverse order.
+     * @param x Dfa original.
+     * @return Nfa reverse of x.
+     */
+    public static Nfa reverse(Dfa x){
         DfaConstructor dcx = x.getConstructor();
         NfaConstructor nc = new NfaConstructor();
         State newStart = new State();
@@ -228,27 +274,35 @@ public class AutomatonFactory {
         for(Rule r : dcx.transition.getRules()){
             nc.transition.add(r.destiny(), r.origin(), r.character());
         }
-
         for(State s : dcx.finalStates){
             nc.transition.add(newStart, s, Alphabet.getEmptyChar());
         }
 
-        return nfaToDfa(nc.getNfa());
+        return nc.getNfa();
     }
 
+    /**
+     * Generates the dfa equivalent to the original with minimum number of states.
+     * @param x Dfa original
+     * @return Dfa minimum of x.
+     */
     public static Dfa minimize(Dfa x){
         DfaConstructor dc = x.getConstructor();
         deleteUnusedStates(dc);
         return defineMinimal(dc, findPartition(dc)).getDfa();
     }
 
-    //Regular expressions
+    //REGULAR EXPRESSIONS
 
+    /**
+     * Generates a Nfa that only accepts the character c.
+     * @param c Character that the nfa accept.
+     * @return Nfa that only accepts the character c.
+     */
     public static Nfa regexCharToNfa(char c){
+        NfaConstructor nc = new NfaConstructor();
         State start = new State();
         State finish = new State();
-
-        NfaConstructor nc = new NfaConstructor();
 
         nc.states.add(start);
         nc.states.add(finish);
@@ -265,18 +319,28 @@ public class AutomatonFactory {
         return nc.getNfa();
     }
 
+    /**
+     * Generates a nfa that doesn't accept anything.
+     * @return Nfa that doesn't accept anything.
+     */
     public static Nfa regexVoidToNfa(){
-        State s = new State();
         NfaConstructor nc = new NfaConstructor();
+        State s = new State();
+
         nc.states.add(s);
         nc.alphabet.addEmptyChar();
         nc.start = s;
         return nc.getNfa();
     }
 
+    /**
+     * Generates a nfa that only accepts nothing.
+     * @return Nfa that only accepts nothing.
+     */
     public static Nfa regexEmptyCharToNfa() {
-        State s = new State();
         NfaConstructor nc = new NfaConstructor();
+        State s = new State();
+
         nc.states.add(s);
         nc.alphabet.addEmptyChar();
         nc.start = s;
@@ -284,6 +348,12 @@ public class AutomatonFactory {
         return nc.getNfa();
     }
 
+    /**
+     * Generates a nfa that concatenates a and b.
+     * @param a First nfa.
+     * @param b Second nfa.
+     * @return Nfa that is a concatenation of a and b.
+     */
     public static Nfa concatenation(Nfa a, Nfa b) {
         NfaConstructor nca = a.getConstructor();
         NfaConstructor ncb = b.getConstructor();
@@ -294,6 +364,7 @@ public class AutomatonFactory {
 
         nc.alphabet.addAll(nca.alphabet);
         nc.alphabet.addAll(ncb.alphabet);
+        nc.alphabet.addEmptyChar();
 
         nc.start = nca.start;
 
@@ -306,6 +377,12 @@ public class AutomatonFactory {
         return nc.getNfa();
     }
 
+    /**
+     * Generates a nfa that accepts a and b.
+     * @param a First nfa.
+     * @param b Second nfa.
+     * @return Nfa that is the union of a and b.
+     */
     public static Nfa union(Nfa a, Nfa b){
         NfaConstructor nca = a.getConstructor();
         NfaConstructor ncb = b.getConstructor();
@@ -318,6 +395,7 @@ public class AutomatonFactory {
 
         nc.alphabet.addAll(nca.alphabet);
         nc.alphabet.addAll(ncb.alphabet);
+        nc.alphabet.addEmptyChar();
 
         nc.start = s;
 
@@ -332,6 +410,11 @@ public class AutomatonFactory {
         return nc.getNfa();
     }
 
+    /**
+     * Generates a nfa that accepts x n(>=0) times.
+     * @param x Original Nfa.
+     * @return Nfa that is the star of x.
+     */
     public static Nfa star(Nfa x){
         NfaConstructor ncx = x.getConstructor();
         NfaConstructor nc = new NfaConstructor();
@@ -341,6 +424,7 @@ public class AutomatonFactory {
         nc.states.add(s);
 
         nc.alphabet.addAll(ncx.alphabet);
+        nc.alphabet.addEmptyChar();
 
         nc.start = s;
 
@@ -356,15 +440,15 @@ public class AutomatonFactory {
 
     //private methods
 
-    private static List<Set<State>> powerset(Set<State> ss){
-        List<Set<State>> list = new ArrayList<>();
+    private static Set<Set<State>> powerset(Set<State> ss){
+        Set<Set<State>> list = new HashSet<>();
         list.add(new HashSet<>());
         List<State> toadd = new ArrayList<>(ss);
 
         return powersetIm(list, toadd);
     }
 
-    private static List<Set<State>> powersetIm(List<Set<State>> list, List<State> toadd){
+    private static Set<Set<State>> powersetIm(Set<Set<State>> list, List<State> toadd){
         if(toadd.isEmpty()) return list;
 
         List<Set<State>> added = new ArrayList<>();

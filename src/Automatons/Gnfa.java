@@ -4,7 +4,9 @@ import AutomatonElements.Alphabet;
 import AutomatonElements.Gntf;
 import AutomatonElements.State;
 
+import Factory.AutomatonFactory;
 import Factory.GnfaConstructor;
+import RegularExpressions.RegularExpression;
 
 import java.util.Set;
 
@@ -25,6 +27,10 @@ public class Gnfa {
 
     public GnfaConstructor getConstructor() {
         return new GnfaConstructor(states, alphabet, start, accept, transition);
+    }
+
+    public RegularExpression toRegex(){
+        return AutomatonFactory.gnfaToRegex(this);
     }
 
 }

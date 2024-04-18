@@ -1,4 +1,4 @@
-import AutomatonElements.AutomatonData;
+import Automatons.AutomatonData;
 import Factory.AutomatonFactory;
 import Automatons.Dfa;
 import Factory.Reader;
