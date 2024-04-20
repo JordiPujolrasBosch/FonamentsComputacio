@@ -1,12 +1,10 @@
-import Automatons.AutomatonData;
-import Factory.AutomatonFactory;
-import Automatons.Dfa;
-import Factory.Reader;
+import Exceptions.RegexReaderException;
+
+import java.io.FileNotFoundException;
 
 /*
 * TODO
 * Test all
-* Read regular expression from file
 * Implement CFG
 * Chomsky reduce
 * Pushdown automaton
@@ -16,37 +14,12 @@ import Factory.Reader;
 * */
 
 public class Main {
-    public static void main(String[] args){
-        test2();
+    public static void main(String[] args) throws FileNotFoundException, RegexReaderException {
+        String s = "a     bcd  e";
+        String[] ss = s.split(" ");
+        System.out.println(ss);
     }
 
-    private static void test1(){
-        try {
-            Reader gen = new Reader();
-            String path = "dfa1.txt";
-            AutomatonData data = gen.readAutomatonFile(path);
-            System.out.println(data.check());
-            System.out.println(data.isDeterministic());
-            Dfa dfa = AutomatonFactory.dataToDfa(data);
-            System.out.println(dfa.checkWord("110000"));
-        }
-        catch (Exception ex){
-            System.out.println(ex);
-        }
-    }
 
-    private static void test2(){
-        try {
-            Reader gen = new Reader();
-            String path = "dfa2.txt";
-            AutomatonData data = gen.readAutomatonFile(path);
-            System.out.println(data.check());
-            System.out.println(data.isDeterministic());
-            Dfa dfa = AutomatonFactory.dataToDfa(data);
-            System.out.println(dfa.checkWord(""));
-        }
-        catch (Exception ex){
-            System.out.println(ex);
-        }
-    }
+
 }

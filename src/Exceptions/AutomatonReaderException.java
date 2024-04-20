@@ -1,4 +1,4 @@
-package Factory;
+package Exceptions;
 
 public class AutomatonReaderException extends Exception {
     public AutomatonReaderException(){

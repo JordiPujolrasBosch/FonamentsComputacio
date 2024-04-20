@@ -16,4 +16,8 @@ public class OutputMessages {
     public static String nonequal(String fa, String fb) {
         return "NOT EQUAL " + fa + " " + fb;
     }
+
+    public static String grammarCheck(String filename) {
+        return "Incorrect format for the grammar file " + filename;
+    }
 }

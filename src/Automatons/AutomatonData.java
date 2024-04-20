@@ -3,7 +3,7 @@ package Automatons;
 import AutomatonElements.Alphabet;
 import AutomatonElements.RuleData;
 import Factory.AutomatonFactory;
-import Factory.AutomatonReaderException;
+import Exceptions.AutomatonReaderException;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -83,7 +83,7 @@ public class AutomatonData {
     }
 
     public List<Integer> getFinalStates() {
-        if(finalStatesNumbers.size() == 1 && finalStatesNumbers.getFirst() < 0) return new ArrayList<>();
+        if(finalStatesNumbers.size() == 1 && finalStatesNumbers.get(0) < 0) return new ArrayList<>();
         return finalStatesNumbers;
     }
 
@@ -106,7 +106,7 @@ public class AutomatonData {
         ok = ok && numberStates > 0;
         ok = ok && validState(startStateNumber);
 
-        if(finalStatesNumbers.size() == 1 && finalStatesNumbers.getFirst() < 0) ok = true;
+        if(finalStatesNumbers.size() == 1 && finalStatesNumbers.get(0) < 0) ok = true;
         else{
             Iterator<Integer> it1 = finalStatesNumbers.iterator();
             while (it1.hasNext() && ok) ok = validState(it1.next());

@@ -115,6 +115,9 @@ public class Alphabet {
         comma.add(',');
         mapper.put("comma", comma);
 
+        Set<Character> nothing = new HashSet<>();
+        mapper.put("nothing",nothing);
+
         return mapper;
     }
 }

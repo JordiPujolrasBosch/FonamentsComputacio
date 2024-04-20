@@ -1,6 +1,11 @@
 package Factory;
 
 import Automatons.AutomatonData;
+import ContextFreeGrammars.Cfg;
+import ContextFreeGrammars.GrammarData;
+import Exceptions.AutomatonReaderException;
+import Exceptions.GrammarReaderException;
+import Exceptions.RegexReaderException;
 import RegularExpressions.Builder;
 import RegularExpressions.RegularExpression;
 
@@ -51,6 +56,34 @@ public class Reader {
         List<String> list = new ArrayList<>();
         while(sc.hasNextLine()) list.add(sc.nextLine());
         return list;
+    }
+
+    public static Cfg readGrammarFile(String filename) throws FileNotFoundException, GrammarReaderException {
+        Scanner sc = new Scanner(new File(filename));
+        GrammarData data = new GrammarData(filename);
+
+        try{
+            while(!data.hasBasic()){
+                String x = sc.next();
+                switch (x) {
+                    case "terminals:" -> data.setTerminals(sc.nextLine().replace(" ", "").split(","));
+                    case "variables:" -> data.setVariables(sc.nextLine().replace(" ", "").split(","));
+                    case "start:"     -> data.setStart(sc.next());
+                    default -> throw new Exception();
+                }
+            }
+
+            while(sc.hasNextLine()){
+                data.addRule(sc.nextLine().split(" "));
+            }
+        }
+        catch (Exception ex){
+            throw new GrammarReaderException(OutputMessages.grammarCheck(filename));
+        }
+
+        if(!data.check()) throw new GrammarReaderException(OutputMessages.grammarCheck(filename));
+
+        return data.getCfg();
     }
 
 }

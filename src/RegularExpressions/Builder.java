@@ -1,6 +1,6 @@
 package RegularExpressions;
 
-import Factory.RegexReaderException;
+import Exceptions.RegexReaderException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,17 +92,17 @@ public class Builder {
             for(BuildRegex r : list){
                 if(r.isOpenElement()){
                     BuildRegexList x = new BuildRegexList();
-                    depth.getLast().add(x);
+                    depth.get(depth.size()-1).add(x);
                     depth.add(x);
                     parenthesis++;
                 }
                 else if(r.isCloseElement()){
                     parenthesis--;
                     if(parenthesis < 0) throw new RegexReaderException();
-                    depth.removeLast();
+                    depth.remove(depth.size()-1);
                 }
                 else{
-                    depth.getLast().add(r);
+                    depth.get(depth.size()-1).add(r);
                 }
             }
 
@@ -133,7 +133,7 @@ public class Builder {
                 }
                 i++;
             }
-            if(i==list.size()-1) aux.add(list.getLast().buildStarAndPlus());
+            if(i==list.size()-1) aux.add(list.get(list.size()-1).buildStarAndPlus());
 
             return aux;
         }
@@ -154,7 +154,7 @@ public class Builder {
 
         public RegularExpression getRegex() throws RegexReaderException {
             if(list.size() != 1) throw new RegexReaderException();
-            return list.getFirst().getRegex();
+            return list.get(0).getRegex();
         }
     }
 
@@ -315,9 +315,9 @@ public class Builder {
             if(list.isEmpty()) throw new RegexReaderException();
 
             List<BuildRegex> aux = new ArrayList<>(list);
-            RegularExpression regex = aux.removeLast().getRegex();
+            RegularExpression regex = aux.remove(aux.size()-1).getRegex();
             while(!aux.isEmpty()){
-                regex = new RegexUnion(aux.removeLast().getRegex(), regex);
+                regex = new RegexUnion(aux.remove(aux.size()-1).getRegex(), regex);
             }
             return regex;
         }
@@ -346,9 +346,9 @@ public class Builder {
             if(list.isEmpty()) throw new RegexReaderException();
 
             List<BuildRegex> aux = new ArrayList<>(list);
-            RegularExpression regex = aux.removeLast().getRegex();
+            RegularExpression regex = aux.remove(aux.size()-1).getRegex();
             while(!aux.isEmpty()){
-                regex = new RegexConcat(aux.removeLast().getRegex(), regex);
+                regex = new RegexConcat(aux.remove(aux.size()-1).getRegex(), regex);
             }
             return regex;
         }

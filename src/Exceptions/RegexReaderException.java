@@ -1,4 +1,4 @@
-package Factory;
+package Exceptions;
 
 public class RegexReaderException extends Exception {
     public RegexReaderException(){

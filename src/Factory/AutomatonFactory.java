@@ -2,6 +2,7 @@ package Factory;
 
 import Automatons.*;
 import AutomatonElements.*;
+import Exceptions.AutomatonReaderException;
 import RegularExpressions.*;
 
 import java.util.*;
@@ -30,7 +31,8 @@ public class AutomatonFactory {
 
         nc.states.addAll(array);
 
-        nc.alphabet = data.getAlphabet();
+        nc.alphabet.addAll(data.getAlphabet());
+        nc.alphabet.addEmptyChar();
 
         nc.start = array.get(data.getStart());
 
@@ -123,33 +125,7 @@ public class AutomatonFactory {
      * @return Dfa equivalent to x.
      */
     public static Dfa nfaToDfa(Nfa x){
-        NfaConstructor ncx = x.getConstructor();
-        Set<Set<State>> ps = powerset(ncx.states);
-
-        Map<Set<State>, State> mapper = new HashMap<>();
-        for(Set<State> ss : ps) mapper.put(ss, new State());
-
-        DfaConstructor dc = new DfaConstructor();
-
-        dc.states.addAll(mapper.values());
-
-        dc.alphabet.addAll(ncx.alphabet);
-        dc.alphabet.removeEmptyChar();
-
-        dc.start = mapper.get(x.stateExtended(ncx.start));
-
-        for(Set<State> ss : mapper.keySet()){
-            if(!conjunctionIsEmpty(ss, ncx.finalStates)) dc.finalStates.add(mapper.get(ss));
-        }
-
-        for(Set<State> ss : mapper.keySet()){
-            for(Character c : dc.alphabet.set()){
-                dc.transition.add(mapper.get(ss), mapper.get(destinyOf(x,ss,c)), c);
-            }
-        }
-
-        deleteUnusedStates(dc);
-        return dc.getDfa();
+        return defineDetermine(x, findDeterminingSet(x)).getDfa();
     }
 
     /**
@@ -438,31 +414,7 @@ public class AutomatonFactory {
         return nc.getNfa();
     }
 
-    //private methods
-
-    private static Set<Set<State>> powerset(Set<State> ss){
-        Set<Set<State>> list = new HashSet<>();
-        list.add(new HashSet<>());
-        List<State> toadd = new ArrayList<>(ss);
-
-        return powersetIm(list, toadd);
-    }
-
-    private static Set<Set<State>> powersetIm(Set<Set<State>> list, List<State> toadd){
-        if(toadd.isEmpty()) return list;
-
-        List<Set<State>> added = new ArrayList<>();
-        State act = toadd.removeFirst();
-
-        for (Set<State> ss : list){
-            Set<State> aux = new HashSet<>(ss);
-            aux.add(act);
-            added.add(aux);
-        }
-
-        list.addAll(added);
-        return powersetIm(list, toadd);
-    }
+    //PRIVATE
 
     private static boolean conjunctionIsEmpty(Set<State> a, Set<State> b) {
         boolean found = false;
@@ -473,11 +425,75 @@ public class AutomatonFactory {
         return !found;
     }
 
+    private static RegularExpression regexReductionStep(RegularExpression a, RegularExpression b, RegularExpression c){
+        return new RegexConcat(new RegexConcat(a,new RegexStar(b)),c);
+    }
+
+    //PRIVATE determine
+
+    private static DfaConstructor defineDetermine(Nfa x, Set<Set<State>> dsss){
+        NfaConstructor nc = x.getConstructor();
+        DfaConstructor dc = new DfaConstructor();
+
+        Map<Set<State>, State> mapper = new HashMap<>();
+        for(Set<State> ss : dsss) mapper.put(ss, new State());
+
+        dc.states.addAll(mapper.values());
+
+        dc.alphabet.addAll(nc.alphabet);
+        dc.alphabet.removeEmptyChar();
+
+        dc.start = mapper.get(x.stateExtended(nc.start));
+
+        for(Set<State> ss : dsss){
+            if(!conjunctionIsEmpty(ss, nc.finalStates)) dc.finalStates.add(mapper.get(ss));
+        }
+
+        for(Set<State> ss : dsss){
+            for(Character c : dc.alphabet.set()){
+                dc.transition.add(mapper.get(ss), mapper.get(destinyOf(x,ss,c)), c);
+            }
+        }
+
+        return dc;
+    }
+
     private static Set<State> destinyOf(Nfa x, Set<State> ss, Character c){
         Set<State> res = new HashSet<>();
         for(State s : ss) res.addAll(x.stepWithEmptyChar(s,c));
         return res;
     }
+
+    private static Set<Set<State>> findDeterminingSet(Nfa x){
+        NfaConstructor nc = x.getConstructor();
+        Set<Set<State>> before = new HashSet<>();
+        Set<Set<State>> mid    = new HashSet<>();
+        Set<Set<State>> after  = new HashSet<>();
+
+        mid.add(x.stateExtended(nc.start));
+
+        boolean consolidated = false;
+        while(!consolidated){
+            consolidated = true;
+
+            for(Set<State> ss : mid){
+                if(!after.contains(ss)){
+                    after.add(ss);
+                    for(Character c : nc.alphabet.set()) before.add(destinyOf(x,ss,c));
+                    consolidated = false;
+                }
+            }
+
+            mid.clear();
+            mid.addAll(before);
+            before.clear();
+        }
+
+        return after;
+    }
+
+
+    //PRIVATE minimize
 
     private static void deleteUnusedStates(DfaConstructor dc){
         Set<State> unused = new HashSet<>(dc.states);
@@ -515,10 +531,6 @@ public class AutomatonFactory {
         }
     }
 
-    private static RegularExpression regexReductionStep(RegularExpression a, RegularExpression b, RegularExpression c){
-        return new RegexConcat(new RegexConcat(a,new RegexStar(b)),c);
-    }
-
     private static Set<Set<State>> findPartition(DfaConstructor dc){
         Set<Set<State>> partition = new HashSet<>();
         Set<State> nonFinal = new HashSet<>();
@@ -529,11 +541,43 @@ public class AutomatonFactory {
         partition.add(dc.finalStates);
 
         boolean consolidated = false;
+        Iterator<Set<State>> ita, itb = null;
+        Iterator<Character> itc = null;
+        Set<State> sa, sb, right, left = null;
+        Character c = null;
 
         while(!consolidated){
             consolidated = true;
 
-            for(Set<State> ss : partition){
+            ita = partition.iterator();
+            while(ita.hasNext() && consolidated){
+                sa = ita.next();
+                itb = partition.iterator();
+                while(itb.hasNext() && consolidated){
+                    sb = itb.next();
+                    itc = dc.alphabet.set().iterator();
+                    while(itc.hasNext() && consolidated){
+                        c = itc.next();
+                        right = new HashSet<>();
+                        left = new HashSet<>();
+                        for(State a : sa){
+                            if(sb.contains(dc.transition.step(a,c))) right.add(a);
+                            else left.add(a);
+                        }
+
+                        if(!right.isEmpty() && right.size()!=sa.size()){
+                            consolidated = false;
+                            partition.remove(sa);
+                            partition.add(right);
+                            partition.add(left);
+                        }
+                    }
+                }
+            }
+
+
+
+            /*for(Set<State> ss : partition){
                 for(Set<State> tt : partition){
                     for(Character a : dc.alphabet.set()){
                         Set<State> temp = new HashSet<>();
@@ -551,7 +595,7 @@ public class AutomatonFactory {
                         }
                     }
                 }
-            }
+            }*/
         }
 
         return partition;

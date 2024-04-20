@@ -3,6 +3,8 @@ import Factory.AutomatonFactory;
 import Factory.OutputMessages;
 import Factory.Reader;
 
+import java.util.List;
+
 public class Menu {
 
     /*
@@ -13,7 +15,7 @@ public class Menu {
 
     //COMPARE
 
-    public void equalDfaDfa(String fa, String fb) {
+    public static void equalDfaDfa(String fa, String fb) {
         try {
             Dfa a = Reader.readAutomatonFile(fa).toDfa().minimize();
             Dfa b = Reader.readAutomatonFile(fb).toDfa().minimize();
@@ -25,7 +27,7 @@ public class Menu {
         }
     }
 
-    public void equalDfaNfa(String fa, String fb){
+    public static void equalDfaNfa(String fa, String fb){
         try{
             Dfa a = Reader.readAutomatonFile(fa).toDfa().minimize();
             Dfa b = Reader.readAutomatonFile(fb).toNfa().toDfa().minimize();
@@ -37,7 +39,7 @@ public class Menu {
         }
     }
 
-    public void equalDfaRegex(String fa, String fb){
+    public static void equalDfaRegex(String fa, String fb){
         try{
             Dfa a = Reader.readAutomatonFile(fa).toDfa().minimize();
             Dfa b = Reader.readRegularExpressionFile(fb).getNfa().toDfa().minimize();
@@ -49,7 +51,7 @@ public class Menu {
         }
     }
 
-    public void equalNfaNfa(String fa, String fb){
+    public static void equalNfaNfa(String fa, String fb){
         try{
             Dfa a = Reader.readAutomatonFile(fa).toNfa().toDfa().minimize();
             Dfa b = Reader.readAutomatonFile(fb).toNfa().toDfa().minimize();
@@ -61,7 +63,7 @@ public class Menu {
         }
     }
 
-    public void equalNfaRegex(String fa, String fb){
+    public static void equalNfaRegex(String fa, String fb){
         try{
             Dfa a = Reader.readAutomatonFile(fa).toNfa().toDfa().minimize();
             Dfa b = Reader.readRegularExpressionFile(fb).getNfa().toDfa().minimize();
@@ -73,7 +75,7 @@ public class Menu {
         }
     }
 
-    public void equalRegexRegex(String fa, String fb){
+    public static void equalRegexRegex(String fa, String fb){
         try{
             Dfa a = Reader.readRegularExpressionFile(fa).getNfa().toDfa().minimize();
             Dfa b = Reader.readRegularExpressionFile(fb).getNfa().toDfa().minimize();
@@ -87,7 +89,7 @@ public class Menu {
 
     //DFA transformations
 
-    public void minimizeDfa(String f){
+    public static void minimizeDfa(String f){
         try{
             System.out.println(Reader.readAutomatonFile(f).toDfa().minimize());
         }
@@ -96,7 +98,7 @@ public class Menu {
         }
     }
 
-    public void reverseDfa(String f){
+    public static void reverseDfa(String f){
         try{
             System.out.println(AutomatonFactory.reverse(Reader.readAutomatonFile(f).toDfa()));
         }
@@ -105,7 +107,7 @@ public class Menu {
         }
     }
 
-    public void complementDfa(String f){
+    public static void complementDfa(String f){
         try{
             System.out.println(AutomatonFactory.complement(Reader.readAutomatonFile(f).toDfa()));
         }
@@ -116,7 +118,7 @@ public class Menu {
 
     //TRANSFORM
 
-    public void transformDfaNfa(String f){
+    public static void transformDfaNfa(String f){
         try{
             System.out.println(Reader.readAutomatonFile(f).toDfa().toNfa());
         }
@@ -125,7 +127,7 @@ public class Menu {
         }
     }
 
-    public void transformDfaGnfa(String f){
+    public static void transformDfaGnfa(String f){
         try{
             System.out.println(Reader.readAutomatonFile(f).toDfa().toNfa().toGnfa());
         }
@@ -134,7 +136,7 @@ public class Menu {
         }
     }
 
-    public void transformDfaRegex(String f){
+    public static void transformDfaRegex(String f){
         try{
             System.out.println(Reader.readAutomatonFile(f).toDfa().toNfa().toGnfa().toRegex());
         }
@@ -143,7 +145,7 @@ public class Menu {
         }
     }
 
-    public void transformNfaDfa(String f){
+    public static void transformNfaDfa(String f){
         try{
             System.out.println(Reader.readAutomatonFile(f).toNfa().toDfa());
         }
@@ -152,7 +154,7 @@ public class Menu {
         }
     }
 
-    public void transformNfaGnfa(String f){
+    public static void transformNfaGnfa(String f){
         try{
             System.out.println(Reader.readAutomatonFile(f).toNfa().toGnfa());
         }
@@ -161,7 +163,7 @@ public class Menu {
         }
     }
 
-    public void transformNfaRegex(String f){
+    public static void transformNfaRegex(String f){
         try{
             System.out.println(Reader.readAutomatonFile(f).toNfa().toGnfa().toRegex());
         }
@@ -170,7 +172,7 @@ public class Menu {
         }
     }
 
-    public void transformRegexDfa(String f){
+    public static void transformRegexDfa(String f){
         try{
             System.out.println(Reader.readRegularExpressionFile(f).getNfa().toDfa().minimize());
         }
@@ -179,7 +181,7 @@ public class Menu {
         }
     }
 
-    public void transformRegexNfa(String f){
+    public static void transformRegexNfa(String f){
         try{
             System.out.println(Reader.readRegularExpressionFile(f).getNfa().toDfa().minimize().toNfa());
         }
@@ -190,7 +192,42 @@ public class Menu {
 
     //CHECK WORDS
 
-    public void checkWordDfa(String f, String fw){
+    public static void checkWordsDfa(String f, String fw){
+        try{
+            Dfa dfa = Reader.readAutomatonFile(f).toDfa();
+            List<String> list = Reader.readWordsFile(fw);
+            for(String word : list){
+                if(!dfa.checkWord(word)) System.out.println(word);
+            }
+        }
+        catch (Exception ex){
+            System.out.println(ex);
+        }
+    }
 
+    public static void checkWordsNfa(String f, String fw){
+        try{
+            Dfa dfa = Reader.readAutomatonFile(f).toNfa().toDfa();
+            List<String> list = Reader.readWordsFile(fw);
+            for(String word : list){
+                if(!dfa.checkWord(word)) System.out.println(word);
+            }
+        }
+        catch (Exception ex){
+            System.out.println(ex);
+        }
+    }
+
+    public static void checkWordsRegex(String f, String fw){
+        try{
+            Dfa dfa = Reader.readRegularExpressionFile(f).getNfa().toDfa();
+            List<String> list = Reader.readWordsFile(fw);
+            for(String word : list){
+                if(!dfa.checkWord(word)) System.out.println(word);
+            }
+        }
+        catch (Exception ex){
+            System.out.println(ex);
+        }
     }
 }
