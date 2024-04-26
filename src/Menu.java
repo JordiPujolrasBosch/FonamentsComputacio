@@ -1,21 +1,17 @@
 import Automatons.Dfa;
+import Exceptions.AutomatonReaderException;
 import Factory.AutomatonFactory;
 import Factory.OutputMessages;
 import Factory.Reader;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 public class Menu {
 
-    /*
-    dfa == dfa
-    ====
-    CHECK WORD: dfa, nfa, regex
-    */
-
     //COMPARE
 
-    public static void equalDfaDfa(String fa, String fb) {
+    public static void equalDfaDfa(String fa, String fb) throws FileNotFoundException, AutomatonReaderException {
         try {
             Dfa a = Reader.readAutomatonFile(fa).toDfa().minimize();
             Dfa b = Reader.readAutomatonFile(fb).toDfa().minimize();
@@ -175,6 +171,24 @@ public class Menu {
     public static void transformRegexDfa(String f){
         try{
             System.out.println(Reader.readRegularExpressionFile(f).getNfa().toDfa().minimize());
+        }
+        catch (Exception ex){
+            System.out.println(ex);
+        }
+    }
+
+    public static void transformRegexDfaNotMinim(String f){
+        try{
+            System.out.println(Reader.readRegularExpressionFile(f).getNfa().toDfa());
+        }
+        catch (Exception ex){
+            System.out.println(ex);
+        }
+    }
+
+    public static void transformRegexNfaDirectly(String f){
+        try{
+            System.out.println(Reader.readRegularExpressionFile(f).getNfa());
         }
         catch (Exception ex){
             System.out.println(ex);

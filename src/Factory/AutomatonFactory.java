@@ -492,7 +492,6 @@ public class AutomatonFactory {
         return after;
     }
 
-
     //PRIVATE minimize
 
     private static void deleteUnusedStates(DfaConstructor dc){

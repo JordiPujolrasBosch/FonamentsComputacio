@@ -2,12 +2,12 @@ package Automatons;
 
 import AutomatonElements.Alphabet;
 import AutomatonElements.Ntf;
+import AutomatonElements.Rule;
 import AutomatonElements.State;
 import Factory.AutomatonFactory;
 import Factory.NfaConstructor;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class Nfa {
     private final Set<State> states;
@@ -46,6 +46,45 @@ public class Nfa {
 
     public Gnfa toGnfa(){
         return AutomatonFactory.nfaToGnfa(this);
+    }
+
+    public String toString(){
+        Map<State, Integer> mapper = new HashMap<>();
+        int i = 0;
+        for(State s : states) mapper.put(s, i++);
+
+        String res = "";
+        res = res + "states: " + states.size() + "\n";
+        res = res + "start: " + mapper.get(start) + "\n";
+
+        res = res + "final: ";
+        if(finalStates.isEmpty()) res = res + "-1\n";
+        else {
+            Iterator<State> it = finalStates.iterator();
+            while(it.hasNext()){
+                State act = it.next();
+                if(it.hasNext()) res = res + mapper.get(act) + ", ";
+                else res = res + mapper.get(act) + "\n";
+            }
+        }
+
+        res = res + "alphabet: ";
+        if(alphabet.contains(Alphabet.getEmptyChar())) res = res + "'', ";
+        for(Character c : alphabet.set()){
+            if(c.equals(' ')) res = res + "space, ";
+            else if(c.equals(',')) res = res + "comma, ";
+            else res = res + c + ", ";
+        }
+        res = res + "nothing\n";
+
+        for(Rule r : transition.getRules()){
+            String character = r.character().toString();
+            if(r.character().equals(Alphabet.getEmptyChar())) character = "''";
+            else if(r.character().equals(' ')) character = "space";
+            res = res + mapper.get(r.origin()) + " " + character + " " + mapper.get(r.destiny()) + "\n";
+        }
+
+        return res;
     }
 
 }

@@ -1,7 +1,5 @@
 package ContextFreeGrammars;
 
-import java.util.Objects;
-
 public class CfgVariable {
     private final char c;
     private final int n;
@@ -18,6 +16,11 @@ public class CfgVariable {
             for(int i=1; i < s.length(); i++) isvar = isvar && s.charAt(i) >= '0' && s.charAt(i) <= '9';
         }
         return isvar;
+    }
+
+    public static CfgVariable transform(String s) throws Exception {
+        if(!check(s)) throw new Exception();
+        return new CfgVariable(s.charAt(0), Integer.parseInt(s.substring(1)));
     }
 
     public boolean equals(Object o) {

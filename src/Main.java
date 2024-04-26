@@ -1,3 +1,4 @@
+import Exceptions.AutomatonReaderException;
 import Exceptions.RegexReaderException;
 
 import java.io.FileNotFoundException;
@@ -14,10 +15,8 @@ import java.io.FileNotFoundException;
 * */
 
 public class Main {
-    public static void main(String[] args) throws FileNotFoundException, RegexReaderException {
-        String s = "a     bcd  e";
-        String[] ss = s.split(" ");
-        System.out.println(ss);
+    public static void main(String[] args) throws FileNotFoundException, RegexReaderException, AutomatonReaderException {
+        Menu.equalDfaNfa("Resources/x1_dfa.txt", "Resources/x1_nfa3.txt");
     }
 
 
