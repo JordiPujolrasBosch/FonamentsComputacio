@@ -3,6 +3,9 @@ package Factory;
 import Automatons.*;
 import AutomatonElements.*;
 import Exceptions.AutomatonReaderException;
+import Factory.Constructors.DfaConstructor;
+import Factory.Constructors.GnfaConstructor;
+import Factory.Constructors.NfaConstructor;
 import RegularExpressions.*;
 
 import java.util.*;
@@ -21,6 +24,9 @@ public class AutomatonFactory {
         if(!data.check()){
             throw new AutomatonReaderException(OutputMessages.automatonCheck(data.getFilename()));
         }
+        if(!data.getAlphabet().contains(Alphabet.getEmptyChar())){
+            throw new AutomatonReaderException(OutputMessages.automatonCheck(data.getFilename()));
+        }
 
         List<State> array = new ArrayList<>();
         for(int i = 0; i < data.getNumberStates(); i++) {
@@ -31,8 +37,7 @@ public class AutomatonFactory {
 
         nc.states.addAll(array);
 
-        nc.alphabet.addAll(data.getAlphabet());
-        nc.alphabet.addEmptyChar();
+        nc.alphabet = data.getAlphabet();
 
         nc.start = array.get(data.getStart());
 

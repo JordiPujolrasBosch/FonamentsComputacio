@@ -1,11 +1,12 @@
-package RegularExpressions;
+package Factory;
 
 import Exceptions.RegexReaderException;
+import RegularExpressions.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Builder {
+public class RegexBuilder {
     public static RegularExpression buildRegex(String r) throws RegexReaderException {
         BuildRegexList list = buildTokenList(r);
         BuildRegex build = list.buildParenthesis();

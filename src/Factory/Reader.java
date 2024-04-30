@@ -1,12 +1,7 @@
 package Factory;
 
-import Automatons.AutomatonData;
 import ContextFreeGrammars.Cfg;
-import ContextFreeGrammars.GrammarData;
-import Exceptions.AutomatonReaderException;
-import Exceptions.GrammarReaderException;
-import Exceptions.RegexReaderException;
-import RegularExpressions.Builder;
+import Exceptions.*;
 import RegularExpressions.RegularExpression;
 
 import java.io.File;
@@ -48,7 +43,7 @@ public class Reader {
         Scanner sc = new Scanner(new File(filename));
         StringBuilder r = new StringBuilder();
         while(sc.hasNextLine()) r.append(sc.nextLine());
-        return Builder.buildRegex(r.toString());
+        return RegexBuilder.buildRegex(r.toString());
     }
 
     public static List<String> readWordsFile(String filename) throws FileNotFoundException {

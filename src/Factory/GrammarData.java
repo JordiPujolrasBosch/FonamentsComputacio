@@ -1,6 +1,9 @@
-package ContextFreeGrammars;
+package Factory;
 
 import AutomatonElements.Alphabet;
+import ContextFreeGrammars.Cfg;
+import ContextFreeGrammars.CfgRule;
+import ContextFreeGrammars.CfgVariable;
 
 import java.util.*;
 
@@ -13,21 +16,22 @@ public class GrammarData {
     private Set<CfgVariable> setvar;
     private boolean variablesRead;
 
+    private String startString;
     private CfgVariable start;
     private boolean startRead;
 
-    private final String filename;
     private List<CfgRule> rules;
-    private List<String> rulesString;
+    private List<List<String>> rulesString;
+
+    private final String filename;
 
     public GrammarData(String filename){
         terminalElementsRead = false;
         variablesRead = false;
         startRead = false;
+        rulesString = new ArrayList<>();
 
         this.filename = filename;
-        rules = new ArrayList<>();
-        rulesString = new ArrayList<>();
     }
 
     public boolean hasBasic() {
@@ -44,28 +48,21 @@ public class GrammarData {
         variables = Arrays.asList(vars);
     }
 
-    public void setStart(String s) throws Exception {
+    public void setStart(String s) {
         startRead = true;
-        start = CfgVariable.transform(s);
+        startString = s;
     }
 
     public void addRule(String[] s) {
-        rulesString = new ArrayList<>();
-        for(String x : s) if(!x.isEmpty()) rulesString.add(x);
+        List<String> l = new ArrayList<>();
+        for(String x : s) if(!x.isEmpty()) l.add(x);
+        rulesString.add(l);
     }
 
     public boolean check() {
         boolean ok = hasBasic();
 
-        Iterator<String> it = terminalElements.iterator();
-        while (it.hasNext() && ok) ok = Alphabet.validElement(it.next());
-        alphabet = new Alphabet();
-        if (ok) for(String x : terminalElements) alphabet.addElement(x);
 
-        Iterator<String> it2 = variables.iterator();
-        //while (it2.hasNext() && ok) ok = CfgVariable.validElement(it.next());
-        setvar = new HashSet<>();
-        //if(ok) for(String x : variables) setvar.addAll(CfgVariable.getElements());
 
 
 

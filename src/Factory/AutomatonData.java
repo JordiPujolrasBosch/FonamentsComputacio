@@ -1,8 +1,9 @@
-package Automatons;
+package Factory;
 
 import AutomatonElements.Alphabet;
 import AutomatonElements.RuleData;
-import Factory.AutomatonFactory;
+import Automatons.Dfa;
+import Automatons.Nfa;
 import Exceptions.AutomatonReaderException;
 
 import java.util.Arrays;
@@ -25,7 +26,7 @@ public class AutomatonData {
     private boolean alphabetElementsRead;
 
     private final List<RuleData> transition;
-    private Alphabet alphabet;
+    private final Alphabet alphabet;
     private final String filename;
 
     //Constructor
@@ -65,7 +66,9 @@ public class AutomatonData {
     }
 
     public void addRule(int o, String s, int d) throws Exception {
-        transition.add(new RuleData(o,d,Alphabet.transform(s)));
+        if(s.length() == 1) transition.add(new RuleData(o,d,s.charAt(0)));
+        else if(TokenFactory.btokensContains(s)) transition.add(new RuleData(o,d,TokenFactory.btokensGet(s)));
+        else throw new Exception();
     }
 
     //Getters
@@ -106,25 +109,26 @@ public class AutomatonData {
         ok = ok && numberStates > 0;
         ok = ok && validState(startStateNumber);
 
-        if(finalStatesNumbers.size() == 1 && finalStatesNumbers.get(0) < 0) ok = true;
+        if(ok && finalStatesNumbers.size() == 1 && finalStatesNumbers.get(0) < 0) ok = true;
         else{
             Iterator<Integer> it1 = finalStatesNumbers.iterator();
             while (it1.hasNext() && ok) ok = validState(it1.next());
         }
 
         Iterator<String> it2 = alphabetElements.iterator();
-        while (it2.hasNext() && ok) ok = Alphabet.validElement(it2.next());
-
-        Alphabet alp = new Alphabet();
-        if (ok) for(String x : alphabetElements) alp.addElement(x);
+        while (it2.hasNext() && ok){
+            String s = it2.next();
+            if(s.length() == 1) alphabet.addChar(s.charAt(0));
+            else if(TokenFactory.atokensContains(s)) alphabet.addAll(TokenFactory.atokensGet(s));
+            else ok = false;
+        }
 
         Iterator<RuleData> it3 = transition.iterator();
         while (it3.hasNext() && ok){
             RuleData r = it3.next();
-            ok = validState(r.origin()) && validState(r.destiny()) && alp.contains(r.character());
+            ok = validState(r.origin()) && validState(r.destiny()) && alphabet.contains(r.character());
         }
 
-        if(ok) alphabet = alp;
         return ok;
     }
 
@@ -153,6 +157,8 @@ public class AutomatonData {
     private boolean validState(int x){
         return x >= 0 && x < numberStates;
     }
+
+    //Transformations
 
     public Dfa toDfa() throws AutomatonReaderException {
         return AutomatonFactory.dataToDfa(this);

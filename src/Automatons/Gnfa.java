@@ -5,7 +5,7 @@ import AutomatonElements.Gntf;
 import AutomatonElements.State;
 
 import Factory.AutomatonFactory;
-import Factory.GnfaConstructor;
+import Factory.Constructors.GnfaConstructor;
 import RegularExpressions.RegularExpression;
 
 import java.util.Set;

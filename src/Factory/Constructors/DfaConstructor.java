@@ -1,4 +1,4 @@
-package Factory;
+package Factory.Constructors;
 
 import AutomatonElements.Alphabet;
 import AutomatonElements.Dtf;
