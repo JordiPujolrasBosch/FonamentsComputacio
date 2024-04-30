@@ -2,6 +2,7 @@ package RegularExpressions;
 
 import Factory.AutomatonFactory;
 import Automatons.Nfa;
+import Factory.TokenFactory;
 
 public class RegexVoid implements RegularExpression {
     public RegexVoid(){}
@@ -15,7 +16,7 @@ public class RegexVoid implements RegularExpression {
     }
 
     public String toString() {
-        return "#";
+        return TokenFactory.regexVoidString();
     }
 
     public TypesRegex type() {

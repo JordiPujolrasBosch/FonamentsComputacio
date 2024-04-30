@@ -2,6 +2,7 @@ package RegularExpressions;
 
 import Factory.AutomatonFactory;
 import Automatons.Nfa;
+import Factory.TokenFactory;
 
 public class RegexChar implements RegularExpression {
     private final char c;
@@ -19,9 +20,7 @@ public class RegexChar implements RegularExpression {
     }
 
     public String toString(){
-        boolean eight = (c=='(' || c==')' || c=='|' || c=='*' || c=='+' || c=='#' || c=='\\' || c=='$');
-        if(eight) return "$" + c;
-        if(c==' ') return "$s";
+        if(TokenFactory.rtokensReverseContains(c)) return TokenFactory.rtokensReverseGet(c);
         return String.valueOf(c);
     }
 

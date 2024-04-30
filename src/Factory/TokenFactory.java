@@ -62,6 +62,38 @@ public class TokenFactory {
         return btokensReverse.get(character);
     }
 
+    //Regex
+
+    public static String regexVoidString() {
+        return "#";
+    }
+
+    public static String regexUnionString() {
+        return "|";
+    }
+
+    public static String regexStarString() {
+        return "*";
+    }
+
+    public static String regexEmptyCharString() {
+        return "/";
+    }
+
+    public static boolean rtokensReverseContains(Character c){
+        return rtokensReverse.containsKey(c);
+    }
+
+    public static String rtokensReverseGet(Character c){
+        return rtokensReverse.get(c);
+    }
+
+    //Grammar
+
+    public static String grammarUnionString() {
+        return "|";
+    }
+
     //Build
 
     private static Map<String, Set<Character>> buildATokens(){

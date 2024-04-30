@@ -2,6 +2,7 @@ package RegularExpressions;
 
 import Factory.AutomatonFactory;
 import Automatons.Nfa;
+import Factory.TokenFactory;
 
 public class RegexUnion implements RegularExpression {
     private RegularExpression a;
@@ -28,7 +29,7 @@ public class RegexUnion implements RegularExpression {
     }
 
     public String toString() {
-        return a + "|" + b;
+        return a + TokenFactory.regexUnionString() + b;
     }
 
     public TypesRegex type() {

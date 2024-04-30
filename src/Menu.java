@@ -11,7 +11,7 @@ public class Menu {
 
     //COMPARE
 
-    public static void equalDfaDfa(String fa, String fb) throws FileNotFoundException, AutomatonReaderException {
+    public static void equalDfaDfa(String fa, String fb) {
         try {
             Dfa a = Reader.readAutomatonFile(fa).toDfa().minimize();
             Dfa b = Reader.readAutomatonFile(fb).toDfa().minimize();

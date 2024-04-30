@@ -2,6 +2,7 @@ package RegularExpressions;
 
 import Factory.AutomatonFactory;
 import Automatons.Nfa;
+import Factory.TokenFactory;
 
 public class RegexStar implements RegularExpression {
     private RegularExpression x;
@@ -22,8 +23,10 @@ public class RegexStar implements RegularExpression {
     }
 
     public String toString() {
-        if(x.type() == TypesRegex.CONCAT || x.type() == TypesRegex.STAR || x.type() == TypesRegex.UNION) return "(" + x + ")*";
-        return x + "*";
+        if(x.type() == TypesRegex.CONCAT || x.type() == TypesRegex.STAR || x.type() == TypesRegex.UNION){
+            return "(" + x + ")" + TokenFactory.regexStarString();
+        }
+        return x + TokenFactory.regexStarString();
     }
 
     public TypesRegex type() {

@@ -164,6 +164,104 @@ America
 | Oceania
 ```
 
+## Context free grammars
+
+---
+
+### Format
+
+```
+terminals: [alphabet-tokens]
+variables: [variables-list]
+start: [start-variable]
+[cfg-rules]
+```
+
+### Keywords
+
+#### 1) [alphabet-tokens]
+
+**Description:** List of tokens separated with `,`.
+
+**Conditions:**
+* Each token in the list must be a character or an `[a-token]`.
+
+**Examples:** `$\, 0, 1`, `$0, $c, $\, +, -`, `$a, $A, $s, .`, `$w` ...
+
+#### 2) [variables-list]
+
+**Description:** List of variables separated with `,`.
+
+**Conditions:**
+* Each element of the list must be a `[cfg-variable]` or a `[cfg-var-group]`.
+
+**Examples:** `A0, B0, B1`, `A-F, A2`, `B0-7, C0-9` ...
+
+#### 3) [cfg-variable]
+
+**Description:** A variable (non-terminal) for a context free grammar.
+
+**Format:** `[upper-letter][natural-number]`
+
+**Conditions:**
+* It must not be a space between the letter and the number.
+
+**Examples:** `A0`, `B2`, `C5`, `X0` ...
+
+#### 4) [cfg-var-group]
+
+**Description:** A short way to write many `[cfg-variable]`.
+
+**Option 1:** 
+* **Format:** `[upper-letter-a]-[upper-letter-b]`.
+* **Conditions:** `[upper-letter-a] < [upper-letter-b]`.
+* **Examples:**
+  * `A-D` represents `A0, B0, C0, D0`.
+  * `C-H` represents `C0, D0, E0, F0, G0, H0`.
+
+**Option 2:**
+* **Format:** `[upper-letter][natural-number-a]-[natural-number-b]`.
+* **Conditions:** `[natural-number-a] < [natural-number-b]`.
+* **Examples:**
+  * `A0-5` represents `A0, A1, A2, A3, A4, A5`.
+  * `E4-7` represents `E4, E5, E6, E7`.
+  * `G12-15` represents `G12, G13, G14, G15`.
+
+#### 5) [start-variable]
+
+**Description:** `[cfg-variable]` of the start state.
+
+**Conditions:**
+* `[start-variable]` must be variable included in `[variables-list]`.
+
+**Examples:** `A0`, `C1`, `C3` ...
+
+#### 6) [cfg-rules]
+
+**Description:** List of [grammar-rule]. Each element of the list must be on a different line.
+
+#### 7) [grammar-rule]
+
+**Description:** Rule that describes one (or more) substitutions of the grammar.
+
+**Format:** `[left] -> [right]`
+
+**Elements:**
+* `[left]`: `[cfg-variable]` to substitute.
+* `[right]`: possible substitutions of `[left]`.
+
+**Conditions:**
+* `[left]` must be a variable included in `[variables-list]`.
+* `[right]` is a combination of: 
+  * Characters included in `[alphabet-tokens]`
+  * Variables included in `[variables-list]`
+  * `[g-token]`
+* All the elements in right must be separated with spaces.
+* An empty char (`/`) in `[left]` cannot be concatenated with a variable or character.
+
+**Examples:** `A0 -> A1 A2`, `B0 -> A1 c B3 | / | a b`, 
+`A1 -> a | b | c | d d`,`D11 -> / | A1 A2 A3 | B0 $s`, `N0 -> $0` ...
+
 ## Tokens
 
 ---
@@ -207,3 +305,15 @@ America
 * `$A`: Union of letters: `A|B|C| ... |X|Y|Z`
 
 `$?` is ilegal where `?` is not: `()|*+#/s$0aA`
+
+### List of [g-token]
+* `/`: Empty char
+* `|`: Union
+* `$/`: Character `/`
+* `$|`: Character `|`
+* `$s`: Character space `' '`
+* `$0`: Union of numbers: `0|1|2|3|4|5|6|7|8|9`
+* `$a`: Union of letters: `a|b|c| ... |x|y|z`
+* `$A`: Union of letters: `A|B|C| ... |X|Y|Z`
+
+`$?` is ilegal where `?` is not: `/|s0aA`

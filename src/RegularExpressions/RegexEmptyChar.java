@@ -2,6 +2,7 @@ package RegularExpressions;
 
 import Factory.AutomatonFactory;
 import Automatons.Nfa;
+import Factory.TokenFactory;
 
 public class RegexEmptyChar implements RegularExpression {
     public RegexEmptyChar(){}
@@ -15,7 +16,7 @@ public class RegexEmptyChar implements RegularExpression {
     }
 
     public String toString() {
-        return "\\";
+        return TokenFactory.regexEmptyCharString();
     }
 
     public TypesRegex type() {

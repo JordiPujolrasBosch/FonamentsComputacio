@@ -43,7 +43,7 @@ public class Reader {
         Scanner sc = new Scanner(new File(filename));
         StringBuilder r = new StringBuilder();
         while(sc.hasNextLine()) r.append(sc.nextLine());
-        return RegexBuilder.buildRegex(r.toString());
+        return RegexBuilder.buildRegex(r.toString().replace(" ", ""));
     }
 
     public static List<String> readWordsFile(String filename) throws FileNotFoundException {
@@ -55,7 +55,7 @@ public class Reader {
 
     public static Cfg readGrammarFile(String filename) throws FileNotFoundException, GrammarReaderException {
         Scanner sc = new Scanner(new File(filename));
-        GrammarData data = new GrammarData(filename);
+        GrammarData data = new GrammarData();
 
         try{
             while(!data.hasBasic()){
