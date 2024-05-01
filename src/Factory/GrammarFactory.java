@@ -1,11 +1,14 @@
 package Factory;
 
-import AutomatonElements.Alphabet;
-import AutomatonElements.State;
+import Elements.Alphabet;
+import Elements.Grammars.CfgRule;
+import Elements.Grammars.CfgVariable;
+import Elements.State;
 import Automatons.Pda;
-import ContextFreeGrammars.*;
+import Grammars.*;
 import Factory.Constructors.CfgConstructor;
 import Factory.Constructors.PdaConstructor;
+import Grammars.Right;
 
 import java.util.*;
 

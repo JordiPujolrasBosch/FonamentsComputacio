@@ -1,4 +1,4 @@
-package AutomatonElements;
+package Elements;
 
 public class RuleData {
     private final int origin;

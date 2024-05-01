@@ -1,11 +1,11 @@
 package Factory;
 
+import Elements.Transitions.Gntf;
 import Automatons.*;
-import AutomatonElements.*;
+import Elements.*;
 import Exceptions.AutomatonReaderException;
-import Factory.Constructors.DfaConstructor;
-import Factory.Constructors.GnfaConstructor;
-import Factory.Constructors.NfaConstructor;
+import Factory.Builders.AutomatonData;
+import Factory.Constructors.*;
 import RegularExpressions.*;
 
 import java.util.*;

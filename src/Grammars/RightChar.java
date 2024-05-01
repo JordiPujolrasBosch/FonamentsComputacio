@@ -1,6 +1,6 @@
-package ContextFreeGrammars;
+package Grammars;
 
-import java.util.Objects;
+import Elements.Grammars.CfgVariable;
 
 public class RightChar implements RightNonEmpty {
     private final char c;

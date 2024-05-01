@@ -1,4 +1,4 @@
-package ContextFreeGrammars;
+package Elements.Grammars;
 
 public class CfgVariable {
     private final char c;

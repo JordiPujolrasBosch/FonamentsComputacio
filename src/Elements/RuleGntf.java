@@ -1,4 +1,4 @@
-package AutomatonElements;
+package Elements;
 
 import RegularExpressions.RegularExpression;
 

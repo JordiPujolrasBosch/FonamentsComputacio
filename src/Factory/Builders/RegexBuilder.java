@@ -1,4 +1,4 @@
-package Factory;
+package Factory.Builders;
 
 import Exceptions.RegexReaderException;
 import RegularExpressions.*;

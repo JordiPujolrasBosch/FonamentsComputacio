@@ -1,7 +1,10 @@
 package Factory;
 
-import ContextFreeGrammars.Cfg;
+import Grammars.Cfg;
 import Exceptions.*;
+import Factory.Builders.AutomatonData;
+import Factory.Builders.GrammarData;
+import Factory.Builders.RegexBuilder;
 import RegularExpressions.RegularExpression;
 
 import java.io.File;

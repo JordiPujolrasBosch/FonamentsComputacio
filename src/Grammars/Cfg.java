@@ -1,7 +1,9 @@
-package ContextFreeGrammars;
+package Grammars;
 
-import AutomatonElements.Alphabet;
+import Elements.Alphabet;
 import Automatons.Pda;
+import Elements.Grammars.CfgRule;
+import Elements.Grammars.CfgVariable;
 import Factory.Constructors.CfgConstructor;
 import Factory.GrammarFactory;
 

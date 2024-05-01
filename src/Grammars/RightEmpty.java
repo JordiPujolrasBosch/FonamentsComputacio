@@ -1,4 +1,6 @@
-package ContextFreeGrammars;
+package Grammars;
+
+import Elements.Grammars.CfgVariable;
 
 public class RightEmpty implements Right {
     public RightEmpty(){}

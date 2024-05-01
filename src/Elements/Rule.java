@@ -1,4 +1,4 @@
-package AutomatonElements;
+package Elements;
 
 public class Rule {
     private final State origin;

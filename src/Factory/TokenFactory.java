@@ -1,10 +1,6 @@
 package Factory;
 
-import AutomatonElements.Alphabet;
-import ContextFreeGrammars.Right;
-import ContextFreeGrammars.RightChar;
-import ContextFreeGrammars.RightConcat;
-import ContextFreeGrammars.RightNonEmpty;
+import Elements.Alphabet;
 import RegularExpressions.RegexChar;
 import RegularExpressions.RegexUnion;
 import RegularExpressions.RegularExpression;

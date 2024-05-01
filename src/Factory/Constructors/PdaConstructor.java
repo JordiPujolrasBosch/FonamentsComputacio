@@ -1,10 +1,10 @@
 package Factory.Constructors;
 
-import AutomatonElements.Alphabet;
-import AutomatonElements.Pdtf;
-import AutomatonElements.State;
+import Elements.Alphabet;
+import Elements.Transitions.Pdtf;
+import Elements.State;
 import Automatons.Pda;
-import ContextFreeGrammars.CfgVariable;
+import Elements.Grammars.CfgVariable;
 
 import java.util.HashMap;
 import java.util.HashSet;

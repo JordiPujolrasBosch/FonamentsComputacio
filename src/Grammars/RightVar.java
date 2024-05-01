@@ -1,4 +1,6 @@
-package ContextFreeGrammars;
+package Grammars;
+
+import Elements.Grammars.CfgVariable;
 
 import java.util.Objects;
 

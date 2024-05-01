@@ -1,8 +1,10 @@
-package Factory;
+package Factory.Builders;
 
-import AutomatonElements.Alphabet;
-import AutomatonElements.Rule;
-import ContextFreeGrammars.*;
+import Elements.Alphabet;
+import Grammars.*;
+import Elements.Grammars.CfgRule;
+import Elements.Grammars.CfgVariable;
+import Factory.TokenFactory;
 
 import java.util.*;
 

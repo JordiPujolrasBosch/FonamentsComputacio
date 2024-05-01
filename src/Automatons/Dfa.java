@@ -1,9 +1,8 @@
 package Automatons;
 
-import AutomatonElements.Alphabet;
-import AutomatonElements.Dtf;
-import AutomatonElements.Rule;
-import AutomatonElements.State;
+import Elements.Alphabet;
+import Elements.Transitions.Dtf;
+import Elements.State;
 import Factory.AutomatonFactory;
 import Factory.Constructors.DfaConstructor;
 import Factory.OutputMessages;

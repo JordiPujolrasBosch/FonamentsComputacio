@@ -1,4 +1,8 @@
-package AutomatonElements;
+package Elements.Transitions;
+
+import Elements.Alphabet;
+import Elements.Rule;
+import Elements.State;
 
 import java.util.Map;
 import java.util.HashMap;

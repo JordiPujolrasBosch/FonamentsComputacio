@@ -1,11 +1,10 @@
 package Automatons;
 
-import AutomatonElements.Alphabet;
-import AutomatonElements.Pdtf;
-import AutomatonElements.State;
-import ContextFreeGrammars.CfgVariable;
+import Elements.Alphabet;
+import Elements.Transitions.Pdtf;
+import Elements.State;
+import Elements.Grammars.CfgVariable;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 

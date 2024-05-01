@@ -1,8 +1,8 @@
 package Factory;
 
-import AutomatonElements.Alphabet;
-import AutomatonElements.Rule;
-import AutomatonElements.State;
+import Elements.Alphabet;
+import Elements.Rule;
+import Elements.State;
 
 import java.util.*;
 

@@ -1,5 +1,7 @@
-package AutomatonElements;
+package Elements.Transitions;
 
+import Elements.RuleGntf;
+import Elements.State;
 import RegularExpressions.RegexUnion;
 import RegularExpressions.RegexVoid;
 import RegularExpressions.RegularExpression;

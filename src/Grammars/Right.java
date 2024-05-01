@@ -1,4 +1,6 @@
-package ContextFreeGrammars;
+package Grammars;
+
+import Elements.Grammars.CfgVariable;
 
 public interface Right {
     boolean containsVar(CfgVariable v);

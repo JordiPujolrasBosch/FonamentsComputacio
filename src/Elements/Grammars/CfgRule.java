@@ -1,7 +1,8 @@
-package ContextFreeGrammars;
+package Elements.Grammars;
 
-import java.util.ArrayList;
-import java.util.List;
+import Grammars.Right;
+import Grammars.RightEmpty;
+
 import java.util.Objects;
 
 public class CfgRule {

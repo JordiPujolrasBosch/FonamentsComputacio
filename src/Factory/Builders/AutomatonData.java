@@ -1,10 +1,12 @@
-package Factory;
+package Factory.Builders;
 
-import AutomatonElements.Alphabet;
-import AutomatonElements.RuleData;
+import Elements.Alphabet;
+import Elements.RuleData;
 import Automatons.Dfa;
 import Automatons.Nfa;
 import Exceptions.AutomatonReaderException;
+import Factory.AutomatonFactory;
+import Factory.TokenFactory;
 
 import java.util.Arrays;
 import java.util.Iterator;

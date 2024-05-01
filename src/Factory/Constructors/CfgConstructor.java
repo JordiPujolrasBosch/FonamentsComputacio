@@ -1,9 +1,9 @@
 package Factory.Constructors;
 
-import AutomatonElements.Alphabet;
-import ContextFreeGrammars.Cfg;
-import ContextFreeGrammars.CfgRule;
-import ContextFreeGrammars.CfgVariable;
+import Elements.Alphabet;
+import Grammars.Cfg;
+import Elements.Grammars.CfgRule;
+import Elements.Grammars.CfgVariable;
 
 import java.util.HashMap;
 import java.util.HashSet;
