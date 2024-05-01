@@ -257,7 +257,7 @@ start: [start-variable]
   * Variables included in `[variables-list]`
   * `[g-token]`
 * All the elements in right must be separated with spaces.
-* An empty char (`/`) in `[left]` cannot be concatenated with a variable or character.
+* Cannot be concatenated: `/`, `$a`, `$A`, `$0`.
 
 **Examples:** `A0 -> A1 A2`, `B0 -> A1 c B3 | / | a b`, 
 `A1 -> a | b | c | d d`,`D11 -> / | A1 A2 A3 | B0 $s`, `N0 -> $0` ...

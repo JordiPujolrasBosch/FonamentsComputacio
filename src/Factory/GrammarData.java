@@ -2,10 +2,7 @@ package Factory;
 
 import AutomatonElements.Alphabet;
 import AutomatonElements.Rule;
-import ContextFreeGrammars.Cfg;
-import ContextFreeGrammars.CfgRule;
-import ContextFreeGrammars.CfgVariable;
-import ContextFreeGrammars.Right;
+import ContextFreeGrammars.*;
 
 import java.util.*;
 
@@ -162,18 +159,75 @@ public class GrammarData {
         int i = 0;
         while(ok && i < list.size()){
             String act = list.get(i);
-            //if(/*act is character*/);
-            //if(/*act is variable*/);
-            //if(/*act is gtoken*/);
-            //if(/*act is union*/);
-            //if(/*act is empty char*/);
+            if(act.length()==1){
+                ok = alphabet.contains(act.charAt(0));
+            }
+            else if(isVariable(act)){
+                ok = setvar.contains(toVariable(act));
+            }
+            else if(TokenFactory.gtokenCharContains(act)){
+                ok = alphabet.contains(TokenFactory.gtokenCharGet(act));
+            }
+            else if(TokenFactory.gtokenGroupContains(act)){
+                ok = alphabet.set().containsAll(TokenFactory.gtokenGroupSet(act));
+                if(ok && i == 0 && i == list.size()-1) ok = true;
+                else if(ok && i == 0) ok = list.get(i+1).equals(TokenFactory.getGrammarUnion());
+                else if(ok && i == list.size()-1) ok = list.get(i-1).equals(TokenFactory.getGrammarUnion());
+                else if(ok) ok = list.get(i+1).equals(list.get(i-1)) && list.get(i+1).equals(TokenFactory.getGrammarUnion());
+            }
+            else if(act.equals(TokenFactory.getGrammarUnion())){
+                if(i == 0 || i == list.size()-1) ok = false;
+                else ok = !list.get(i-1).equals(TokenFactory.getGrammarUnion()) && !list.get(i+1).equals(TokenFactory.getGrammarUnion());
+            }
+            else if(act.equals(TokenFactory.getGrammarEmpty())){
+                ok = alphabet.contains(Alphabet.getEmptyChar());
+                if(ok && i == 0 && i == list.size()-1) ok = true;
+                else if(ok && i == 0) ok = list.get(i+1).equals(TokenFactory.getGrammarUnion());
+                else if(ok && i == list.size()-1) ok = list.get(i-1).equals(TokenFactory.getGrammarUnion());
+                else if(ok) ok = list.get(i+1).equals(list.get(i-1)) && list.get(i+1).equals(TokenFactory.getGrammarUnion());
+            }
+            else{
+                ok = false;
+            }
+
             i++;
         }
         return ok;
     }
 
     private List<Right> getListRight(List<String> list) {
-        return null;
+        List<Right> listRight = new ArrayList<>();
+        RightNonEmpty right = null;
+
+        int i = 0;
+        while(i < list.size()){
+            String act = list.get(i);
+            if(act.length()==1){
+                if(right == null) right = new RightChar(act.charAt(0));
+                else right = new RightConcat(right, new RightChar(act.charAt(0)));
+            }
+            else if(isVariable(act)){
+                if(right == null) right = new RightVar(toVariable(act));
+                else right = new RightConcat(right, new RightVar(toVariable(act)));
+            }
+            else if(TokenFactory.gtokenCharContains(act)){
+                if(right == null) right = new RightChar(TokenFactory.gtokenCharGet(act));
+                else right = new RightConcat(right, new RightChar(TokenFactory.gtokenCharGet(act)));
+            }
+            else if(TokenFactory.gtokenGroupContains(act)){
+                for(char c : TokenFactory.gtokenGroupSet(act)) listRight.add(new RightChar(c));
+            }
+            else if(act.equals(TokenFactory.getGrammarEmpty())){
+                listRight.add(new RightEmpty());
+            }
+            else if(act.equals(TokenFactory.getGrammarUnion())){
+                listRight.add(right);
+                right = null;
+            }
+            i++;
+        }
+        if(right != null) listRight.add(right);
+        return listRight;
     }
 
     //Private

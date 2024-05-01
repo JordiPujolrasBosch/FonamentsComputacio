@@ -9,18 +9,12 @@ public class CfgVariable {
         this.n = n;
     }
 
-    public static boolean check(String s){
-        boolean isvar = s.length() >= 2;
-        isvar = isvar && s.charAt(0) >= 'A' && s.charAt(0) <= 'Z';
-        if(isvar){
-            for(int i=1; i < s.length(); i++) isvar = isvar && s.charAt(i) >= '0' && s.charAt(i) <= '9';
-        }
-        return isvar;
+    public char c(){
+        return c;
     }
 
-    public static CfgVariable transform(String s) throws Exception {
-        if(!check(s)) throw new Exception();
-        return new CfgVariable(s.charAt(0), Integer.parseInt(s.substring(1)));
+    public int n(){
+        return n;
     }
 
     public boolean equals(Object o) {

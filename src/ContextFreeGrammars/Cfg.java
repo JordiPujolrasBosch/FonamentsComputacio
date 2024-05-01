@@ -1,6 +1,9 @@
 package ContextFreeGrammars;
 
 import AutomatonElements.Alphabet;
+import Automatons.Pda;
+import Factory.Constructors.CfgConstructor;
+import Factory.GrammarFactory;
 
 import java.util.Set;
 
@@ -15,5 +18,13 @@ public class Cfg {
         this.variables = variables;
         this.start = start;
         this.rules = rules;
+    }
+
+    public CfgConstructor getConstructor(){
+        return new CfgConstructor(terminals, variables, start, rules);
+    }
+
+    public Pda toPda(){
+        return GrammarFactory.cfgToPda(this);
     }
 }

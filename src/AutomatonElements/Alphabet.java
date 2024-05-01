@@ -73,4 +73,8 @@ public class Alphabet {
         return Character.MIN_VALUE;
     }
 
+    public static Character getStackChar(){
+        return Character.MIN_VALUE + 1;
+    }
+
 }

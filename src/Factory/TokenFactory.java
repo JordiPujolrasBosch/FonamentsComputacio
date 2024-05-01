@@ -1,14 +1,15 @@
 package Factory;
 
 import AutomatonElements.Alphabet;
+import ContextFreeGrammars.Right;
+import ContextFreeGrammars.RightChar;
+import ContextFreeGrammars.RightConcat;
+import ContextFreeGrammars.RightNonEmpty;
 import RegularExpressions.RegexChar;
 import RegularExpressions.RegexUnion;
 import RegularExpressions.RegularExpression;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class TokenFactory {
     private final static Map<String, Set<Character>> atokens = buildATokens();
@@ -17,6 +18,8 @@ public class TokenFactory {
     private final static Map<Character, String> btokensReverse = buildBTokensReverse();
     private final static Map<String, RegularExpression> rtokens = buildRTokens();
     private final static Map<Character, String> rtokensReverse = buildRTokensReverse();
+    private final static Map<String, Character> gtokensChar = buildGTokensChar();
+    private final static Map<String, Set<Character>> gtokenGroup = buildGTokensGroup();
 
     //ATokens
 
@@ -90,8 +93,28 @@ public class TokenFactory {
 
     //Grammar
 
-    public static String grammarUnionString() {
+    public static String getGrammarUnion() {
         return "|";
+    }
+
+    public static String getGrammarEmpty() {
+        return "/";
+    }
+
+    public static boolean gtokenCharContains(String act) {
+        return gtokensChar.containsKey(act);
+    }
+
+    public static Character gtokenCharGet(String act) {
+        return gtokensChar.get(act);
+    }
+
+    public static boolean gtokenGroupContains(String act) {
+        return gtokenGroup.containsKey(act);
+    }
+
+    public static Set<Character> gtokenGroupSet(String act) {
+        return gtokenGroup.get(act);
     }
 
     //Build
@@ -220,6 +243,33 @@ public class TokenFactory {
         return mapper;
     }
 
+    private static Map<String, Character> buildGTokensChar(){
+        Map<String, Character> mapper = new HashMap<>();
 
+        mapper.put("$/", '/');
+        mapper.put("$|", '|');
+        mapper.put("$s", ' ');
+
+        return mapper;
+    }
+
+    private static Map<String, Set<Character>> buildGTokensGroup(){
+        Map<String, Set<Character>> mapper = new HashMap<>();
+        Set<Character> set = null;
+
+        set = new HashSet<>();
+        for(char c = 'a'; c <= 'z'; c++) set.add(c);
+        mapper.put("$a", set);
+
+        set = new HashSet<>();
+        for(char c = 'A'; c <= 'Z'; c++) set.add(c);
+        mapper.put("$A", set);
+
+        set = new HashSet<>();
+        for(char c = '0'; c <= '9'; c++) set.add(c);
+        mapper.put("$0", set);
+
+        return mapper;
+    }
 
 }
