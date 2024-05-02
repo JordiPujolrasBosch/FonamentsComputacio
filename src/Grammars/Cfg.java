@@ -29,4 +29,8 @@ public class Cfg {
     public Pda toPda(){
         return GrammarFactory.cfgToPda(this);
     }
+
+    public Cfg toChomsky(){
+        return GrammarFactory.chomsky(this);
+    }
 }

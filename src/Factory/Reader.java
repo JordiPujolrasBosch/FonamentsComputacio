@@ -2,9 +2,7 @@ package Factory;
 
 import Grammars.Cfg;
 import Exceptions.*;
-import Factory.Builders.AutomatonData;
-import Factory.Builders.GrammarData;
-import Factory.Builders.RegexBuilder;
+import Factory.Builders.*;
 import RegularExpressions.RegularExpression;
 
 import java.io.File;
@@ -67,7 +65,7 @@ public class Reader {
                     case "terminals:" -> data.setTerminals(sc.nextLine().replace(" ", "").split(","));
                     case "variables:" -> data.setVariables(sc.nextLine().replace(" ", "").split(","));
                     case "start:"     -> data.setStart(sc.next());
-                    default -> throw new Exception();
+                    default           -> throw new Exception();
                 }
             }
 

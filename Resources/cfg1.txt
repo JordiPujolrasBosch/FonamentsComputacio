@@ -1,0 +1,5 @@
+terminals: a, b, $/
+variables: T0, S0
+start: S0
+S0 -> a T0 b | b
+T0 -> T0 a | /

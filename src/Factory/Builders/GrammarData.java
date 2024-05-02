@@ -126,8 +126,17 @@ public class GrammarData {
     }
 
     private boolean checkStart() {
-        boolean ok = isVariable(startString) && setvar.contains(toVariable(startString));
-        if(ok) start = toVariable(startString);
+        boolean ok = isVariable(startString);
+        if(ok){
+            CfgVariable x;
+            ok = false;
+            Iterator<CfgVariable> it = setvar.iterator();
+            while(it.hasNext() && !ok){
+                x = it.next();
+                ok = x.equals(toVariable(startString));
+                if(ok) start = x;
+            }
+        }
         return ok;
     }
 
@@ -145,12 +154,12 @@ public class GrammarData {
 
         String leftString = list.remove(0);
         String arrow = list.remove(0);
-        boolean ok = isVariable(leftString) && setvar.contains(toVariable(leftString)) && arrow.equals("->");
+        boolean ok = isVariable(leftString) && existVariableInSet(leftString) && arrow.equals("->");
         if(!ok) return false;
 
         if(!correctFormRight(list)) return false;
 
-        CfgVariable left = toVariable(leftString);
+        CfgVariable left = findVariableInSet(leftString);
         List<Right> listRight = getListRight(list);
         for(Right right : listRight) rules.add(new CfgRule(left, right));
         return true;
@@ -161,11 +170,8 @@ public class GrammarData {
         int i = 0;
         while(ok && i < list.size()){
             String act = list.get(i);
-            if(act.length()==1){
-                ok = alphabet.contains(act.charAt(0));
-            }
-            else if(isVariable(act)){
-                ok = setvar.contains(toVariable(act));
+            if(isVariable(act)){
+                ok = existVariableInSet(act);
             }
             else if(TokenFactory.gtokenCharContains(act)){
                 ok = alphabet.contains(TokenFactory.gtokenCharGet(act));
@@ -188,6 +194,9 @@ public class GrammarData {
                 else if(ok && i == list.size()-1) ok = list.get(i-1).equals(TokenFactory.getGrammarUnion());
                 else if(ok) ok = list.get(i+1).equals(list.get(i-1)) && list.get(i+1).equals(TokenFactory.getGrammarUnion());
             }
+            else if(act.length()==1){
+                ok = alphabet.contains(act.charAt(0));
+            }
             else{
                 ok = false;
             }
@@ -204,13 +213,9 @@ public class GrammarData {
         int i = 0;
         while(i < list.size()){
             String act = list.get(i);
-            if(act.length()==1){
-                if(right == null) right = new RightChar(act.charAt(0));
-                else right = new RightConcat(right, new RightChar(act.charAt(0)));
-            }
-            else if(isVariable(act)){
-                if(right == null) right = new RightVar(toVariable(act));
-                else right = new RightConcat(right, new RightVar(toVariable(act)));
+            if(isVariable(act)){
+                if(right == null) right = new RightVar(findVariableInSet(act));
+                else right = new RightConcat(right, new RightVar(findVariableInSet(act)));
             }
             else if(TokenFactory.gtokenCharContains(act)){
                 if(right == null) right = new RightChar(TokenFactory.gtokenCharGet(act));
@@ -226,6 +231,10 @@ public class GrammarData {
                 listRight.add(right);
                 right = null;
             }
+            else if(act.length()==1){
+                if(right == null) right = new RightChar(act.charAt(0));
+                else right = new RightConcat(right, new RightChar(act.charAt(0)));
+            }
             i++;
         }
         if(right != null) listRight.add(right);
@@ -235,7 +244,7 @@ public class GrammarData {
     //Private
 
     private boolean isVariable(String s) {
-        return s.charAt(0) >= 'A' && s.charAt(0) <= 'Z' && isNumber(s.substring(1));
+        return s.length() > 1 && s.charAt(0) >= 'A' && s.charAt(0) <= 'Z' && isNumber(s.substring(1));
     }
 
     private CfgVariable toVariable(String s) {
@@ -279,6 +288,29 @@ public class GrammarData {
             i++;
         }
         return isnumber;
+    }
+
+    private boolean existVariableInSet(String var){
+        CfgVariable x = toVariable(var);
+        boolean found = false;
+        Iterator<CfgVariable> it = setvar.iterator();
+        while(it.hasNext() && !found){
+            found = it.next().equals(x);
+        }
+        return found;
+    }
+
+    private CfgVariable findVariableInSet(String var){
+        CfgVariable x = toVariable(var);
+        CfgVariable res = null;
+        boolean found = false;
+        Iterator<CfgVariable> it = setvar.iterator();
+        while(it.hasNext() && !found){
+            res = it.next();
+            found = res.equals(x);
+        }
+        if(found) return res;
+        else return null;
     }
 
 }

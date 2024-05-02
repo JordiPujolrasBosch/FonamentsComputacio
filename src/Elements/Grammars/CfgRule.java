@@ -32,4 +32,8 @@ public class CfgRule {
         CfgRule cfgRule = (CfgRule) o;
         return Objects.equals(left, cfgRule.left) && Objects.equals(right, cfgRule.right);
     }
+
+    public String toString() {
+        return left.toString() + " -> " + right.toString();
+    }
 }

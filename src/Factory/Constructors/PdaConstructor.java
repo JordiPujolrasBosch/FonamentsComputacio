@@ -44,11 +44,11 @@ public class PdaConstructor {
         if(!mapperVar.containsKey(v)) mapperVar.put(v, generateInt());
     }
 
-    public Integer getMapper(Character c) {
+    public int getMapper(Character c) {
         return mapperChar.get(c);
     }
 
-    public Integer getMapper(CfgVariable v) {
+    public int getMapper(CfgVariable v) {
         return mapperVar.get(v);
     }
 

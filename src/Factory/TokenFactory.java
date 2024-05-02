@@ -17,51 +17,128 @@ public class TokenFactory {
     private final static Map<String, Character> gtokensChar = buildGTokensChar();
     private final static Map<String, Set<Character>> gtokenGroup = buildGTokensGroup();
 
-    //ATokens
+    // A-TOKENS
+
+    /*
+       $/  => EmptyChar
+       $s  => ' '
+       $c  => ','
+       $w  => nothing
+       $a  => a..z
+       $A  => A..Z
+       $0  => 0..9
+    */
+
+    private static Map<String, Set<Character>> buildATokens(){
+        Map<String, Set<Character>> mapper = new HashMap<>();
+        Set<Character> set = null;
+
+        set = new HashSet<>();
+        set.add(Alphabet.getEmptyChar());
+        mapper.put("$/", set);
+
+        set = new HashSet<>();
+        for(char c = 'a'; c <= 'z'; c++) set.add(c);
+        mapper.put("$a", set);
+
+        set = new HashSet<>();
+        for(char c = 'A'; c <= 'Z'; c++) set.add(c);
+        mapper.put("$A", set);
+
+        set = new HashSet<>();
+        for(char c = '0'; c <= '9'; c++) set.add(c);
+        mapper.put("$0", set);
+
+        set = new HashSet<>();
+        set.add(' ');
+        mapper.put("$s", set);
+
+        set = new HashSet<>();
+        set.add(',');
+        mapper.put("$c", set);
+
+        set = new HashSet<>();
+        mapper.put("$w", set);
+
+        return mapper;
+    }
+
+    private static Map<Character, String> buildATokensReverse(){
+        Map<Character, String> mapper = new HashMap<>();
+
+        mapper.put(Alphabet.getEmptyChar(), "$/");
+        mapper.put(' ', "$s");
+        mapper.put(',', "$c");
+
+        return mapper;
+    }
 
     public static boolean atokensContains(String s) {
         return atokens.containsKey(s);
-    }
-
-    public static Set<Character> atokensGet(String s) {
-        return atokens.get(s);
-    }
-
-    public static String atokensGetNothing() {
-        return "$w";
-    }
-
-    //ATokensReverse
-
-    public static String atokensReverseGet(Character c) {
-        return atokensReverse.get(c);
     }
 
     public static boolean atokensReverseContains(Character c) {
         return atokensReverse.containsKey(c);
     }
 
-    //BTokens
+    public static Set<Character> atokensGet(String s) {
+        return atokens.get(s);
+    }
+
+    public static String atokensReverseGet(Character c) {
+        return atokensReverse.get(c);
+    }
+
+    public static String atokensGetNothing() {
+        return "$w";
+    }
+
+    public static String atokensGetEmptyChar() {
+        return "$/";
+    }
+
+    // B-TOKENS
+
+    /*
+       $/  => EmptyChar
+       $s  => ' '
+    */
+
+    private static Map<String, Character> buildBTokens(){
+        Map<String, Character> mapper = new HashMap<>();
+
+        mapper.put("$/", Alphabet.getEmptyChar());
+        mapper.put("$s", ' ');
+
+        return mapper;
+    }
+
+    private static Map<Character, String> buildBTokensReverse(){
+        Map<Character, String> mapper = new HashMap<>();
+
+        mapper.put(Alphabet.getEmptyChar(), "$/");
+        mapper.put(' ', "$s");
+
+        return mapper;
+    }
 
     public static boolean btokensContains(String s) {
         return btokens.containsKey(s);
+    }
+
+    public static boolean btokensReverseContains(Character character) {
+        return btokensReverse.containsKey(character);
     }
 
     public static Character btokensGet(String s) {
         return btokens.get(s);
     }
 
-    //BTokensReverse
-
-    public static boolean btokensReverseContains(Character character) {
-        return btokensReverse.containsKey(character);
-    }
-
     public static String btokensReverseGet(Character character) {
         return btokensReverse.get(character);
     }
 
-    //Regex
+    // REGEX
 
     public static String regexVoidString() {
         return "#";
@@ -115,67 +192,13 @@ public class TokenFactory {
 
     //Build
 
-    private static Map<String, Set<Character>> buildATokens(){
-        Map<String, Set<Character>> mapper = new HashMap<>();
-        Set<Character> set = null;
 
-        set = new HashSet<>();
-        set.add(Alphabet.getEmptyChar());
-        mapper.put("$/", set);
 
-        set = new HashSet<>();
-        for(char c = 'a'; c <= 'z'; c++) set.add(c);
-        mapper.put("$a", set);
 
-        set = new HashSet<>();
-        for(char c = 'A'; c <= 'Z'; c++) set.add(c);
-        mapper.put("$A", set);
 
-        set = new HashSet<>();
-        for(char c = '0'; c <= '9'; c++) set.add(c);
-        mapper.put("$0", set);
 
-        set = new HashSet<>();
-        set.add(' ');
-        mapper.put("$s", set);
 
-        set = new HashSet<>();
-        set.add(',');
-        mapper.put("$c", set);
 
-        set = new HashSet<>();
-        mapper.put("$w", set);
-
-        return mapper;
-    }
-
-    private static Map<Character, String> buildATokensReverse(){
-        Map<Character, String> mapper = new HashMap<>();
-
-        mapper.put(Alphabet.getEmptyChar(), "$/");
-        mapper.put(' ', "$s");
-        mapper.put(',', "$c");
-
-        return mapper;
-    }
-
-    private static Map<String, Character> buildBTokens(){
-        Map<String, Character> mapper = new HashMap<>();
-
-        mapper.put("$/", Alphabet.getEmptyChar());
-        mapper.put("$s", ' ');
-
-        return mapper;
-    }
-
-    private static Map<Character, String> buildBTokensReverse(){
-        Map<Character, String> mapper = new HashMap<>();
-
-        mapper.put(Alphabet.getEmptyChar(), "$/");
-        mapper.put(' ', "$s");
-
-        return mapper;
-    }
 
     private static Map<String, RegularExpression> buildRTokens(){
         Map<String, RegularExpression> mapper = new HashMap<>();

@@ -37,6 +37,10 @@ public class RightChar implements RightNonEmpty {
         return new RightVar(x);
     }
 
+    public String toString() {
+        return Character.toString(c);
+    }
+
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

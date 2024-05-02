@@ -23,4 +23,8 @@ public class CfgVariable {
         CfgVariable that = (CfgVariable) o;
         return c == that.c && n == that.n;
     }
+
+    public String toString() {
+        return Character.toString(c) + n;
+    }
 }

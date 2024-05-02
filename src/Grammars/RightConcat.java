@@ -61,6 +61,10 @@ public class RightConcat implements RightNonEmpty {
         return Objects.equals(a, that.a) && Objects.equals(b, that.b);
     }
 
+    public String toString() {
+        return a.toString() + " " + b.toString();
+    }
+
     public RightNonEmpty getChanged(RightConcat pair, CfgVariable x) {
         if(this.equals(pair)) {
             return new RightVar(x);

@@ -1,24 +1,29 @@
-import Exceptions.AutomatonReaderException;
-import Exceptions.RegexReaderException;
-
-import java.io.FileNotFoundException;
+import Automatons.Pda;
+import Factory.Reader;
+import Grammars.Cfg;
 
 /*
-* TODO
-* Test all
-* Implement CFG
-* Chomsky reduce
-* Pushdown automaton
-* CFL to PDA
-* PDA to CFL
-* Turing Machine ?
-* */
+ * TODO
+ * Test all
+ * */
+
 
 public class Main {
-    public static void main(String[] args) throws FileNotFoundException, RegexReaderException, AutomatonReaderException {
-        Menu.equalDfaNfa("Resources/x1_dfa.txt", "Resources/x1_nfa3.txt");
+    public static void main(String[] args) {
+        try{
+            Pda pda = Reader.readGrammarFile("Resources/cfg1.txt").toPda();
+            pda.checkWord("abbbbbb");
+            pda.checkWord("aaaaaabbbbbb");
+            pda.checkWord("aaabbb");
+            pda.checkWord("b");
+            pda.checkWord("abbbbaa");
+            pda.checkWord("aaaaaaa");
+            pda.checkWord("abb");
+        }
+        catch (Exception ex){
+            System.out.println(ex);
+        }
+
     }
-
-
 
 }

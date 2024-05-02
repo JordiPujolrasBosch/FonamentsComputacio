@@ -1,10 +1,9 @@
 import Automatons.Dfa;
-import Exceptions.AutomatonReaderException;
+import Automatons.Pda;
 import Factory.AutomatonFactory;
 import Factory.OutputMessages;
 import Factory.Reader;
 
-import java.io.FileNotFoundException;
 import java.util.List;
 
 public class Menu {
@@ -123,15 +122,6 @@ public class Menu {
         }
     }
 
-    public static void transformDfaGnfa(String f){
-        try{
-            System.out.println(Reader.readAutomatonFile(f).toDfa().toNfa().toGnfa());
-        }
-        catch (Exception ex){
-            System.out.println(ex);
-        }
-    }
-
     public static void transformDfaRegex(String f){
         try{
             System.out.println(Reader.readAutomatonFile(f).toDfa().toNfa().toGnfa().toRegex());
@@ -150,15 +140,6 @@ public class Menu {
         }
     }
 
-    public static void transformNfaGnfa(String f){
-        try{
-            System.out.println(Reader.readAutomatonFile(f).toNfa().toGnfa());
-        }
-        catch (Exception ex){
-            System.out.println(ex);
-        }
-    }
-
     public static void transformNfaRegex(String f){
         try{
             System.out.println(Reader.readAutomatonFile(f).toNfa().toGnfa().toRegex());
@@ -168,7 +149,7 @@ public class Menu {
         }
     }
 
-    public static void transformRegexDfa(String f){
+    public static void transformRegexDfaMinim(String f){
         try{
             System.out.println(Reader.readRegularExpressionFile(f).getNfa().toDfa().minimize());
         }
@@ -186,7 +167,7 @@ public class Menu {
         }
     }
 
-    public static void transformRegexNfaDirectly(String f){
+    public static void transformRegexNfaNotMinim(String f){
         try{
             System.out.println(Reader.readRegularExpressionFile(f).getNfa());
         }
@@ -195,7 +176,7 @@ public class Menu {
         }
     }
 
-    public static void transformRegexNfa(String f){
+    public static void transformRegexNfaMinim(String f){
         try{
             System.out.println(Reader.readRegularExpressionFile(f).getNfa().toDfa().minimize().toNfa());
         }
@@ -242,6 +223,30 @@ public class Menu {
         }
         catch (Exception ex){
             System.out.println(ex);
+        }
+    }
+
+    public static void checkWordsCfg(String f, String fw){
+        try{
+            Pda pda = Reader.readGrammarFile(f).toPda();
+            List<String> list = Reader.readWordsFile(fw);
+            for(String word : list){
+                if(!pda.checkWord(word)) System.out.println(word);
+            }
+        }
+        catch (Exception ex){
+            System.out.println(ex);
+        }
+    }
+
+    //CFG transformations
+
+    public static void transformChomsky(String f){
+        try{
+            System.out.println(Reader.readGrammarFile(f).toChomsky());
+        }
+        catch (Exception ex){
+            System.out.println(ex.toString());
         }
     }
 }

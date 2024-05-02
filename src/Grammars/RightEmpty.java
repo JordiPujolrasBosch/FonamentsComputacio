@@ -1,6 +1,7 @@
 package Grammars;
 
 import Elements.Grammars.CfgVariable;
+import Factory.TokenFactory;
 
 public class RightEmpty implements Right {
     public RightEmpty(){}
@@ -35,6 +36,10 @@ public class RightEmpty implements Right {
 
     public Right getChanged(char c, CfgVariable x) {
         return this;
+    }
+
+    public String toString() {
+        return TokenFactory.getGrammarEmpty();
     }
 
     public Right toRight()                 {return this;}
