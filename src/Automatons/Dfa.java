@@ -4,7 +4,6 @@ import Elements.Alphabet;
 import Elements.Transitions.Dtf;
 import Elements.State;
 import Factory.Algorithms;
-import Factory.AutomatonFactory;
 import Factory.Constructors.DfaConstructor;
 import Factory.Printer;
 
@@ -30,18 +29,7 @@ public class Dfa {
     }
 
     public boolean checkWord(String word){
-        boolean in = true;
-        State act = start;
-        int i = 0;
-
-        while(i < word.length() && in){
-            char c = word.charAt(i);
-            in = alphabet.contains(c);
-            if(in) act = transition.step(act,c);
-            i++;
-        }
-
-        return in && finalStates.contains(act);
+        return Algorithms.checkWordDfa(this, word);
     }
 
     public boolean equal(Dfa b){
@@ -49,13 +37,14 @@ public class Dfa {
     }
 
     public Nfa toNfa(){
-        return AutomatonFactory.dfaToNfa(this);
+        return Algorithms.dfaToNfa(this);
     }
 
     public Dfa minimize(){
-        return AutomatonFactory.minimize(this);
+        return Algorithms.minimize(this);
     }
 
+    @Override
     public String toString(){
         return Printer.stringOfDfa(this);
     }

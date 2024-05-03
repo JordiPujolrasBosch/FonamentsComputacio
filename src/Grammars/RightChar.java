@@ -37,6 +37,7 @@ public class RightChar implements RightNonEmpty {
         return new RightVar(x);
     }
 
+    @Override
     public String toString() {
         return Character.toString(c);
     }

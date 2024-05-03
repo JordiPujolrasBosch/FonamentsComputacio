@@ -1,2 +1,0 @@
-dfa1.txt: automaton page 9
-dfa2.txt: only accept even numbers of 0 and even numbers of 1

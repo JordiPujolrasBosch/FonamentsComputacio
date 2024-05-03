@@ -15,8 +15,8 @@ public class Alphabet {
 
     //Add and remove
 
-    public void addChar(Character c) {
-        if(getEmptyChar().equals(c)) hasEmptyChar = true;
+    public void addChar(char c) {
+        if(getEmptyChar() == c) hasEmptyChar = true;
         else set.add(c);
     }
 
@@ -26,7 +26,7 @@ public class Alphabet {
     }
 
     public void addAll(Set<Character> s) {
-        for(Character c : s) addChar(c);
+        for(char c : s) addChar(c);
     }
 
     public void addEmptyChar() {
@@ -39,9 +39,13 @@ public class Alphabet {
 
     //Consult
 
-    public boolean contains(Character c) {
-        if(getEmptyChar().equals(c)) return hasEmptyChar;
+    public boolean contains(char c) {
+        if(getEmptyChar() == c) return hasEmptyChar;
         else return set.contains(c);
+    }
+
+    public boolean containsEmptyChar(){
+        return hasEmptyChar;
     }
 
     public int size() {
@@ -49,32 +53,34 @@ public class Alphabet {
         else return set.size();
     }
 
-    public boolean equal(Alphabet b) {
-        boolean eq = set.size() == b.set.size();
-        eq = eq && ((hasEmptyChar && b.hasEmptyChar) || (!hasEmptyChar && !b.hasEmptyChar));
-
-        Iterator<Character> it = set.iterator();
-        while (eq && it.hasNext()){
-            eq = b.set.contains(it.next());
-        }
-
-        return eq;
-    }
-
     //Getter set
 
-    public Set<Character> set(){
+    public Set<Character> getSet(){
         return set;
     }
 
-    //Empty char
+    //Empty char and stack char
 
-    public static Character getEmptyChar() {
+    public static char getEmptyChar() {
         return Character.MIN_VALUE;
     }
 
-    public static Character getStackChar(){
+    public static char getStackChar(){
         return Character.MIN_VALUE + 1;
     }
 
+    //Equals
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Alphabet alphabet = (Alphabet) o;
+        return hasEmptyChar == alphabet.hasEmptyChar && Objects.equals(set, alphabet.set);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(set, hasEmptyChar);
+    }
 }

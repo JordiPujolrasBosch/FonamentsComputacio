@@ -24,14 +24,14 @@ public class Ntf {
 
     //Add
 
-    public void add(State origin, State destiny, Character character) {
+    public void add(State origin, State destiny, char character) {
         if(!rules.containsKey(origin)) rules.put(origin, new HashMap<>());
         if(!rules.get(origin).containsKey(character)) rules.get(origin).put(character, new HashSet<>());
         rules.get(origin).get(character).add(destiny);
     }
 
     public void addRules(List<Rule> l){
-        for(Rule r : l) add(r.origin(), r.destiny(), r.character());
+        for(Rule r : l) add(r.getOrigin(), r.getDestiny(), r.getCharacter());
     }
 
     //Get rules
@@ -39,7 +39,7 @@ public class Ntf {
     public List<Rule> getRules(){
         List<Rule> l = new ArrayList<>();
         for(State o : rules.keySet()){
-            for(Character c : rules.get(o).keySet()){
+            for(char c : rules.get(o).keySet()){
                 for(State d : rules.get(o).get(c)){
                     l.add(new Rule(o,d,c));
                 }
@@ -50,7 +50,7 @@ public class Ntf {
 
     //Step
 
-    public Set<State> step(State o, Character c) {
+    public Set<State> step(State o, char c) {
         if(!rules.containsKey(o)) return new HashSet<>();
         if(!rules.get(o).containsKey(c)) return new HashSet<>();
         return rules.get(o).get(c);

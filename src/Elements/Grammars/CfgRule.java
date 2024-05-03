@@ -1,7 +1,6 @@
 package Elements.Grammars;
 
 import Grammars.Right;
-import Grammars.RightEmpty;
 
 import java.util.Objects;
 
@@ -14,18 +13,24 @@ public class CfgRule {
         right = r;
     }
 
-    public CfgVariable left(){
+    //Getters
+
+    public CfgVariable getLeft(){
         return left;
     }
 
-    public Right right() {
+    public Right getRight() {
         return right;
     }
 
-    public boolean isEmptyRule() {
-        return right.equals(new RightEmpty());
+    //String and equals
+
+    @Override
+    public String toString() {
+        return left.toString() + " -> " + right.toString();
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -33,7 +38,8 @@ public class CfgRule {
         return Objects.equals(left, cfgRule.left) && Objects.equals(right, cfgRule.right);
     }
 
-    public String toString() {
-        return left.toString() + " -> " + right.toString();
+    @Override
+    public int hashCode() {
+        return Objects.hash(left, right);
     }
 }

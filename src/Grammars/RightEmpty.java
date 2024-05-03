@@ -38,6 +38,7 @@ public class RightEmpty implements Right {
         return this;
     }
 
+    @Override
     public String toString() {
         return TokenFactory.getGrammarEmpty();
     }

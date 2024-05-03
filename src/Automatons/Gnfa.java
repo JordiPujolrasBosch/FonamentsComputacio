@@ -4,7 +4,7 @@ import Elements.Alphabet;
 import Elements.Transitions.Gntf;
 import Elements.State;
 
-import Factory.AutomatonFactory;
+import Factory.Algorithms;
 import Factory.Constructors.GnfaConstructor;
 import RegularExpressions.RegularExpression;
 
@@ -30,7 +30,7 @@ public class Gnfa {
     }
 
     public RegularExpression toRegex(){
-        return AutomatonFactory.gnfaToRegex(this);
+        return Algorithms.gnfaToRegex(this);
     }
 
 }

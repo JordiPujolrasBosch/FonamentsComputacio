@@ -50,6 +50,7 @@ public class RightVar implements RightNonEmpty {
         return Objects.equals(v, rightVar.v);
     }
 
+    @Override
     public String toString() {
         return v.toString();
     }

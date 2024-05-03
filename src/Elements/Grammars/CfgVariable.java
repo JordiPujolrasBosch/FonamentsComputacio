@@ -1,5 +1,7 @@
 package Elements.Grammars;
 
+import java.util.Objects;
+
 public class CfgVariable {
     private final char c;
     private final int n;
@@ -9,14 +11,24 @@ public class CfgVariable {
         this.n = n;
     }
 
-    public char c(){
+    //Getters
+
+    public char getC(){
         return c;
     }
 
-    public int n(){
+    public int getN(){
         return n;
     }
 
+    //String and equals
+
+    @Override
+    public String toString() {
+        return Character.toString(c) + n;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -24,7 +36,8 @@ public class CfgVariable {
         return c == that.c && n == that.n;
     }
 
-    public String toString() {
-        return Character.toString(c) + n;
+    @Override
+    public int hashCode() {
+        return Objects.hash(c, n);
     }
 }

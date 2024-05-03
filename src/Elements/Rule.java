@@ -1,13 +1,13 @@
 package Elements;
 
+import java.util.Objects;
+
 public class Rule {
     private final State origin;
     private final State destiny;
-    private final Character character;
+    private final char character;
 
-    //Constructor
-
-    public Rule(State o, State d, Character c){
+    public Rule(State o, State d, char c){
         origin = o;
         destiny = d;
         character = c;
@@ -15,15 +15,30 @@ public class Rule {
 
     //Getters
 
-    public State origin(){
+    public State getOrigin(){
         return origin;
     }
 
-    public State destiny(){
+    public State getDestiny(){
         return destiny;
     }
 
-    public Character character(){
+    public char getCharacter(){
         return character;
+    }
+
+    //Equals
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Rule rule = (Rule) o;
+        return character == rule.character && Objects.equals(origin, rule.origin) && Objects.equals(destiny, rule.destiny);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(origin, destiny, character);
     }
 }

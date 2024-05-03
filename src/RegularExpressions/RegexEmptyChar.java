@@ -1,6 +1,6 @@
 package RegularExpressions;
 
-import Factory.AutomatonFactory;
+import Factory.Algorithms;
 import Automatons.Nfa;
 import Factory.TokenFactory;
 
@@ -8,13 +8,14 @@ public class RegexEmptyChar implements RegularExpression {
     public RegexEmptyChar(){}
 
     public Nfa getNfa(){
-        return AutomatonFactory.regexEmptyCharToNfa();
+        return Algorithms.regexEmptyCharToNfa();
     }
 
     public RegularExpression simplify() {
         return this;
     }
 
+    @Override
     public String toString() {
         return TokenFactory.regexEmptyCharString();
     }

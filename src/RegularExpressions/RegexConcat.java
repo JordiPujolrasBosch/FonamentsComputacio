@@ -1,6 +1,6 @@
 package RegularExpressions;
 
-import Factory.AutomatonFactory;
+import Factory.Algorithms;
 import Automatons.Nfa;
 
 public class RegexConcat implements RegularExpression {
@@ -13,7 +13,7 @@ public class RegexConcat implements RegularExpression {
     }
 
     public Nfa getNfa() {
-        return AutomatonFactory.concatenation(a.getNfa(), b.getNfa());
+        return Algorithms.concatenation(a.getNfa(), b.getNfa());
     }
 
     public RegularExpression simplify() {
@@ -28,6 +28,7 @@ public class RegexConcat implements RegularExpression {
         return this;
     }
 
+    @Override
     public String toString() {
         if(a.type() == b.type() && a.type() == TypesRegex.UNION) return "(" + a + ")(" + b + ")";
         if(a.type() == TypesRegex.UNION) return "(" + a + ")" + b;

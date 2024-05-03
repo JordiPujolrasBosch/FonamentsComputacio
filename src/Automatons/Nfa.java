@@ -3,9 +3,9 @@ package Automatons;
 import Elements.Alphabet;
 import Elements.Transitions.Ntf;
 import Elements.State;
-import Factory.AutomatonFactory;
+import Factory.Algorithms;
 import Factory.Constructors.NfaConstructor;
-import Factory.OutputMessages;
+import Factory.Printer;
 
 import java.util.*;
 
@@ -28,28 +28,17 @@ public class Nfa {
         return new NfaConstructor(states, alphabet, start, finalStates, transition);
     }
 
-    //Step
-
-    public Set<State> stepWithEmptyChar(State o, Character c){
-        Set<State> res = new HashSet<>();
-        for(State s : transition.step(o,c)) res.addAll(transition.stateExtended(s));
-        return res;
-    }
-
-    public Set<State> stateExtended(State x) {
-        return transition.stateExtended(x);
-    }
-
     public Dfa toDfa(){
-        return AutomatonFactory.nfaToDfa(this);
+        return Algorithms.nfaToDfa(this);
     }
 
     public Gnfa toGnfa(){
-        return AutomatonFactory.nfaToGnfa(this);
+        return Algorithms.nfaToGnfa(this);
     }
 
+    @Override
     public String toString(){
-        return OutputMessages.automatonToString(states, alphabet, start, finalStates, transition.getRules());
+        return Printer.stringOfNfa(this);
     }
 
 }

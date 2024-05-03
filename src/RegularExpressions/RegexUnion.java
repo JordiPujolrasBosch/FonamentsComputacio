@@ -1,6 +1,6 @@
 package RegularExpressions;
 
-import Factory.AutomatonFactory;
+import Factory.Algorithms;
 import Automatons.Nfa;
 import Factory.TokenFactory;
 
@@ -14,7 +14,7 @@ public class RegexUnion implements RegularExpression {
     }
 
     public Nfa getNfa(){
-        return AutomatonFactory.union(a.getNfa(),b.getNfa());
+        return Algorithms.union(a.getNfa(),b.getNfa());
     }
 
     public RegularExpression simplify() {
@@ -28,6 +28,7 @@ public class RegexUnion implements RegularExpression {
         return this;
     }
 
+    @Override
     public String toString() {
         return a + TokenFactory.regexUnionString() + b;
     }

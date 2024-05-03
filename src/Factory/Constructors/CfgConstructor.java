@@ -41,20 +41,20 @@ public class CfgConstructor {
 
         generator = new HashMap<>();
         for(CfgVariable var : variables){
-            if(!generator.containsKey(var.c())) generator.put(var.c(), var.n());
-            else if(var.n() > generator.get(var.c())) generator.put(var.c(), var.n());
+            if(!generator.containsKey(var.getC())) generator.put(var.getC(), var.getN());
+            else if(var.getN() > generator.get(var.getC())) generator.put(var.getC(), var.getN());
         }
     }
 
     public CfgVariable generate(CfgVariable v){
-        if(!generator.containsKey(v.c())) {
-            generator.put(v.c(), v.n());
+        if(!generator.containsKey(v.getC())) {
+            generator.put(v.getC(), v.getN());
             variables.add(v);
             return v;
         }
-        CfgVariable ret = new CfgVariable(v.c(), generator.get(v.c())+1);
+        CfgVariable ret = new CfgVariable(v.getC(), generator.get(v.getC())+1);
         variables.add(ret);
-        generator.put(ret.c(), ret.n());
+        generator.put(ret.getC(), ret.getN());
         return ret;
     }
 

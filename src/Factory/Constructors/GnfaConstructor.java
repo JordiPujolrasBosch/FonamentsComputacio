@@ -38,7 +38,7 @@ public class GnfaConstructor {
         this.transition.addRules(transition.getRules());
     }
 
-    public Gnfa toGnfa(){
+    public Gnfa getGnfa(){
         return new Gnfa(states, alphabet, start, accept, transition);
     }
 }

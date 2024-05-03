@@ -1,6 +1,6 @@
 package RegularExpressions;
 
-import Factory.AutomatonFactory;
+import Factory.Algorithms;
 import Automatons.Nfa;
 import Factory.TokenFactory;
 
@@ -8,13 +8,14 @@ public class RegexVoid implements RegularExpression {
     public RegexVoid(){}
 
     public Nfa getNfa() {
-        return AutomatonFactory.regexVoidToNfa();
+        return Algorithms.regexVoidToNfa();
     }
 
     public RegularExpression simplify() {
         return this;
     }
 
+    @Override
     public String toString() {
         return TokenFactory.regexVoidString();
     }

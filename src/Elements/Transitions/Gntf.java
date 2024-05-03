@@ -48,7 +48,7 @@ public class Gntf {
     }
 
     public void addRules(List<RuleGntf> l){
-        for(RuleGntf r : l) addReplace(r.origin(), r.destiny(), r.regex());
+        for(RuleGntf r : l) addReplace(r.getOrigin(), r.getDestiny(), r.getRegex());
     }
 
     public void removeState(State act) {

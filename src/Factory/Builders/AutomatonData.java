@@ -1,11 +1,10 @@
 package Factory.Builders;
 
 import Elements.Alphabet;
-import Elements.RuleData;
 import Automatons.Dfa;
 import Automatons.Nfa;
 import Exceptions.AutomatonReaderException;
-import Factory.AutomatonFactory;
+import Factory.Algorithms;
 import Factory.TokenFactory;
 
 import java.util.Arrays;
@@ -128,21 +127,21 @@ public class AutomatonData {
         Iterator<RuleData> it3 = transition.iterator();
         while (it3.hasNext() && ok){
             RuleData r = it3.next();
-            ok = validState(r.origin()) && validState(r.destiny()) && alphabet.contains(r.character());
+            ok = validState(r.getOrigin()) && validState(r.getDestiny()) && alphabet.contains(r.getCharacter());
         }
 
         return ok;
     }
 
     public boolean isDeterministic(){
-        boolean det = ! alphabet.contains(Alphabet.getEmptyChar());
+        boolean det = ! alphabet.containsEmptyChar();
 
         if(det){
             int i = 0;
             while (i<numberStates-1 && det){
                 int j = i+1;
                 while (j<numberStates && det){
-                    det = !(transition.get(i).origin() == transition.get(j).origin() && transition.get(i).character() == transition.get(j).character());
+                    det = !(transition.get(i).getOrigin() == transition.get(j).getOrigin() && transition.get(i).getCharacter() == transition.get(j).getCharacter());
                     j++;
                 }
                 i++;
@@ -163,10 +162,10 @@ public class AutomatonData {
     //Transformations
 
     public Dfa toDfa() throws AutomatonReaderException {
-        return AutomatonFactory.dataToDfa(this);
+        return Algorithms.dataToDfa(this);
     }
 
     public Nfa toNfa() throws AutomatonReaderException {
-        return AutomatonFactory.dataToNfa(this);
+        return Algorithms.dataToNfa(this);
     }
 }

@@ -21,8 +21,8 @@ public class GrammarData {
     private String startString;
     private CfgVariable start;
 
-    private List<List<String>> rulesString;
-    private List<CfgRule> rules;
+    private final List<List<String>> rulesString;
+    private final List<CfgRule> rules;
 
     public GrammarData(){
         terminalElementsRead = false;
@@ -177,7 +177,7 @@ public class GrammarData {
                 ok = alphabet.contains(TokenFactory.gtokenCharGet(act));
             }
             else if(TokenFactory.gtokenGroupContains(act)){
-                ok = alphabet.set().containsAll(TokenFactory.gtokenGroupSet(act));
+                ok = alphabet.getSet().containsAll(TokenFactory.gtokenGroupSet(act));
                 if(ok && i == 0 && i == list.size()-1) ok = true;
                 else if(ok && i == 0) ok = list.get(i+1).equals(TokenFactory.getGrammarUnion());
                 else if(ok && i == list.size()-1) ok = list.get(i-1).equals(TokenFactory.getGrammarUnion());
@@ -188,7 +188,7 @@ public class GrammarData {
                 else ok = !list.get(i-1).equals(TokenFactory.getGrammarUnion()) && !list.get(i+1).equals(TokenFactory.getGrammarUnion());
             }
             else if(act.equals(TokenFactory.getGrammarEmpty())){
-                ok = alphabet.contains(Alphabet.getEmptyChar());
+                ok = alphabet.containsEmptyChar();
                 if(ok && i == 0 && i == list.size()-1) ok = true;
                 else if(ok && i == 0) ok = list.get(i+1).equals(TokenFactory.getGrammarUnion());
                 else if(ok && i == list.size()-1) ok = list.get(i-1).equals(TokenFactory.getGrammarUnion());

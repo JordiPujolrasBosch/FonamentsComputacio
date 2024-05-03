@@ -1,6 +1,6 @@
 import Automatons.Dfa;
 import Automatons.Pda;
-import Factory.AutomatonFactory;
+import Factory.Algorithms;
 import Factory.OutputMessages;
 import Factory.Reader;
 
@@ -95,7 +95,7 @@ public class Menu {
 
     public static void reverseDfa(String f){
         try{
-            System.out.println(AutomatonFactory.reverse(Reader.readAutomatonFile(f).toDfa()));
+            System.out.println(Algorithms.reverse(Reader.readAutomatonFile(f).toDfa()));
         }
         catch (Exception ex){
             System.out.println(ex);
@@ -104,7 +104,7 @@ public class Menu {
 
     public static void complementDfa(String f){
         try{
-            System.out.println(AutomatonFactory.complement(Reader.readAutomatonFile(f).toDfa()));
+            System.out.println(Algorithms.complement(Reader.readAutomatonFile(f).toDfa()));
         }
         catch (Exception ex){
             System.out.println(ex);

@@ -1,6 +1,6 @@
 package RegularExpressions;
 
-import Factory.AutomatonFactory;
+import Factory.Algorithms;
 import Automatons.Nfa;
 import Factory.TokenFactory;
 
@@ -12,7 +12,7 @@ public class RegexStar implements RegularExpression {
     }
 
     public Nfa getNfa(){
-        return AutomatonFactory.star(x.getNfa());
+        return Algorithms.star(x.getNfa());
     }
 
     public RegularExpression simplify() {
@@ -22,6 +22,7 @@ public class RegexStar implements RegularExpression {
         return this;
     }
 
+    @Override
     public String toString() {
         if(x.type() == TypesRegex.CONCAT || x.type() == TypesRegex.STAR || x.type() == TypesRegex.UNION){
             return "(" + x + ")" + TokenFactory.regexStarString();

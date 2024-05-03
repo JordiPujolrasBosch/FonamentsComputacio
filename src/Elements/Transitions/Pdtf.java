@@ -2,7 +2,11 @@ package Elements.Transitions;
 
 import Elements.State;
 
-import java.util.*;
+import java.util.Set;
+import java.util.Map;
+import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Objects;
 
 public class Pdtf {
     private final Map<PdtfInput, Set<PdtfOutput>> rules;
@@ -81,11 +85,17 @@ public class Pdtf {
             push = s;
         }
 
+        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             PdtfOutput that = (PdtfOutput) o;
-            return push == that.push && that.destiny.equals(destiny);
+            return push == that.push && Objects.equals(destiny, that.destiny);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(destiny, push);
         }
     }
 }

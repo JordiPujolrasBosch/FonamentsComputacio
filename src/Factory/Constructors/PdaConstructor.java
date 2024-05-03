@@ -5,6 +5,7 @@ import Elements.Transitions.Pdtf;
 import Elements.State;
 import Automatons.Pda;
 import Elements.Grammars.CfgVariable;
+import Factory.Algorithms;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,7 +19,7 @@ public class PdaConstructor {
     public Set<State> finalStates;
     public Pdtf transition;
 
-    private final Map<Character, Integer> mapperChar;
+    public final Map<Character, Integer> mapperChar;
     private final Map<CfgVariable, Integer> mapperVar;
 
     public PdaConstructor(){
@@ -32,11 +33,22 @@ public class PdaConstructor {
         mapperVar = new HashMap<>();
     }
 
+    public PdaConstructor(Set<State> states, Alphabet alphabet, State start, Set<State> finalStates, Pdtf transition,
+                          Map<Character,Integer> mapperChar, Map<CfgVariable,Integer> mapperVar){
+        this.states = states;
+        this.alphabet = alphabet;
+        this.start = start;
+        this.finalStates = finalStates;
+        this.transition = transition;
+        this.mapperChar = mapperChar;
+        this.mapperVar = mapperVar;
+    }
+
     private int generateInt(){
         return mapperVar.size() + mapperChar.size();
     }
 
-    public void addMapper(Character c) {
+    public void addMapper(char c) {
         if(!mapperChar.containsKey(c)) mapperChar.put(c, generateInt());
     }
 
@@ -44,7 +56,7 @@ public class PdaConstructor {
         if(!mapperVar.containsKey(v)) mapperVar.put(v, generateInt());
     }
 
-    public int getMapper(Character c) {
+    public int getMapper(char c) {
         return mapperChar.get(c);
     }
 

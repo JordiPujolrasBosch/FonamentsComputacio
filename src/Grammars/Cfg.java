@@ -2,10 +2,10 @@ package Grammars;
 
 import Elements.Alphabet;
 import Automatons.Pda;
-import Elements.Grammars.CfgRule;
-import Elements.Grammars.CfgVariable;
+import Elements.Grammars.*;
+import Factory.Algorithms;
 import Factory.Constructors.CfgConstructor;
-import Factory.GrammarFactory;
+import Factory.Printer;
 
 import java.util.Set;
 
@@ -27,10 +27,15 @@ public class Cfg {
     }
 
     public Pda toPda(){
-        return GrammarFactory.cfgToPda(this);
+        return Algorithms.cfgToPda(this);
     }
 
     public Cfg toChomsky(){
-        return GrammarFactory.chomsky(this);
+        return Algorithms.chomsky(this);
+    }
+
+    @Override
+    public String toString() {
+        return Printer.stringOfGrammar(this);
     }
 }

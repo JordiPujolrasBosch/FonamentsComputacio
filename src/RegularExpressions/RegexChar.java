@@ -1,6 +1,6 @@
 package RegularExpressions;
 
-import Factory.AutomatonFactory;
+import Factory.Algorithms;
 import Automatons.Nfa;
 import Factory.TokenFactory;
 
@@ -12,13 +12,14 @@ public class RegexChar implements RegularExpression {
     }
 
     public Nfa getNfa() {
-        return AutomatonFactory.regexCharToNfa(c);
+        return Algorithms.regexCharToNfa(c);
     }
 
     public RegularExpression simplify() {
         return this;
     }
 
+    @Override
     public String toString(){
         if(TokenFactory.rtokensReverseContains(c)) return TokenFactory.rtokensReverseGet(c);
         return String.valueOf(c);

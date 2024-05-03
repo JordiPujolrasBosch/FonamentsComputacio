@@ -55,9 +55,9 @@ public class Printer {
     private static String automatonRules(List<Rule> rules, Map<State,Integer> mapper){
         String res = "";
         for(Rule r : rules){
-            String character = r.character().toString();
-            if(TokenFactory.btokensReverseContains(r.character())) character = TokenFactory.btokensReverseGet(r.character());
-            res = res + mapper.get(r.origin()) + " " + character + " " + mapper.get(r.destiny()) + "\n";
+            String character = Character.toString(r.getCharacter());
+            if(TokenFactory.btokensReverseContains(r.getCharacter())) character = TokenFactory.btokensReverseGet(r.getCharacter());
+            res = res + mapper.get(r.getOrigin()) + " " + character + " " + mapper.get(r.getDestiny()) + "\n";
         }
         return res;
     }
@@ -89,10 +89,10 @@ public class Printer {
 
     private static String alphabetPrinter(Alphabet alphabet, String name){
         String res = name + ": ";
-        if(alphabet.contains(Alphabet.getEmptyChar())){
+        if(alphabet.containsEmptyChar()){
             res = res + TokenFactory.atokensGetEmptyChar() + ", ";
         }
-        for(Character c : alphabet.set()){
+        for(char c : alphabet.getSet()){
             if(TokenFactory.atokensReverseContains(c)) res = res + TokenFactory.atokensReverseGet(c) + ", ";
             else res = res + c + ", ";
         }
