@@ -7,6 +7,50 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RegexBuilder {
+    public static RegularExpression buildRegex2(String r) throws RegexReaderException {
+        List<NewBuildRegex> list = buildList2(r);
+        return null;
+    }
+
+    private static List<NewBuildRegex> buildList2(String r) throws RegexReaderException {
+        List<NewBuildRegex> list = new ArrayList<>();
+        int i = 0;
+
+        //if endsWith("$?") is valid gtoken?
+        //if endsWith("$") throw
+        while(i < r.length()){
+            char x = r.charAt(i);
+            char y;
+            boolean isLast = i == r.length()-1;
+            if(!isLast) y = r.charAt(i+1);
+            /*
+            if(isOperator()) list.add(new NewBuildRegexOperator(x));
+            else if(!isLast && isGroup()) list.add(new Union(xy)); i++;
+            else if(!isLast && isGToken()) list.add(new Char(xy)); i++;
+            else if(!isLast && x=='$') throw
+            else list.add(new Char(x))
+             */
+            i++;
+        }
+        return list;
+    }
+
+    private interface NewBuildRegex {}
+    private class NewBuildRegexOperator implements NewBuildRegex {}
+    private class NewBuildRegexChar implements NewBuildRegex {}
+    private class NewBuildRegexConcat implements NewBuildRegex {}
+    private class NewBuildRegexUnion implements NewBuildRegex {}
+    private class NewBuildRegexStar implements NewBuildRegex {}
+    private class NewBuildRegexPlus implements NewBuildRegex {}
+
+
+
+
+
+
+
+
+
     public static RegularExpression buildRegex(String r) throws RegexReaderException {
         BuildRegexList list = buildTokenList(r);
         BuildRegex build = list.buildParenthesis();

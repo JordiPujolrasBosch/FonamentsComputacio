@@ -109,27 +109,9 @@ public class AutomatonData {
         boolean ok = hasBasic();
         ok = ok && numberStates > 0;
         ok = ok && validState(startStateNumber);
-
-        if(ok && finalStatesNumbers.size() == 1 && finalStatesNumbers.get(0) < 0) ok = true;
-        else{
-            Iterator<Integer> it1 = finalStatesNumbers.iterator();
-            while (it1.hasNext() && ok) ok = validState(it1.next());
-        }
-
-        Iterator<String> it2 = alphabetElements.iterator();
-        while (it2.hasNext() && ok){
-            String s = it2.next();
-            if(s.length() == 1) alphabet.addChar(s.charAt(0));
-            else if(TokenFactory.atokensContains(s)) alphabet.addAll(TokenFactory.atokensGet(s));
-            else ok = false;
-        }
-
-        Iterator<RuleData> it3 = transition.iterator();
-        while (it3.hasNext() && ok){
-            RuleData r = it3.next();
-            ok = validState(r.getOrigin()) && validState(r.getDestiny()) && alphabet.contains(r.getCharacter());
-        }
-
+        ok = ok && checkFinalStates();
+        ok = ok && checkAlphabet();
+        ok = ok && checkRules();
         return ok;
     }
 
@@ -155,10 +137,6 @@ public class AutomatonData {
         return transition.size() == numberStates * alphabet.size();
     }
 
-    private boolean validState(int x){
-        return x >= 0 && x < numberStates;
-    }
-
     //Transformations
 
     public Dfa toDfa() throws AutomatonReaderException {
@@ -168,4 +146,42 @@ public class AutomatonData {
     public Nfa toNfa() throws AutomatonReaderException {
         return Algorithms.dataToNfa(this);
     }
+
+    //Private
+
+    private boolean validState(int x){
+        return x >= 0 && x < numberStates;
+    }
+
+    private boolean checkFinalStates(){
+        if(finalStatesNumbers.size() == 1 && finalStatesNumbers.get(0) < 0) return true;
+
+        boolean ok = true;
+        Iterator<Integer> it = finalStatesNumbers.iterator();
+        while (it.hasNext() && ok) ok = validState(it.next());
+        return ok;
+    }
+
+    private boolean checkAlphabet(){
+        boolean ok = true;
+        Iterator<String> it = alphabetElements.iterator();
+        while (it.hasNext() && ok){
+            String s = it.next();
+            if(s.length() == 1) alphabet.addChar(s.charAt(0));
+            else if(TokenFactory.atokensContains(s)) alphabet.addAll(TokenFactory.atokensGet(s));
+            else ok = false;
+        }
+        return ok;
+    }
+
+    private boolean checkRules(){
+        boolean ok = true;
+        Iterator<RuleData> it = transition.iterator();
+        while (it.hasNext() && ok){
+            RuleData r = it.next();
+            ok = validState(r.getOrigin()) && validState(r.getDestiny()) && alphabet.contains(r.getCharacter());
+        }
+        return ok;
+    }
+
 }

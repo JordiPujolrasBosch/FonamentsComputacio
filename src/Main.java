@@ -5,20 +5,21 @@ import Grammars.Cfg;
 /*
  * TODO
  * Test all
+ *
+ * Regex builder
+ * Right
+ * Chomsky
+ * Algorithms
+ * TokenFactory
+ *
+ * Article CFG==CFG
  * */
 
 
 public class Main {
     public static void main(String[] args) {
         try{
-            Pda pda = Reader.readGrammarFile("Resources/cfg1.txt").toPda();
-            pda.checkWord("abbbbbb");
-            pda.checkWord("aaaaaabbbbbb");
-            pda.checkWord("aaabbb");
-            pda.checkWord("b");
-            pda.checkWord("abbbbaa");
-            pda.checkWord("aaaaaaa");
-            pda.checkWord("abb");
+            Menu.checkWordsCfg("Resources/cfg1.txt", "Resources/words1.txt");
         }
         catch (Exception ex){
             System.out.println(ex);

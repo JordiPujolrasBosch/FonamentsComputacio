@@ -1,7 +1,7 @@
 states: 11
 start: 4
 final: 2, 7
-alphabet: a, b, c, nothing
+alphabet: a, b, c, $w
 0 a 10
 0 b 5
 0 c 7

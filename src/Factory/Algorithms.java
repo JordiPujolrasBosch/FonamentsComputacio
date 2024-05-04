@@ -220,6 +220,197 @@ public class Algorithms {
         }
     }
 
+    public static Dfa minimize2(Dfa x){
+        DfaConstructor dc = x.getConstructor();
+
+        MinimizeTwoPrivate.deleteUnusedStates(dc);
+
+        //Pair int <-> state
+
+        Map<State,Integer> mapper  = new HashMap<>();
+        Map<Integer,State> reverse = new HashMap<>();
+        int i = 0;
+        for(State s : dc.states){
+            mapper.put(s,i);
+            reverse.put(i,s);
+            i++;
+        }
+
+        Map<State,Map<State,Boolean>> matrix = MinimizeTwoPrivate.startMatrix(dc, reverse);
+        MinimizeTwoPrivate.iterateMatrix(dc, reverse, mapper, matrix);
+        Set<Set<State>> partition = MinimizeTwoPrivate.buildPartition(dc, mapper, matrix);
+        return MinimizeTwoPrivate.defineMinimal(dc, partition).getDfa();
+    }
+
+    private static class MinimizeTwoPrivate {
+        private static void deleteUnusedStates(DfaConstructor dc){
+            Set<State> unused = new HashSet<>(dc.states);
+            unused.remove(dc.start);
+
+            Set<State> checking = new HashSet<>();
+            checking.add(dc.start);
+
+            boolean changed = true;
+
+            while(changed){
+                changed = false;
+
+                Set<State> goTo = new HashSet<>();
+                for(State o : checking){
+                    for(char c : dc.alphabet.getSet()){
+                        goTo.add(dc.transition.step(o,c));
+                    }
+                }
+
+                checking.clear();
+                for(State s : goTo){
+                    if(unused.contains(s)){
+                        checking.add(s);
+                        unused.remove(s);
+                        changed = true;
+                    }
+                }
+            }
+
+            for(State s : unused){
+                dc.states.remove(s);
+                dc.finalStates.remove(s);
+                dc.transition.removeState(s);
+            }
+        }
+
+        private static Map<State,Map<State,Boolean>> startMatrix(DfaConstructor dc, Map<Integer,State> reverse){
+            Map<State,Map<State,Boolean>> matrix = new HashMap<>();
+            int n = dc.states.size();
+
+            for(int a = 0; a <= n-2; a++){
+                State sa = reverse.get(a);
+                boolean accepta = dc.finalStates.contains(sa);
+                for(int b = a+1; b <= n-1; b++){
+                    State sb = reverse.get(b);
+                    boolean acceptb = dc.finalStates.contains(sb);
+
+                    if(!matrix.containsKey(sa)) matrix.put(sa, new HashMap<>());
+                    if(accepta != acceptb) matrix.get(sa).put(sb,false);
+                    else matrix.get(sa).put(sb,true);
+                }
+            }
+
+            return matrix;
+        }
+
+        private static void iterateMatrix(DfaConstructor dc, Map<Integer,State> reverse, Map<State,Integer> mapper, Map<State,Map<State,Boolean>> matrix){
+            int n = dc.states.size();
+
+            boolean consolidated = false;
+            while(!consolidated){
+                consolidated = true;
+                for(int a = 0; a <= n-2; a++){
+                    State sa = reverse.get(a);
+                    for(int b = a+1; b <= n-1; b++){
+                        State sb = reverse.get(b);
+                        for(char c : dc.alphabet.getSet()){
+                            State destinya = dc.transition.step(sa,c);
+                            State destinyb = dc.transition.step(sb,c);
+
+                            if(destinya != destinyb){
+                                boolean value;
+                                if(mapper.get(destinya) < mapper.get(destinyb)) value = matrix.get(destinya).get(destinyb);
+                                else value = matrix.get(destinyb).get(destinya);
+
+                                if(!value && matrix.get(sa).get(sb)){
+                                    consolidated = false;
+                                    matrix.get(sa).put(sb,false);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private static Set<Set<State>> buildPartition(DfaConstructor dc, Map<State,Integer> mapper, Map<State,Map<State,Boolean>> matrix){
+            Set<State> bag = new HashSet<>(dc.states);
+            Set<Set<State>> partition = new HashSet<>();
+
+            while(!bag.isEmpty()){
+                State s = bag.iterator().next();
+                bag.remove(s);
+
+                Set<State> toadd = new HashSet<>();
+                Set<State> act = new HashSet<>();
+                act.add(s);
+                for(State q : bag){
+                    if(mapper.get(s) < mapper.get(q)){
+                        if(matrix.get(s).get(q)) toadd.add(q);
+                    }
+                    else{
+                        if(matrix.get(q).get(s)) toadd.add(q);
+                    }
+                }
+
+                act.addAll(toadd);
+                bag.removeAll(toadd);
+                partition.add(act);
+            }
+
+            return partition;
+        }
+
+        private static DfaConstructor defineMinimal(DfaConstructor dc, Set<Set<State>> partition){
+            Map<Set<State>, State> mapper = new HashMap<>();
+            for(Set<State> ss : partition) mapper.put(ss, new State());
+
+            DfaConstructor res = new DfaConstructor();
+
+            res.states.addAll(mapper.values());
+
+            res.alphabet.addAll(dc.alphabet);
+
+            res.start = mapper.get(findWhichSetContains(partition, dc.start));
+
+            for(Set<State> ss : partition){
+                if(!conjunctionIsEmpty(ss,dc.finalStates)){
+                    res.finalStates.add(mapper.get(ss));
+                }
+            }
+
+            for(Set<State> oo : partition){
+                for(Character c : dc.alphabet.getSet()){
+                    State inOrigin = oo.iterator().next();
+                    State inDestiny = dc.transition.step(inOrigin, c);
+
+                    State origin = mapper.get(oo);
+                    State destiny = mapper.get(findWhichSetContains(partition, inDestiny));
+
+                    res.transition.add(origin, destiny, c);
+                }
+            }
+
+            return res;
+        }
+
+        private static boolean conjunctionIsEmpty(Set<State> a, Set<State> b) {
+            boolean found = false;
+            Iterator<State> it = b.iterator();
+            while(it.hasNext() && !found){
+                found = a.contains(it.next());
+            }
+            return !found;
+        }
+
+        private static Set<State> findWhichSetContains(Set<Set<State>> x, State s){
+            boolean found = false;
+            Set<State> act = null;
+            Iterator<Set<State>> it = x.iterator();
+            while(it.hasNext() && !found){
+                act = it.next();
+                found = act.contains(s);
+            }
+            return act;
+        }
+    }
+
     // NFA TO DFA
 
     public static Dfa nfaToDfa(Nfa x){
@@ -307,10 +498,10 @@ public class Algorithms {
 
     public static Nfa dataToNfa(AutomatonData data) throws AutomatonReaderException {
         if(!data.check()){
-            throw new AutomatonReaderException(OutputMessages.automatonCheck(data.getFilename()));
+            throw new AutomatonReaderException(Printer.automatonCheck(data.getFilename()));
         }
         if(!data.getAlphabet().containsEmptyChar()){
-            throw new AutomatonReaderException(OutputMessages.automatonCheck(data.getFilename()));
+            throw new AutomatonReaderException(Printer.automatonCheck(data.getFilename()));
         }
 
         List<State> array = new ArrayList<>();
@@ -339,10 +530,10 @@ public class Algorithms {
 
     public static Dfa dataToDfa(AutomatonData data) throws AutomatonReaderException {
         if(!data.check()) {
-            throw new AutomatonReaderException(OutputMessages.automatonCheck(data.getFilename()));
+            throw new AutomatonReaderException(Printer.automatonCheck(data.getFilename()));
         }
         if(!data.isDeterministic()) {
-            throw new AutomatonReaderException(OutputMessages.automatonNondeterministic(data.getFilename()));
+            throw new AutomatonReaderException(Printer.automatonNondeterministic(data.getFilename()));
         }
 
         List<State> array = new ArrayList<>();

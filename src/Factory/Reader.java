@@ -34,7 +34,7 @@ public class Reader {
             }
         }
         catch (Exception ex){
-            throw new AutomatonReaderException(OutputMessages.automatonCheck(filename));
+            throw new AutomatonReaderException(Printer.automatonCheck(filename));
         }
 
         return data;
@@ -64,7 +64,7 @@ public class Reader {
                 switch (x) {
                     case "terminals:" -> data.setTerminals(sc.nextLine().replace(" ", "").split(","));
                     case "variables:" -> data.setVariables(sc.nextLine().replace(" ", "").split(","));
-                    case "start:"     -> data.setStart(sc.next());
+                    case "start:"     -> data.setStart(sc.nextLine().replace(" ", ""));
                     default           -> throw new Exception();
                 }
             }
@@ -74,10 +74,10 @@ public class Reader {
             }
         }
         catch (Exception ex){
-            throw new GrammarReaderException(OutputMessages.grammarCheck(filename));
+            throw new GrammarReaderException(Printer.grammarCheck(filename));
         }
 
-        if(!data.check()) throw new GrammarReaderException(OutputMessages.grammarCheck(filename));
+        if(!data.check()) throw new GrammarReaderException(Printer.grammarCheck(filename));
 
         return data.getCfg();
     }

@@ -16,6 +16,30 @@ import java.util.*;
 
 public class Printer {
 
+    //Output messages
+
+    public static String automatonCheck(String filename) {
+        return "Incorrect format for the automaton in file " + filename;
+    }
+
+    public static String automatonNondeterministic(String filename) {
+        return "The automaton of file " + filename + " is nondeterministic";
+    }
+
+    public static String equal(String fa, String fb) {
+        return "EQUAL " + fa + " " + fb;
+    }
+
+    public static String nonequal(String fa, String fb) {
+        return "NOT EQUAL " + fa + " " + fb;
+    }
+
+    public static String grammarCheck(String filename) {
+        return "Incorrect format for the grammar file " + filename;
+    }
+
+    //Automatons and grammars
+
     public static String stringOfDfa(Dfa dfa){
         DfaConstructor dc = dfa.getConstructor();
         return stringOfAutomaton(dc.states, dc.alphabet, dc.start, dc.finalStates, dc.transition.getRules());
@@ -37,6 +61,7 @@ public class Printer {
         return res;
     }
 
+    //Private
 
     private static String stringOfAutomaton(Set<State> states, Alphabet alphabet, State start, Set<State> finalStates, List<Rule> rules){
         Map<State,Integer> mapper = new HashMap<>();
