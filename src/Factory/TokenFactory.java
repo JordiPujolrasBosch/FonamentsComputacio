@@ -300,6 +300,13 @@ public class TokenFactory {
 
 
 
+
+
+
+
+
+    public static char getSpecialChar(){return '$';}
+
     //A-TOKENS
 
     public static String getAEmptyChar(){return "$/";}

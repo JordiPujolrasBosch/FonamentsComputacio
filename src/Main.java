@@ -2,6 +2,9 @@ import Automatons.Pda;
 import Factory.Reader;
 import Grammars.Cfg;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*
  * TODO
  * Test all
@@ -19,12 +22,12 @@ import Grammars.Cfg;
 public class Main {
     public static void main(String[] args) {
         try{
-            Menu.checkWordsCfg("Resources/cfg1.txt", "Resources/words1.txt");
+            String s = Reader.readRegularExpressionFile("Resources/x1_regex.txt").toString();
+            System.out.println(s);
         }
         catch (Exception ex){
-            System.out.println(ex);
+            System.out.println(ex.toString());
         }
-
     }
 
 }
