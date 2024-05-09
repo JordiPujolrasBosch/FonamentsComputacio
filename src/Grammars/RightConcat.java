@@ -2,6 +2,8 @@ package Grammars;
 
 import Elements.Grammars.CfgVariable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class RightConcat implements RightNonEmpty {
@@ -88,6 +90,24 @@ public class RightConcat implements RightNonEmpty {
 
     public Right getChanged(char c, CfgVariable x) {
         return new RightConcat(a.getChanged(c,x).toRightNonEmpty(), b.getChanged(c,x).toRightNonEmpty());
+    }
+
+    public List<RightChar> getListChars() {
+        List<RightChar> list = new ArrayList<>();
+        if(a.type() == TypesRight.CHAR) list.add(a.toRightChar());
+        else if(a.type() == TypesRight.CONCAT) list.addAll(a.toRightConcat().getListChars());
+        if(b.type() == TypesRight.CHAR) list.add(b.toRightChar());
+        else if(b.type() == TypesRight.CONCAT) list.addAll(b.toRightConcat().getListChars());
+        return list;
+    }
+
+    public List<RightVar> getListVars() {
+        List<RightVar> list = new ArrayList<>();
+        if(a.type() == TypesRight.VAR) list.add(a.toRightVar());
+        else if(a.type() == TypesRight.CONCAT) list.addAll(a.toRightConcat().getListVars());
+        if(b.type() == TypesRight.VAR) list.add(b.toRightVar());
+        else if(b.type() == TypesRight.CONCAT) list.addAll(b.toRightConcat().getListVars());
+        return list;
     }
 
     public Right toRight()                 {return this;}

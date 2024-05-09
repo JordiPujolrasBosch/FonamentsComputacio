@@ -7,6 +7,7 @@ import Factory.Algorithms;
 import Factory.Constructors.CfgConstructor;
 import Factory.Printer;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class Cfg {
@@ -26,12 +27,36 @@ public class Cfg {
         return new CfgConstructor(terminals, variables, start, rules);
     }
 
+    public Set<CfgRule> getRulesLeft(CfgVariable v) {
+        Set<CfgRule> ret = new HashSet<>();
+        for(CfgRule r : rules){
+            if(r.getLeft().equals(v)) ret.add(r);
+        }
+        return ret;
+    }
+
     public Pda toPda(){
         return Algorithms.cfgToPda(this);
     }
 
     public Cfg toChomsky(){
         return Algorithms.chomsky(this);
+    }
+
+    public Cfg toGriebach(){
+        return null;
+    }
+
+    public boolean isLL(){
+        return false;
+    }
+
+    public boolean isLLOne(){
+        return false;
+    }
+
+    public boolean isLLTwo(){
+        return false;
     }
 
     @Override
