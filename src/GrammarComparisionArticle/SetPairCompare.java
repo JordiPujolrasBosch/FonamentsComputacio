@@ -11,16 +11,31 @@ public class SetPairCompare {
     private final Set<Right> right;
     private final boolean opEq; //true = equivalence, false = inclusion
 
-    public SetPairCompare(Set<Right> l, Set<Right> r, boolean eq){
-        left = new HashSet<>(l);
-        right = new HashSet<>(r);
+    public SetPairCompare(Set<Right> sl, Set<Right> sr, boolean eq){
+        left = new HashSet<>(sl);
+        right = new HashSet<>(sr);
         opEq = eq;
     }
 
-    public SetPairCompare(Right l, Set<Right> r, boolean eq){
+    public SetPairCompare(Right l, Set<Right> sr, boolean eq){
         left = new HashSet<>();
         left.add(l);
-        right = new HashSet<>(r);
+        right = new HashSet<>(sr);
+        opEq = eq;
+    }
+
+    public SetPairCompare(Set<Right> sl, Right r, boolean eq){
+        left = new HashSet<>(sl);
+        right = new HashSet<>();
+        right.add(r);
+        opEq = eq;
+    }
+
+    public SetPairCompare(Right l, Right r, boolean eq){
+        left = new HashSet<>();
+        left.add(l);
+        right = new HashSet<>();
+        right.add(r);
         opEq = eq;
     }
 

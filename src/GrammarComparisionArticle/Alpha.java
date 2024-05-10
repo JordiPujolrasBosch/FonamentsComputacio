@@ -20,6 +20,10 @@ public class Alpha {
         innerChoose = null;
     }
 
+    public List<String> generateWords(int n, Right rule) {
+        return null;
+    }
+
     public Enumerator enumFunction(RightNonEmpty r, int n) throws EnumeratorException {
         if(r.type() == TypesRight.CHAR){
             if(n != 0) throw new EnumeratorException();
@@ -76,6 +80,8 @@ public class Alpha {
             return n;
         }
     }
+
+
 
     private static class InnerChoose {
         private Map<CfgVariable, List<RightNonEmpty>> orderedRights;
