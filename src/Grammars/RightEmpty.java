@@ -14,6 +14,27 @@ public class RightEmpty implements Right {
         return false;
     }
 
+    public boolean containsVar(){
+        return false;
+    }
+
+    public Right getSufix(int n){
+        if(n == 0) return this;
+        return null;
+    }
+
+    public boolean hasPrefixTerminalOfSize(int length) {
+        return false;
+    }
+
+    public CfgVariable getLeftMostVar() {
+        return null;
+    }
+
+    public RightNonEmpty getSubstitutionLeft(RightNonEmpty toRightNonEmpty) {
+        return null;
+    }
+
     public TypesRight type() {
         return TypesRight.EMPTY;
     }

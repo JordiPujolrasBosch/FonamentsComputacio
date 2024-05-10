@@ -9,11 +9,38 @@ public class RightChar implements RightNonEmpty {
         this.c = c;
     }
 
-    public char c() {
+    public char getC() {
         return c;
     }
 
+    public RightNonEmpty getPrefix(int n) {
+        if(n != 1) return null;
+        return this;
+    }
+
+    public boolean hasPrefixTerminalOfSize(int n) {
+        return n == 1;
+    }
+
+    public CfgVariable getLeftMostVar() {
+        return null;
+    }
+
+    public RightNonEmpty getSubstitutionLeft(RightNonEmpty subs) {
+        return null;
+    }
+
+    public Right getSufix(int n){
+        if(n == 1) return this;
+        if(n == 0) return new RightEmpty();
+        return null;
+    }
+
     public boolean containsVar(CfgVariable v) {
+        return false;
+    }
+
+    public boolean containsVar(){
         return false;
     }
 

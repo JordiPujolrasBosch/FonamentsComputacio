@@ -11,12 +11,39 @@ public class RightVar implements RightNonEmpty {
         this.v = v;
     }
 
-    public CfgVariable v(){
+    public CfgVariable getV(){
         return v;
+    }
+
+    public RightNonEmpty getPrefix(int n) {
+        if(n != 1) return null;
+        return this;
+    }
+
+    public boolean hasPrefixTerminalOfSize(int n) {
+        return false;
+    }
+
+    public CfgVariable getLeftMostVar() {
+        return v;
+    }
+
+    public RightNonEmpty getSubstitutionLeft(RightNonEmpty subs) {
+        return subs;
+    }
+
+    public Right getSufix(int n){
+        if(n == 1) return this;
+        if(n == 0) return new RightEmpty();
+        return null;
     }
 
     public boolean containsVar(CfgVariable v) {
         return this.v.equals(v);
+    }
+
+    public boolean containsVar(){
+        return true;
     }
 
     public TypesRight type() {

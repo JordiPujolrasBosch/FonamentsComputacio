@@ -30,8 +30,8 @@ public class Alpha {
             return new EnumeratorNode(r.toRightVar(), enumFunction(choose.getA(), choose.getB()));
         }
         else{
-            RightNonEmpty ra = r.toRightConcat().a();
-            RightNonEmpty rb = r.toRightConcat().b();
+            RightNonEmpty ra = r.toRightConcat().getA();
+            RightNonEmpty rb = r.toRightConcat().getB();
             Pair<Integer, Integer> pi = pi(n, ht(ra), ht(rb));
             return new EnumeratorPair(enumFunction(ra, pi.getA()), enumFunction(rb, pi.getB()));
         }
@@ -60,7 +60,7 @@ public class Alpha {
             return 1;
         }
         else if(r.type() == TypesRight.VAR){
-            Set<CfgRule> rules = cfg.getRulesLeft(r.toRightVar().v());
+            Set<CfgRule> rules = cfg.getRulesLeft(r.toRightVar().getV());
             int n = 0;
             for(CfgRule rule : rules){
                 n += tau(rule.getRight().toRightNonEmpty());

@@ -1,5 +1,13 @@
 package Grammars;
 
-public interface RightNonEmpty extends Right {
+import Elements.Grammars.CfgVariable;
 
+public interface RightNonEmpty extends Right {
+    RightNonEmpty getPrefix(int n);
+
+    boolean hasPrefixTerminalOfSize(int n);
+
+    CfgVariable getLeftMostVar();
+
+    RightNonEmpty getSubstitutionLeft(RightNonEmpty subs);
 }

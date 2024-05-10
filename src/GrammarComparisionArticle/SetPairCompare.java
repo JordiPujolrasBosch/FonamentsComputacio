@@ -2,6 +2,7 @@ package GrammarComparisionArticle;
 
 import Grammars.Right;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -11,8 +12,15 @@ public class SetPairCompare {
     private final boolean opEq; //true = equivalence, false = inclusion
 
     public SetPairCompare(Set<Right> l, Set<Right> r, boolean eq){
-        left = l;
-        right = r;
+        left = new HashSet<>(l);
+        right = new HashSet<>(r);
+        opEq = eq;
+    }
+
+    public SetPairCompare(Right l, Set<Right> r, boolean eq){
+        left = new HashSet<>();
+        left.add(l);
+        right = new HashSet<>(r);
         opEq = eq;
     }
 

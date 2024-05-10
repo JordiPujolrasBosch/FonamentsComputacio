@@ -1,9 +1,8 @@
 package GrammarComparisionArticle;
 
-import Grammars.Cfg;
-import Grammars.Right;
-import Grammars.RightEmpty;
-import Grammars.RightNonEmpty;
+import Elements.Grammars.CfgRule;
+import Elements.Grammars.CfgVariable;
+import Grammars.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -15,9 +14,16 @@ public class Beta {
         this.cfg = cfg;
     }
 
-    public Set<RightNonEmpty> derivative(String word, RightNonEmpty rule){
-        Set<RightNonEmpty> set = new HashSet<>();
+    public Set<Right> derivative(String word, Right rule){
+        Set<Right> set = new HashSet<>();
+        if(wordIsPrefixOfRight(word, rule)) set.add(sufixOfWord(word, rule));
+        else set.addAll(findSufixsInGrammar(word, rule));
+        return set;
+    }
 
+    private Set<Right> derivativeOfSet(String word, Set<Right> left) {
+        Set<Right> set = new HashSet<>();
+        for(Right r : left) set.addAll(derivative(word, r));
         return set;
     }
 
@@ -52,7 +58,9 @@ public class Beta {
     public SetPairCompare verifyEpsilon(SetPairCompare comp){
         // {e} op {e}
         Set<Right> left  = new HashSet<>(comp.getLeft());
+        left.remove(new RightEmpty());
         Set<Right> right = new HashSet<>(comp.getRight());
+        right.remove(new RightEmpty());
         return new SetPairCompare(left, right, comp.isEquivalence());
     }
 
@@ -61,14 +69,9 @@ public class Beta {
     }
 
     public Set<SetPairCompare> verifyInclusion(SetPairCompare comp){
-        Set<Right> la = new HashSet<>(comp.getLeft());
-        Set<Right> ra = new HashSet<>(comp.getRight());
-        Set<Right> lb = new HashSet<>(comp.getLeft());
-        Set<Right> rb = new HashSet<>(comp.getRight());
-
         Set<SetPairCompare> set = new HashSet<>();
-        set.add(new SetPairCompare(la, ra, false));
-        set.add(new SetPairCompare(rb, lb, false));
+        set.add(new SetPairCompare(comp.getLeft(), comp.getRight(), false));
+        set.add(new SetPairCompare(comp.getRight(), comp.getLeft(), false));
         return set;
     }
 
@@ -77,13 +80,79 @@ public class Beta {
     }
 
     public Set<SetPairCompare> verifyDist(SetPairCompare comp){
-        Set<Right> left = comp.getLeft();
         Set<SetPairCompare> set = new HashSet<>();
-        for(Right x : left){
-            Set<Right> newRight = new HashSet<>(comp.getRight());
-            Set<Right> newLeft = new HashSet<>();
-            newLeft.add(x);
-            set.add(new SetPairCompare(newLeft, newRight, false));
+        for(Right x : comp.getLeft()){
+            set.add(new SetPairCompare(x, comp.getRight(), false));
+        }
+        return set;
+    }
+
+    public Set<SetPairCompare> verifyBranch(SetPairCompare comp, Set<SetPairCompare> context){
+        Set<SetPairCompare> set = new HashSet<>();
+        for(char c : cfg.getTerminals()){
+            Set<Right> dl = derivativeOfSet(Character.toString(c), comp.getLeft());
+            Set<Right> dr = derivativeOfSet(Character.toString(c), comp.getRight());
+            set.add(new SetPairCompare(dl, dr, comp.isEquivalence()));
+        }
+        context.add(comp);
+        return set;
+    }
+
+    //Derivative private
+
+    private boolean wordIsPrefixOfRight(String word, Right rule){
+        //r = wB
+        if(word.isEmpty()) return true; // r = ""B
+        if(rule.type() == TypesRight.VAR) return false; // A = wB
+        if(rule.type() == TypesRight.CHAR) return word.equals(rule.toRightChar().toString()); // a = a""
+        if(rule.type() == TypesRight.EMPTY) return false; // "" = *B
+
+        if(word.length() > rule.length()) return false; // *** = ****B
+        if(word.length() == rule.length()) return !rule.containsVar() && word.equals(rule.toString()); // *** = ***""
+
+        RightNonEmpty r = rule.toRightConcat().getPrefix(word.length()); // **** = **B
+        return !r.containsVar() && word.equals(r.toString()); // ** = **B
+    }
+
+    private Right sufixOfWord(String word, Right rule) {
+        // r = wS
+        if(rule.length() == word.length()) return new RightEmpty();
+        if(rule.length() > word.length()) return rule.getSufix(rule.length()-word.length());
+        return null;
+    }
+
+    private Set<Right> findSufixsInGrammar(String word, Right rule){
+        Set<Right> set = new HashSet<>();
+        Set<Right> expanded = new HashSet<>();
+        Set<Right> toexpand = new HashSet<>();
+        if(rule.hasPrefixTerminalOfSize(word.length())) expanded.add(rule);
+        else toexpand.add(rule);
+
+        while(!toexpand.isEmpty()){
+            Set<RightNonEmpty> aux = new HashSet<>();
+            for(Right r : toexpand) aux.addAll(expandOneStepLeft(r));
+            toexpand.clear();
+
+            for(RightNonEmpty r : aux){
+                if(r.hasPrefixTerminalOfSize(word.length())) expanded.add(r);
+                else toexpand.add(r);
+            }
+        }
+
+        for(Right r : expanded){
+            if(wordIsPrefixOfRight(word, r)) set.add(sufixOfWord(word, r));
+        }
+
+        return set;
+    }
+
+    private Set<RightNonEmpty> expandOneStepLeft(Right r) {
+        CfgVariable v = r.getLeftMostVar();
+        if(v == null) return new HashSet<>();
+
+        Set<RightNonEmpty> set = new HashSet<>();
+        for(CfgRule rule : cfg.getRulesLeft(v)){
+            set.add(r.getSubstitutionLeft(rule.getRight().toRightNonEmpty()));
         }
         return set;
     }

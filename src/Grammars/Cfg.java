@@ -35,6 +35,10 @@ public class Cfg {
         return ret;
     }
 
+    public Set<Character> getTerminals(){
+        return new HashSet<>(terminals.getSet());
+    }
+
     public Pda toPda(){
         return Algorithms.cfgToPda(this);
     }

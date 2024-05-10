@@ -15,16 +15,20 @@ public class RightConcat implements RightNonEmpty {
         this.b = b;
     }
 
-    public RightNonEmpty a(){
+    public RightNonEmpty getA(){
         return a;
     }
 
-    public RightNonEmpty b(){
+    public RightNonEmpty getB(){
         return b;
     }
 
     public boolean containsVar(CfgVariable v) {
         return a.containsVar(v) || b.containsVar(v);
+    }
+
+    public boolean containsVar(){
+        return a.containsVar() || b.containsVar();
     }
 
     public TypesRight type() {
@@ -117,4 +121,35 @@ public class RightConcat implements RightNonEmpty {
     public RightVar toRightVar()           {return null;}
     public RightConcat toRightConcat()     {return this;}
 
+    public RightNonEmpty getPrefix(int n) {
+        if(n < 1 || n > length()) return null;
+        if(length() == n)   return this;
+        if(a.length() == n) return a;
+        if(a.length() > n)  return a.getPrefix(n);
+        return new RightConcat(a, b.getPrefix(n-a.length()));
+    }
+
+    public boolean hasPrefixTerminalOfSize(int n) {
+        if(a.containsVar()) return a.hasPrefixTerminalOfSize(n);
+        return b.hasPrefixTerminalOfSize(n-a.length());
+    }
+
+    public CfgVariable getLeftMostVar() {
+        if(a.containsVar()) return a.getLeftMostVar();
+        return b.getLeftMostVar();
+    }
+
+    public RightNonEmpty getSubstitutionLeft(RightNonEmpty subs) {
+        if(a.containsVar()) return new RightConcat(a.getSubstitutionLeft(subs), b);
+        return new RightConcat(a, b.getSubstitutionLeft(subs));
+    }
+
+    public Right getSufix(int n){
+        if(n == 0) return new RightEmpty();
+        if(n < 0 || n > length()) return null;
+        if(length() == n)   return this;
+        if(b.length() == n) return b;
+        if(b.length() > n)  return b.getSufix(n);
+        return new RightConcat(a.getSufix(n-b.length()).toRightNonEmpty(), b);
+    }
 }

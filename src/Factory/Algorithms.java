@@ -866,8 +866,8 @@ public class Algorithms {
                 }
                 else if(r.getRight().length() == 1){
                     int k = 0;
-                    if(r.getRight().type() == TypesRight.VAR) k = pc.getMapper(r.getRight().toRightVar().v());
-                    else k = pc.getMapper(r.getRight().toRightChar().c());
+                    if(r.getRight().type() == TypesRight.VAR) k = pc.getMapper(r.getRight().toRightVar().getV());
+                    else k = pc.getMapper(r.getRight().toRightChar().getC());
                     pc.transition.add(loop, e, pc.getMapper(r.getLeft()), loop, k);
                 }
                 else{
@@ -901,14 +901,14 @@ public class Algorithms {
         private static List<Integer> makeList(Right right, PdaConstructor pc) {
             List<Integer> list = new ArrayList<>();
             if(right.type() == TypesRight.VAR){
-                list.add(pc.getMapper(right.toRightVar().v()));
+                list.add(pc.getMapper(right.toRightVar().getV()));
             }
             else if(right.type() == TypesRight.CHAR){
-                list.add(pc.getMapper(right.toRightChar().c()));
+                list.add(pc.getMapper(right.toRightChar().getC()));
             }
             else{
-                RightNonEmpty a = right.toRightConcat().a();
-                RightNonEmpty b = right.toRightConcat().b();
+                RightNonEmpty a = right.toRightConcat().getA();
+                RightNonEmpty b = right.toRightConcat().getB();
                 list.addAll(makeList(a, pc));
                 list.addAll(makeList(b, pc));
             }
@@ -998,7 +998,7 @@ public class Algorithms {
             Set<CfgRule> removed = new HashSet<>();
             while(!unitRules.isEmpty()){
                 CfgRule rule = unitRules.iterator().next();
-                CfgVariable ri = rule.getRight().toRightVar().v();
+                CfgVariable ri = rule.getRight().toRightVar().getV();
 
                 if(rule.getLeft().equals(ri)){
                     ccx.rules.remove(rule);
@@ -1073,8 +1073,8 @@ public class Algorithms {
                 if(foundBinaryTerminalRules){
                     RightConcat rc = binaryTerminalRule.getRight().toRightConcat();
                     char c;
-                    if(rc.a().type() == TypesRight.CHAR) c = rc.a().toRightChar().c();
-                    else c = rc.b().toRightChar().c();
+                    if(rc.getA().type() == TypesRight.CHAR) c = rc.getA().toRightChar().getC();
+                    else c = rc.getB().toRightChar().getC();
 
                     CfgRule newRule = new CfgRule(ccx.generate(new CfgVariable('Z',0)), new RightChar(c));
 
@@ -1118,20 +1118,20 @@ public class Algorithms {
 
             TypesRight var = TypesRight.VAR;
             TypesRight con = TypesRight.CONCAT;
-            TypesRight ta = right.a().type();
-            TypesRight tb = right.b().type();
-            boolean ina = right.a().containsVar(toremove);
-            boolean inb = right.b().containsVar(toremove);
+            TypesRight ta = right.getA().type();
+            TypesRight tb = right.getB().type();
+            boolean ina = right.getA().containsVar(toremove);
+            boolean inb = right.getB().containsVar(toremove);
 
             if(ina && inb){
                 if(ta == con && tb == con){
                     set.addAll(stepTwoConAB(right, toremove));
                 }
                 else if(ta == var && tb == con){
-                    set.addAll(stepTwoIm(right.b().toRightConcat(), toremove));
+                    set.addAll(stepTwoIm(right.getB().toRightConcat(), toremove));
                 }
                 else if(ta == con && tb == var){
-                    set.addAll(stepTwoIm(right.a().toRightConcat(), toremove));
+                    set.addAll(stepTwoIm(right.getA().toRightConcat(), toremove));
                 }
                 else if(ta == var && tb == var){
                     set.add(new RightEmpty());
@@ -1140,34 +1140,34 @@ public class Algorithms {
 
             if(ta == con && ina) set.addAll(stepTwoConA(right, toremove));
             if(tb == con && inb) set.addAll(stepTwoConB(right, toremove));
-            if(ta == var && ina) set.add(right.b());
-            if(tb == var && inb) set.add(right.a());
+            if(ta == var && ina) set.add(right.getB());
+            if(tb == var && inb) set.add(right.getA());
 
             return set;
         }
 
         private static Set<Right> stepTwoConA(RightConcat right, CfgVariable toremove){
             Set<Right> set = new HashSet<>();
-            for(Right r : stepTwoIm(right.a().toRightConcat(), toremove)){
-                if(r.type() == TypesRight.EMPTY) set.add(right.b());
-                else set.add(new RightConcat(r.toRightNonEmpty(), right.b()));
+            for(Right r : stepTwoIm(right.getA().toRightConcat(), toremove)){
+                if(r.type() == TypesRight.EMPTY) set.add(right.getB());
+                else set.add(new RightConcat(r.toRightNonEmpty(), right.getB()));
             }
             return set;
         }
 
         private static Set<Right> stepTwoConB(RightConcat right, CfgVariable toremove){
             Set<Right> set = new HashSet<>();
-            for(Right r : stepTwoIm(right.b().toRightConcat(), toremove)){
-                if(r.type() == TypesRight.EMPTY) set.add(right.a());
-                else set.add(new RightConcat(right.a(), r.toRightNonEmpty()));
+            for(Right r : stepTwoIm(right.getB().toRightConcat(), toremove)){
+                if(r.type() == TypesRight.EMPTY) set.add(right.getA());
+                else set.add(new RightConcat(right.getA(), r.toRightNonEmpty()));
             }
             return set;
         }
 
         private static Set<Right> stepTwoConAB(RightConcat right, CfgVariable toremove){
             Set<Right> set = new HashSet<>();
-            for(Right ra : stepTwoIm(right.a().toRightConcat(), toremove)){
-                for(Right rb : stepTwoIm(right.b().toRightConcat(), toremove)){
+            for(Right ra : stepTwoIm(right.getA().toRightConcat(), toremove)){
+                for(Right rb : stepTwoIm(right.getB().toRightConcat(), toremove)){
                     if(ra.type() == TypesRight.EMPTY && rb.type() == TypesRight.EMPTY) set.add(ra);
                     else if(ra.type() == TypesRight.EMPTY) set.add(rb);
                     else if(rb.type() == TypesRight.EMPTY) set.add(ra);

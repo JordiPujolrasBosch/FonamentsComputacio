@@ -4,6 +4,8 @@ import Elements.Grammars.CfgVariable;
 
 public interface Right {
     boolean containsVar(CfgVariable v);
+    
+    boolean containsVar();
 
     int length();
 
@@ -22,4 +24,12 @@ public interface Right {
     RightChar toRightChar();
     RightVar toRightVar();
     RightConcat toRightConcat();
+
+    Right getSufix(int n);
+
+    boolean hasPrefixTerminalOfSize(int length);
+
+    CfgVariable getLeftMostVar();
+
+    RightNonEmpty getSubstitutionLeft(RightNonEmpty toRightNonEmpty);
 }
