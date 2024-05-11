@@ -6,9 +6,8 @@ import Elements.Grammars.*;
 import Factory.Algorithms;
 import Factory.Constructors.CfgConstructor;
 import Factory.Printer;
-import GrammarComparisionArticle.Beta;
+import GrammarComparisonArticle.Beta;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class Cfg {
@@ -39,6 +38,8 @@ public class Cfg {
     public Cfg toGriebach(){
         return null;
     }
+
+    // LL -> LL + Greibach ?
 
     public boolean isLL(){
         return false;

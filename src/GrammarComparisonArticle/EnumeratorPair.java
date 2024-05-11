@@ -1,4 +1,4 @@
-package GrammarComparisionArticle;
+package GrammarComparisonArticle;
 
 public class EnumeratorPair implements Enumerator{
     private final Enumerator a;

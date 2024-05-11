@@ -125,6 +125,29 @@ public class GrammarTools {
         return x;
     }
 
+    public static boolean correctVars(GrammarTools gta, GrammarTools gtb, Set<Gramex> left, Set<Gramex> right) {
+        CfgVariable varLeft = null;
+        CfgVariable varRight = null;
+
+        Iterator<Gramex> itl = left.iterator();
+        while(itl.hasNext() && varLeft == null){
+            Gramex k = itl.next();
+            if(containsVar(k)) varLeft = getLeftMostVar(k.toGramexNonEmpty());
+        }
+
+        Iterator<Gramex> itr = right.iterator();
+        while(itr.hasNext() && varRight == null){
+            Gramex k = itr.next();
+            if(containsVar(k)) varRight = getLeftMostVar(k.toGramexNonEmpty());
+        }
+
+        if(varLeft != null && gta.cfg.variables.contains(varLeft)) return true;
+        if(varLeft != null && gtb.cfg.variables.contains(varLeft)) return false;
+        if(varRight != null && gta.cfg.variables.contains(varRight)) return false;
+        if(varRight != null && gtb.cfg.variables.contains(varRight)) return true;
+        return true;
+    }
+
     //Substitution
 
     public static Gramex substituteLeftMost(Gramex original, CfgVariable v, Gramex substitute) {
@@ -170,6 +193,19 @@ public class GrammarTools {
             else{
                 GramexNonEmpty a = substituteConcats(c.getA(), pair, substitute).toGramexNonEmpty();
                 GramexNonEmpty b = substituteConcats(c.getB(), pair, substitute).toGramexNonEmpty();
+                x = new GramexConcat(a,b);
+            }
+        }
+        return x;
+    }
+
+    public static Gramex substituteVarsToVars(Gramex original, Map<CfgVariable,CfgVariable> mapper){
+        Gramex x = original;
+        switch (original.type()){
+            case VAR -> x = new GramexVar(mapper.get(original.toGramexVar().getV()));
+            case CONCAT -> {
+                GramexNonEmpty a = substituteVarsToVars(original.toGramexConcat().getA(),mapper).toGramexNonEmpty();
+                GramexNonEmpty b = substituteVarsToVars(original.toGramexConcat().getB(),mapper).toGramexNonEmpty();
                 x = new GramexConcat(a,b);
             }
         }
@@ -321,23 +357,11 @@ public class GrammarTools {
         Set<Gramex> set = new HashSet<>();
         if(containsVar(r)){
             CfgVariable v = getLeftMostVar(r.toGramexNonEmpty());
-            for(CfgRule rule : getRulesVar(v)){
-                set.add(substituteLeftMost(r, v, rule.getRight()));
+            for(Gramex g : getRulesRightVar(v)){
+                set.add(substituteLeftMost(r, v, g));
             }
         }
         return set;
-    }
-
-    public Set<CfgRule> getRulesVar(CfgVariable v){
-        Set<CfgRule> set = new HashSet<>();
-        for(CfgRule rule : cfg.rules){
-            if(rule.getLeft().equals(v)) set.add(rule);
-        }
-        return set;
-    }
-
-    public Set<Character> getTerminals() {
-        return cfg.terminals.getSet();
     }
 
     public boolean acceptsAllWords(Gramex rule, List<String> words) {
@@ -391,5 +415,64 @@ public class GrammarTools {
         return shortest.toString();
     }
 
+    public boolean hasEmptyRules() {
+        boolean found = false;
+        Iterator<CfgRule> it = cfg.rules.iterator();
+        while(!found && it.hasNext()){
+            found = it.next().getRight().type() == TypesGramex.EMPTY;
+        }
+        return found;
+    }
 
+    public void renameVars(GrammarTools x) {
+        CfgConstructor generator = x.cfg.getCfg().getConstructor();
+        Map<CfgVariable, CfgVariable> mapper = new HashMap<>();
+        for(CfgVariable act : cfg.variables){
+            mapper.put(act, generator.generate(act));
+        }
+
+        cfg.start = mapper.get(cfg.start);
+        cfg.variables.clear();
+        cfg.variables.addAll(mapper.values());
+        Set<CfgRule> newRules = new HashSet<>();
+        for(CfgRule r : cfg.rules){
+            newRules.add(new CfgRule(mapper.get(r.getLeft()), substituteVarsToVars(r.getRight(), mapper)));
+        }
+        cfg.rules.clear();
+        cfg.rules.addAll(newRules);
+    }
+
+    //Getters cfg
+
+    public GramexVar startVar() {
+        return new GramexVar(cfg.start);
+    }
+
+    public Set<CfgRule> getRulesVar(CfgVariable v){
+        Set<CfgRule> set = new HashSet<>();
+        for(CfgRule rule : cfg.rules){
+            if(rule.getLeft().equals(v)) set.add(rule);
+        }
+        return set;
+    }
+
+    public Set<Gramex> getRulesRightVar(CfgVariable v){
+        Set<Gramex> set = new HashSet<>();
+        for(CfgRule r : cfg.rules){
+            if(r.getLeft().equals(v)) set.add(r.getRight());
+        }
+        return set;
+    }
+
+    public Set<CfgRule> getAllRules(){
+        return cfg.rules;
+    }
+
+    public Set<Character> getTerminals() {
+        return cfg.terminals.getSet();
+    }
+
+    public Set<CfgVariable> getVars() {
+        return cfg.variables;
+    }
 }

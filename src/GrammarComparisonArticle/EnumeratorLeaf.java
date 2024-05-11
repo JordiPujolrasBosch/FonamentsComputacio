@@ -1,4 +1,4 @@
-package GrammarComparisionArticle;
+package GrammarComparisonArticle;
 
 import Grammars.GramexChar;
 
