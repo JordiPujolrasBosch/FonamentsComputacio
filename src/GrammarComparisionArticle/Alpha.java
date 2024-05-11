@@ -20,28 +20,28 @@ public class Alpha {
         innerChoose = null;
     }
 
-    public List<String> generateWords(int n, Right rule) {
+    public List<String> generateWords(int n, Gramex rule) {
         return null;
     }
 
-    public Enumerator enumFunction(RightNonEmpty r, int n) throws EnumeratorException {
-        if(r.type() == TypesRight.CHAR){
+    public Enumerator enumFunction(GramexNonEmpty r, int n) throws EnumeratorException {
+        if(r.type() == TypesGramex.CHAR){
             if(n != 0) throw new EnumeratorException();
-            return new EnumeratorLeaf(r.toRightChar());
+            return new EnumeratorLeaf(r.toGramexChar());
         }
-        else if(r.type() == TypesRight.VAR){
-            Pair<RightNonEmpty,Integer> choose = chooseFunction(r.toRightVar(), n);
-            return new EnumeratorNode(r.toRightVar(), enumFunction(choose.getA(), choose.getB()));
+        else if(r.type() == TypesGramex.VAR){
+            Pair<GramexNonEmpty,Integer> choose = chooseFunction(r.toGramexVar(), n);
+            return new EnumeratorNode(r.toGramexVar(), enumFunction(choose.getA(), choose.getB()));
         }
         else{
-            RightNonEmpty ra = r.toRightConcat().getA();
-            RightNonEmpty rb = r.toRightConcat().getB();
+            GramexNonEmpty ra = r.toGramexConcat().getA();
+            GramexNonEmpty rb = r.toGramexConcat().getB();
             Pair<Integer, Integer> pi = pi(n, ht(ra), ht(rb));
             return new EnumeratorPair(enumFunction(ra, pi.getA()), enumFunction(rb, pi.getB()));
         }
     }
 
-    public Pair<RightNonEmpty,Integer> chooseFunction(RightVar r, int a){
+    public Pair<GramexNonEmpty,Integer> chooseFunction(GramexVar r, int a){
         if(innerChoose == null) innerChoose = new InnerChoose(this);
         //int n = cfg.getNumberRulesLeft(r.v());
         //int k = innerChoose.findK(r,a);
@@ -55,28 +55,28 @@ public class Alpha {
         return null;
     }
 
-    public int ht(RightNonEmpty r){
+    public int ht(GramexNonEmpty r){
         return 0;
     }
 
-    public int tau(RightNonEmpty r){
-        if(r.type() == TypesRight.CHAR){
+    public int tau(GramexNonEmpty r){
+        if(r.type() == TypesGramex.CHAR){
             return 1;
         }
-        else if(r.type() == TypesRight.VAR){
-            Set<CfgRule> rules = cfg.getRulesLeft(r.toRightVar().getV());
+        else if(r.type() == TypesGramex.VAR){
+            Set<CfgRule> rules = cfg.getRulesLeft(r.toGramexVar().getV());
             int n = 0;
             for(CfgRule rule : rules){
-                n += tau(rule.getRight().toRightNonEmpty());
+                n += tau(rule.getRight().toGramexNonEmpty());
             }
             return n;
         }
         else{
-            List<RightChar> cl = r.toRightConcat().getListChars();
-            List<RightVar> vl = r.toRightConcat().getListVars();
+            List<GramexChar> cl = r.toGramexConcat().getListChars();
+            List<GramexVar> vl = r.toGramexConcat().getListVars();
             int n = 1;
-            for(RightChar rc : cl) n *= tau(rc);
-            for(RightVar rv : vl)  n *= tau(rv);
+            for(GramexChar rc : cl) n *= tau(rc);
+            for(GramexVar rv : vl)  n *= tau(rv);
             return n;
         }
     }
@@ -84,7 +84,7 @@ public class Alpha {
 
 
     private static class InnerChoose {
-        private Map<CfgVariable, List<RightNonEmpty>> orderedRights;
+        private Map<CfgVariable, List<GramexNonEmpty>> orderedRights;
         private Map<CfgVariable, List<IntegerInf>> bs;
         private Map<CfgVariable, List<IntegerInf>> is;
         private final Alpha a;

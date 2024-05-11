@@ -151,8 +151,8 @@ public class GrammarData {
         if(!correctFormRight(list)) return false;
 
         CfgVariable left = toVariable(leftString);
-        List<Right> listRight = getListRight(list);
-        for(Right right : listRight) rules.add(new CfgRule(left, right));
+        List<Gramex> listRight = getListRight(list);
+        for(Gramex right : listRight) rules.add(new CfgRule(left, right));
         return true;
     }
 
@@ -204,34 +204,34 @@ public class GrammarData {
         return ok;
     }
 
-    private List<Right> getListRight(List<String> list) {
-        List<Right> listRight = new ArrayList<>();
-        RightNonEmpty right = null;
+    private List<Gramex> getListRight(List<String> list) {
+        List<Gramex> listRight = new ArrayList<>();
+        GramexNonEmpty right = null;
 
         int i = 0;
         while(i < list.size()){
             String act = list.get(i);
             if(isVariable(act)){
-                if(right == null) right = new RightVar(toVariable(act));
-                else right = new RightConcat(right, new RightVar(toVariable(act)));
+                if(right == null) right = new GramexVar(toVariable(act));
+                else right = new GramexConcat(right, new GramexVar(toVariable(act)));
             }
             else if(TokenFactory.gtokenCharContains(act)){
-                if(right == null) right = new RightChar(TokenFactory.gtokenCharGet(act));
-                else right = new RightConcat(right, new RightChar(TokenFactory.gtokenCharGet(act)));
+                if(right == null) right = new GramexChar(TokenFactory.gtokenCharGet(act));
+                else right = new GramexConcat(right, new GramexChar(TokenFactory.gtokenCharGet(act)));
             }
             else if(TokenFactory.gtokenGroupContains(act)){
-                for(char c : TokenFactory.gtokenGroupSet(act)) listRight.add(new RightChar(c));
+                for(char c : TokenFactory.gtokenGroupSet(act)) listRight.add(new GramexChar(c));
             }
             else if(act.equals(TokenFactory.getGrammarEmpty())){
-                listRight.add(new RightEmpty());
+                listRight.add(new GramexEmpty());
             }
             else if(act.equals(TokenFactory.getGrammarUnion())){
                 listRight.add(right);
                 right = null;
             }
             else if(act.length()==1){
-                if(right == null) right = new RightChar(act.charAt(0));
-                else right = new RightConcat(right, new RightChar(act.charAt(0)));
+                if(right == null) right = new GramexChar(act.charAt(0));
+                else right = new GramexConcat(right, new GramexChar(act.charAt(0)));
             }
             i++;
         }

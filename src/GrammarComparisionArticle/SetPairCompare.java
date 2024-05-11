@@ -1,37 +1,37 @@
 package GrammarComparisionArticle;
 
-import Grammars.Right;
+import Grammars.Gramex;
 
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 public class SetPairCompare {
-    private final Set<Right> left;
-    private final Set<Right> right;
+    private final Set<Gramex> left;
+    private final Set<Gramex> right;
     private final boolean opEq; //true = equivalence, false = inclusion
 
-    public SetPairCompare(Set<Right> sl, Set<Right> sr, boolean eq){
+    public SetPairCompare(Set<Gramex> sl, Set<Gramex> sr, boolean eq){
         left = new HashSet<>(sl);
         right = new HashSet<>(sr);
         opEq = eq;
     }
 
-    public SetPairCompare(Right l, Set<Right> sr, boolean eq){
+    public SetPairCompare(Gramex l, Set<Gramex> sr, boolean eq){
         left = new HashSet<>();
         left.add(l);
         right = new HashSet<>(sr);
         opEq = eq;
     }
 
-    public SetPairCompare(Set<Right> sl, Right r, boolean eq){
+    public SetPairCompare(Set<Gramex> sl, Gramex r, boolean eq){
         left = new HashSet<>(sl);
         right = new HashSet<>();
         right.add(r);
         opEq = eq;
     }
 
-    public SetPairCompare(Right l, Right r, boolean eq){
+    public SetPairCompare(Gramex l, Gramex r, boolean eq){
         left = new HashSet<>();
         left.add(l);
         right = new HashSet<>();
@@ -39,11 +39,11 @@ public class SetPairCompare {
         opEq = eq;
     }
 
-    public Set<Right> getLeft() {
+    public Set<Gramex> getLeft() {
         return left;
     }
 
-    public Set<Right> getRight() {
+    public Set<Gramex> getRight() {
         return right;
     }
 

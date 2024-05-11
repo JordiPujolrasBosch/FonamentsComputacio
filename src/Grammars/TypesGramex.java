@@ -1,5 +1,5 @@
 package Grammars;
 
-public enum TypesRight {
+public enum TypesGramex {
     EMPTY, CHAR, VAR, CONCAT
 }

@@ -2,9 +2,9 @@ package Factory;
 
 import Elements.Alphabet;
 import Factory.Builders.RegexOperator;
-import Grammars.RightChar;
-import Grammars.RightConcat;
-import Grammars.RightNonEmpty;
+import Grammars.GramexChar;
+import Grammars.GramexConcat;
+import Grammars.GramexNonEmpty;
 import RegularExpressions.RegexChar;
 import RegularExpressions.RegexConcat;
 import RegularExpressions.RegexUnion;
@@ -582,17 +582,17 @@ public class TokenFactory {
        $0 => 0|..|9
     */
 
-    private final static Map<String,RightNonEmpty> gGroup = buildGGroup();
-    private static Map<String,RightNonEmpty> buildGGroup(){
-        Map<String,RightNonEmpty> mapper = new HashMap<>();
+    private final static Map<String, GramexNonEmpty> gGroup = buildGGroup();
+    private static Map<String, GramexNonEmpty> buildGGroup(){
+        Map<String, GramexNonEmpty> mapper = new HashMap<>();
 
-        RightNonEmpty lower = new RightChar('a');
-        RightNonEmpty upper = new RightChar('A');
-        RightNonEmpty numbers = new RightChar('0');
+        GramexNonEmpty lower = new GramexChar('a');
+        GramexNonEmpty upper = new GramexChar('A');
+        GramexNonEmpty numbers = new GramexChar('0');
 
-        for(char c = 'b'; c <= 'z'; c++) lower = new RightConcat(lower, new RightChar(c));
-        for(char c = 'B'; c <= 'Z'; c++) upper = new RightConcat(upper, new RightChar(c));
-        for(char c = '1'; c <= '9'; c++) numbers = new RightConcat(numbers, new RightChar(c));
+        for(char c = 'b'; c <= 'z'; c++) lower = new GramexConcat(lower, new GramexChar(c));
+        for(char c = 'B'; c <= 'Z'; c++) upper = new GramexConcat(upper, new GramexChar(c));
+        for(char c = '1'; c <= '9'; c++) numbers = new GramexConcat(numbers, new GramexChar(c));
 
         mapper.put("$a", lower);
         mapper.put("$A", upper);
@@ -602,6 +602,6 @@ public class TokenFactory {
     }
 
     public static boolean isGGroup(String x){return gGroup.containsKey(x);}
-    public static RightNonEmpty getGGroup(String x){return gGroup.get(x);}
+    public static GramexNonEmpty getGGroup(String x){return gGroup.get(x);}
 
 }

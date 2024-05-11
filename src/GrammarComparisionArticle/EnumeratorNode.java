@@ -1,11 +1,11 @@
 package GrammarComparisionArticle;
 
-import Grammars.RightVar;
+import Grammars.GramexVar;
 
 public class EnumeratorNode implements Enumerator{
-    private final RightVar r;
+    private final GramexVar r;
     private final Enumerator e;
-    public EnumeratorNode(RightVar r, Enumerator e){
+    public EnumeratorNode(GramexVar r, Enumerator e){
         this.r = r;
         this.e = e;
     }

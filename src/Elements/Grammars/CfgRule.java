@@ -1,14 +1,14 @@
 package Elements.Grammars;
 
-import Grammars.Right;
+import Grammars.Gramex;
 
 import java.util.Objects;
 
 public class CfgRule {
     private final CfgVariable left;
-    private final Right right;
+    private final Gramex right;
 
-    public CfgRule(CfgVariable l, Right r){
+    public CfgRule(CfgVariable l, Gramex r){
         left = l;
         right = r;
     }
@@ -19,7 +19,7 @@ public class CfgRule {
         return left;
     }
 
-    public Right getRight() {
+    public Gramex getRight() {
         return right;
     }
 
