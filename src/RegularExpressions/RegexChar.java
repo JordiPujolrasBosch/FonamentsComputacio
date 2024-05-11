@@ -4,6 +4,8 @@ import Factory.Algorithms;
 import Automatons.Nfa;
 import Factory.TokenFactory;
 
+import java.util.Objects;
+
 public class RegexChar implements RegularExpression {
     private final char c;
 
@@ -15,17 +17,30 @@ public class RegexChar implements RegularExpression {
         return Algorithms.regexCharToNfa(c);
     }
 
+    public TypesRegex type() {
+        return TypesRegex.CHAR;
+    }
+
     public RegularExpression simplify() {
         return this;
     }
 
     @Override
     public String toString(){
-        if(TokenFactory.rtokensReverseContains(c)) return TokenFactory.rtokensReverseGet(c);
+        if(TokenFactory.isRString(c)) return TokenFactory.getRString(c);
         return String.valueOf(c);
     }
 
-    public TypesRegex type() {
-        return TypesRegex.CHAR;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RegexChar regexChar = (RegexChar) o;
+        return c == regexChar.c;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(c);
     }
 }

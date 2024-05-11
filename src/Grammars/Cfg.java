@@ -6,6 +6,7 @@ import Elements.Grammars.*;
 import Factory.Algorithms;
 import Factory.Constructors.CfgConstructor;
 import Factory.Printer;
+import GrammarComparisionArticle.Beta;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,18 +26,6 @@ public class Cfg {
 
     public CfgConstructor getConstructor(){
         return new CfgConstructor(terminals, variables, start, rules);
-    }
-
-    public Set<CfgRule> getRulesLeft(CfgVariable v) {
-        Set<CfgRule> ret = new HashSet<>();
-        for(CfgRule r : rules){
-            if(r.getLeft().equals(v)) ret.add(r);
-        }
-        return ret;
-    }
-
-    public Set<Character> getTerminals(){
-        return new HashSet<>(terminals.getSet());
     }
 
     public Pda toPda(){
@@ -61,6 +50,10 @@ public class Cfg {
 
     public boolean isLLTwo(){
         return false;
+    }
+
+    public boolean compare(Cfg x){
+        return Beta.compare(this, x);
     }
 
     @Override

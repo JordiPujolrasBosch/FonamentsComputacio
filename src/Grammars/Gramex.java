@@ -1,7 +1,5 @@
 package Grammars;
 
-import Elements.Grammars.CfgVariable;
-
 public interface Gramex {
     TypesGramex type();
     int length();
@@ -11,7 +9,4 @@ public interface Gramex {
     GramexChar toGramexChar();
     GramexVar toGramexVar();
     GramexConcat toGramexConcat();
-
-    boolean containsPair(GramexConcat pair);
-    Gramex getChanged(char c, CfgVariable x);
 }

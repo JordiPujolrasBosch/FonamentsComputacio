@@ -69,23 +69,24 @@ public class GrammarTools {
         return x;
     }
 
-    public static Gramex substituteLeftMost(Gramex original, CfgVariable v, Gramex substitute) {
-        Gramex x = original;
-        switch (original.type()){
-            case VAR -> {
-                if(original.toGramexVar().getV().equals(v)) x = substitute;
-            }
-            case CONCAT -> {
-                GramexConcat c = original.toGramexConcat();
-                if(containsVar(c.getA(), v)){
-                    x = new GramexConcat(substituteLeftMost(c.getA(), v, substitute).toGramexNonEmpty(), c.getB());
-                }
-                else if(containsVar(c.getB(), v)){
-                    x = new GramexConcat(c.getA(), substituteLeftMost(c.getB(), v, substitute).toGramexNonEmpty());
-                }
-            }
+    public static GramexConcat getRightMostPair(GramexConcat g){
+        if(g.getB().length() == 2) return g.getB().toGramexConcat();
+        if(g.getB().length() > 2)  return getRightMostPair(g.getB().toGramexConcat());
+        if(g.getA().length() == 2) return g.getA().toGramexConcat();
+        if(g.getA().length() > 2)  return getRightMostPair(g.getA().toGramexConcat());
+        return g;
+    }
+
+    public static boolean equalsGramexConcats(GramexConcat a, GramexConcat b){
+        boolean eq = a.getA().type() == b.getA().type();
+        eq = eq && a.getB().type() == b.getB().type();
+        if(eq){
+            if(a.getA().type() != TypesGramex.CONCAT) eq = a.getA().equals(b.getA());
+            else eq = equalsGramexConcats(a.getA().toGramexConcat(), b.getA().toGramexConcat());
+            if(a.getB().type() != TypesGramex.CONCAT) eq = eq && a.getB().equals(b.getB());
+            else eq = eq && equalsGramexConcats(a.getB().toGramexConcat(), b.getB().toGramexConcat());
         }
-        return x;
+        return eq;
     }
 
     public static Gramex commonSuffix(Gramex a, Gramex b) {
@@ -115,7 +116,67 @@ public class GrammarTools {
          */
     }
 
-    // Starts, ends and contains
+    public static boolean containsPair(Gramex g, GramexConcat pair){
+        boolean x = false;
+        if(g.type() == TypesGramex.CONCAT){
+            GramexConcat c = g.toGramexConcat();
+            x = c.equals(pair) || containsPair(c.getA(), pair) || containsPair(c.getB(), pair);
+        }
+        return x;
+    }
+
+    //Substitution
+
+    public static Gramex substituteLeftMost(Gramex original, CfgVariable v, Gramex substitute) {
+        Gramex x = original;
+        switch (original.type()){
+            case VAR -> {
+                if(original.toGramexVar().getV().equals(v)) x = substitute;
+            }
+            case CONCAT -> {
+                GramexConcat c = original.toGramexConcat();
+                if(containsVar(c.getA(), v)){
+                    x = new GramexConcat(substituteLeftMost(c.getA(), v, substitute).toGramexNonEmpty(), c.getB());
+                }
+                else if(containsVar(c.getB(), v)){
+                    x = new GramexConcat(c.getA(), substituteLeftMost(c.getB(), v, substitute).toGramexNonEmpty());
+                }
+            }
+        }
+        return x;
+    }
+
+    public static Gramex substituteAllChars(Gramex original, char c, CfgVariable substitute){
+        Gramex x = original;
+        switch (original.type()){
+            case CHAR -> {
+                if(original.toGramexChar().getC() == c) x = new GramexVar(substitute);
+            }
+            case CONCAT -> {
+                GramexNonEmpty a = substituteAllChars(original.toGramexConcat().getA(), c, substitute).toGramexNonEmpty();
+                GramexNonEmpty b = substituteAllChars(original.toGramexConcat().getB(), c, substitute).toGramexNonEmpty();
+                x = new GramexConcat(a,b);
+            }
+        }
+        return x;
+    }
+
+    public static Gramex substituteConcats(Gramex original, GramexConcat pair, CfgVariable substitute){
+        Gramex x = original;
+        if(original.type() == TypesGramex.CONCAT){
+            GramexVar subs = new GramexVar(substitute);
+            GramexConcat c = original.toGramexConcat();
+            if(equalsGramexConcats(c,pair)) x = subs;
+            else{
+                GramexNonEmpty a = substituteConcats(c.getA(), pair, substitute).toGramexNonEmpty();
+                GramexNonEmpty b = substituteConcats(c.getB(), pair, substitute).toGramexNonEmpty();
+                x = new GramexConcat(a,b);
+            }
+        }
+        return x;
+    }
+
+    // Starts, ends and contains: vars and chars
 
     public static boolean startsWithVar(Gramex g) {
         boolean x = false;

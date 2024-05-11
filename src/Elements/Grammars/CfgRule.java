@@ -1,5 +1,6 @@
 package Elements.Grammars;
 
+import Factory.TokenFactory;
 import Grammars.Gramex;
 
 import java.util.Objects;
@@ -27,7 +28,7 @@ public class CfgRule {
 
     @Override
     public String toString() {
-        return left.toString() + " -> " + right.toString();
+        return left.toString() + " " + TokenFactory.getGArrow() + " " + right.toString();
     }
 
     @Override

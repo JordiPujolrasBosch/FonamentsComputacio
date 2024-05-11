@@ -1,6 +1,6 @@
 package Grammars;
 
-import Elements.Grammars.CfgVariable;
+import Factory.TokenFactory;
 
 public class GramexChar implements GramexNonEmpty {
     private final char c;
@@ -45,17 +45,9 @@ public class GramexChar implements GramexNonEmpty {
         return null;
     }
 
-
-    public boolean containsPair(GramexConcat pair) {
-        return false;
-    }
-
-    public Gramex getChanged(char c, CfgVariable x) {
-        return new GramexVar(x);
-    }
-
     @Override
     public String toString() {
+        if(TokenFactory.isGString(c)) return TokenFactory.getGString(c);
         return Character.toString(c);
     }
 

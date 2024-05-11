@@ -47,25 +47,25 @@ public class Gntf {
         rules.get(origin).put(destiny, r);
     }
 
-    public void addRules(List<RuleGntf> l){
-        for(RuleGntf r : l) addReplace(r.getOrigin(), r.getDestiny(), r.getRegex());
-    }
-
     public void removeState(State act) {
         rules.remove(act);
         for(State s : rules.keySet()) rules.get(s).remove(act);
     }
 
-    // Get rules
+    //GET-ADD rules
 
     public List<RuleGntf> getRules(){
         List<RuleGntf> l = new ArrayList<>();
         for(State o : rules.keySet()){
-            for(State d : rules.keySet()){
+            for(State d : rules.get(o).keySet()){
                 l.add(new RuleGntf(o, d, rules.get(o).get(d)));
             }
         }
         return l;
+    }
+
+    public void addRules(List<RuleGntf> l){
+        for(RuleGntf r : l) addReplace(r.getOrigin(), r.getDestiny(), r.getRegex());
     }
 
     //Step

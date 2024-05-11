@@ -3,6 +3,8 @@ package RegularExpressions;
 import Factory.Algorithms;
 import Automatons.Nfa;
 
+import java.util.Objects;
+
 public class RegexConcat implements RegularExpression {
     private RegularExpression a;
     private RegularExpression b;
@@ -14,6 +16,10 @@ public class RegexConcat implements RegularExpression {
 
     public Nfa getNfa() {
         return Algorithms.concatenation(a.getNfa(), b.getNfa());
+    }
+
+    public TypesRegex type() {
+        return TypesRegex.CONCAT;
     }
 
     public RegularExpression simplify() {
@@ -36,7 +42,16 @@ public class RegexConcat implements RegularExpression {
         return a + b.toString();
     }
 
-    public TypesRegex type() {
-        return TypesRegex.CONCAT;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RegexConcat b = (RegexConcat) o;
+        return getNfa().toDfa().minimize().equal(b.getNfa().toDfa().minimize());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(a, b);
     }
 }

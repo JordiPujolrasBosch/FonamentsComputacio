@@ -27,10 +27,6 @@ public class Dtf {
         return true;
     }
 
-    public void addRules(List<Rule> l){
-        for(Rule r : l) add(r.getOrigin(), r.getDestiny(), r.getCharacter());
-    }
-
     public void removeState(State s) {
         rules.remove(s);
     }
@@ -43,7 +39,7 @@ public class Dtf {
         return rules.get(o).get(c);
     }
 
-    //Get rules
+    //GET-ADD rules
 
     public List<Rule> getRules(){
         List<Rule> l = new ArrayList<>();
@@ -53,6 +49,10 @@ public class Dtf {
             }
         }
         return l;
+    }
+
+    public void addRules(List<Rule> l){
+        for(Rule r : l) add(r.getOrigin(), r.getDestiny(), r.getCharacter());
     }
 
     //Consult

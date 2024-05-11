@@ -7,7 +7,7 @@ import Factory.Algorithms;
 import Factory.Constructors.NfaConstructor;
 import Factory.Printer;
 
-import java.util.*;
+import java.util.Set;
 
 public class Nfa {
     private final Set<State> states;

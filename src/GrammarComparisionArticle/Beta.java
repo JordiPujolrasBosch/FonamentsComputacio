@@ -16,6 +16,10 @@ public class Beta {
         alpha = new Alpha(cfg);
     }
 
+    public static boolean compare(Cfg a, Cfg b) {
+        return false;
+    }
+
     //Derivative
 
     public Set<Gramex> derivative(String word, Gramex rule){

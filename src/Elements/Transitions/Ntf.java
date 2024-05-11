@@ -30,11 +30,7 @@ public class Ntf {
         rules.get(origin).get(character).add(destiny);
     }
 
-    public void addRules(List<Rule> l){
-        for(Rule r : l) add(r.getOrigin(), r.getDestiny(), r.getCharacter());
-    }
-
-    //Get rules
+    //GET-ADD rules
 
     public List<Rule> getRules(){
         List<Rule> l = new ArrayList<>();
@@ -46,6 +42,10 @@ public class Ntf {
             }
         }
         return l;
+    }
+
+    public void addRules(List<Rule> l){
+        for(Rule r : l) add(r.getOrigin(), r.getDestiny(), r.getCharacter());
     }
 
     //Step

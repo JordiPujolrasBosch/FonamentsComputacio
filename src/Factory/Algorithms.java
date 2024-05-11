@@ -1039,14 +1039,14 @@ public class Algorithms {
                 }
 
                 if(foundNonBinaryRule){
-                    GramexConcat pair = nonBinaryRule.getRight().toGramexConcat().getPair();
+                    GramexConcat pair = GrammarTools.getRightMostPair(nonBinaryRule.getRight().toGramexConcat());
                     CfgRule newRule = new CfgRule(ccx.generate(new CfgVariable('Z',0)), pair);
 
                     Set<CfgRule> toremove = new HashSet<>();
                     Set<CfgRule> toadd = new HashSet<>();
                     for(CfgRule r : ccx.rules){
-                        if(r.getRight().containsPair(pair)){
-                            GramexNonEmpty substituted = r.getRight().toGramexConcat().getChanged(pair, newRule.getLeft());
+                        if(GrammarTools.containsPair(r.getRight(), pair)){
+                            Gramex substituted = GrammarTools.substituteConcats(r.getRight().toGramexConcat(), pair, newRule.getLeft());
                             toremove.add(r);
                             toadd.add(new CfgRule(r.getLeft(), substituted));
                         }
@@ -1082,7 +1082,7 @@ public class Algorithms {
                     Set<CfgRule> toadd = new HashSet<>();
                     for(CfgRule r : ccx.rules){
                         if(r.getRight().length() == 2 && GrammarTools.containsChar(r.getRight(), c)){
-                            Gramex substituted = r.getRight().getChanged(c, newRule.getLeft());
+                            Gramex substituted = GrammarTools.substituteAllChars(r.getRight(), c, newRule.getLeft());
                             toremove.add(r);
                             toadd.add(new CfgRule(r.getLeft(), substituted));
                         }

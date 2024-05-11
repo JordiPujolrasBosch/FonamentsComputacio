@@ -11,6 +11,10 @@ public class RegexEmptyChar implements RegularExpression {
         return Algorithms.regexEmptyCharToNfa();
     }
 
+    public TypesRegex type() {
+        return TypesRegex.EMPTY;
+    }
+
     public RegularExpression simplify() {
         return this;
     }
@@ -20,7 +24,14 @@ public class RegexEmptyChar implements RegularExpression {
         return TokenFactory.regexEmptyCharString();
     }
 
-    public TypesRegex type() {
-        return TypesRegex.EMPTY;
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null && getClass() == obj.getClass();
     }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
 }

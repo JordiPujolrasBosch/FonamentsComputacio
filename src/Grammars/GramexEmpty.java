@@ -1,6 +1,5 @@
 package Grammars;
 
-import Elements.Grammars.CfgVariable;
 import Factory.TokenFactory;
 
 public class GramexEmpty implements Gramex {
@@ -38,16 +37,6 @@ public class GramexEmpty implements Gramex {
         return null;
     }
 
-
-
-    public boolean containsPair(GramexConcat pair) {
-        return false;
-    }
-
-    public Gramex getChanged(char c, CfgVariable x) {
-        return this;
-    }
-
     @Override
     public boolean equals(Object obj) {
         return obj != null && getClass() == obj.getClass();
@@ -55,7 +44,7 @@ public class GramexEmpty implements Gramex {
 
     @Override
     public String toString() {
-        return TokenFactory.getGrammarEmpty();
+        return TokenFactory.getGEmptyChar();
     }
 
 }

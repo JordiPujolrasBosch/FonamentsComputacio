@@ -143,32 +143,6 @@ public class TokenFactory {
         return btokensReverse.get(character);
     }
 
-    // REGEX
-
-    public static String regexVoidString() {
-        return "#";
-    }
-
-    public static String regexUnionString() {
-        return "|";
-    }
-
-    public static String regexStarString() {
-        return "*";
-    }
-
-    public static String regexEmptyCharString() {
-        return "/";
-    }
-
-    public static boolean rtokensReverseContains(Character c){
-        return rtokensReverse.containsKey(c);
-    }
-
-    public static String rtokensReverseGet(Character c){
-        return rtokensReverse.get(c);
-    }
-
     //Grammar
 
     public static String getGrammarUnion() {
@@ -196,14 +170,6 @@ public class TokenFactory {
     }
 
     //Build
-
-
-
-
-
-
-
-
 
     private static Map<String, RegularExpression> buildRTokens(){
         Map<String, RegularExpression> mapper = new HashMap<>();
@@ -408,6 +374,11 @@ public class TokenFactory {
 
     //R-TOKENS
 
+    public static String regexVoidString()      {return "#";}
+    public static String regexUnionString()     {return "|";}
+    public static String regexStarString()      {return "*";}
+    public static String regexEmptyCharString() {return "/";}
+
     //R-OPERATOR
     /*
        ( => Open priority parenthesis
@@ -540,8 +511,8 @@ public class TokenFactory {
        ->  => Arrow
     */
 
-    public static char getGUnion(){return '|';}
-    public static char getGEmptyChar(){return '/';}
+    public static String getGUnion(){return "|";}
+    public static String getGEmptyChar(){return "/";}
     public static String getGArrow(){return "->";}
 
     //G-CHAR

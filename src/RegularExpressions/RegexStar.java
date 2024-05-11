@@ -4,6 +4,8 @@ import Factory.Algorithms;
 import Automatons.Nfa;
 import Factory.TokenFactory;
 
+import java.util.Objects;
+
 public class RegexStar implements RegularExpression {
     private RegularExpression x;
 
@@ -13,6 +15,10 @@ public class RegexStar implements RegularExpression {
 
     public Nfa getNfa(){
         return Algorithms.star(x.getNfa());
+    }
+
+    public TypesRegex type() {
+        return TypesRegex.STAR;
     }
 
     public RegularExpression simplify() {
@@ -30,7 +36,16 @@ public class RegexStar implements RegularExpression {
         return x + TokenFactory.regexStarString();
     }
 
-    public TypesRegex type() {
-        return TypesRegex.STAR;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RegexStar b = (RegexStar) o;
+        return x.getNfa().toDfa().minimize().equal(b.x.getNfa().toDfa().minimize());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x);
     }
 }

@@ -3,6 +3,7 @@ package GrammarComparisionArticle;
 import Elements.Grammars.CfgRule;
 import Elements.Grammars.CfgVariable;
 import Exceptions.EnumeratorException;
+import Factory.GrammarTools;
 import Grammars.*;
 import Utils.IntegerInf;
 import Utils.Pair;
@@ -12,11 +13,11 @@ import java.util.Map;
 import java.util.Set;
 
 public class Alpha {
-    private final Cfg cfg;
+    private final GrammarTools gt;
     private InnerChoose innerChoose;
 
     public Alpha(Cfg cfg){
-        this.cfg = cfg;
+        gt = new GrammarTools(cfg);
         innerChoose = null;
     }
 
@@ -64,7 +65,7 @@ public class Alpha {
             return 1;
         }
         else if(r.type() == TypesGramex.VAR){
-            Set<CfgRule> rules = cfg.getRulesLeft(r.toGramexVar().getV());
+            Set<CfgRule> rules = gt.getRulesVar(r.toGramexVar().getV());
             int n = 0;
             for(CfgRule rule : rules){
                 n += tau(rule.getRight().toGramexNonEmpty());
@@ -72,11 +73,8 @@ public class Alpha {
             return n;
         }
         else{
-            List<GramexChar> cl = r.toGramexConcat().getListChars();
-            List<GramexVar> vl = r.toGramexConcat().getListVars();
             int n = 1;
-            for(GramexChar rc : cl) n *= tau(rc);
-            for(GramexVar rv : vl)  n *= tau(rv);
+            for(GramexNonEmpty g : r.toGramexConcat().toList()) n *= tau(g);
             return n;
         }
     }

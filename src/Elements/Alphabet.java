@@ -1,6 +1,8 @@
 package Elements;
 
-import java.util.*;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Objects;
 
 public class Alphabet {
     private final Set<Character> set;

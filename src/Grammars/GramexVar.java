@@ -47,16 +47,6 @@ public class GramexVar implements GramexNonEmpty {
         return null;
     }
 
-
-
-    public boolean containsPair(GramexConcat pair) {
-        return false;
-    }
-
-    public Gramex getChanged(char c, CfgVariable x) {
-        return this;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

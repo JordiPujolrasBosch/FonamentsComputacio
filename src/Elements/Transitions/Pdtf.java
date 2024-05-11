@@ -11,9 +11,13 @@ import java.util.Objects;
 public class Pdtf {
     private final Map<PdtfInput, Set<PdtfOutput>> rules;
 
+    //Constructor
+
     public Pdtf(){
         rules = new HashMap<>();
     }
+
+    //Add
 
     public void add(State origin, int c, int pop, State destiny, int push){
         PdtfInput input = new PdtfInput(origin, c, pop);
@@ -22,9 +26,13 @@ public class Pdtf {
         rules.get(input).add(output);
     }
 
+    //Consult
+
     public boolean hasRule(State origin, int c, int pop){
         return rules.containsKey(new PdtfInput(origin, c, pop));
     }
+
+    //Step
 
     public Set<PdtfTuple> stepWithEmpty(State origin, int c, int pop, int e){
         Set<PdtfTuple> res = new HashSet<>();
@@ -50,6 +58,8 @@ public class Pdtf {
         }
         return res;
     }
+
+    //Private classes
 
     private static class PdtfInput {
         public State origin;

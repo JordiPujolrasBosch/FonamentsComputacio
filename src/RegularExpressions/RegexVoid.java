@@ -11,6 +11,10 @@ public class RegexVoid implements RegularExpression {
         return Algorithms.regexVoidToNfa();
     }
 
+    public TypesRegex type() {
+        return TypesRegex.VOID;
+    }
+
     public RegularExpression simplify() {
         return this;
     }
@@ -20,7 +24,13 @@ public class RegexVoid implements RegularExpression {
         return TokenFactory.regexVoidString();
     }
 
-    public TypesRegex type() {
-        return TypesRegex.VOID;
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null && getClass() == obj.getClass();
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }
