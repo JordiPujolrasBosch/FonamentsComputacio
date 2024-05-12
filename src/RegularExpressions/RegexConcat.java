@@ -47,7 +47,7 @@ public class RegexConcat implements RegularExpression {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RegexConcat b = (RegexConcat) o;
-        return getNfa().toDfa().minimize().equal(b.getNfa().toDfa().minimize());
+        return getNfa().toDfa().minimize().compare(b.getNfa().toDfa().minimize());
     }
 
     @Override

@@ -32,7 +32,7 @@ public class Dfa {
         return Algorithms.checkWordDfa(this, word);
     }
 
-    public boolean equal(Dfa b){
+    public boolean compare(Dfa b){
         return Algorithms.equalsDfas(this, b);
     }
 

@@ -31,9 +31,9 @@ public class RegexStar implements RegularExpression {
     @Override
     public String toString() {
         if(x.type() == TypesRegex.CONCAT || x.type() == TypesRegex.STAR || x.type() == TypesRegex.UNION){
-            return "(" + x + ")" + TokenFactory.regexStarString();
+            return "(" + x + ")" + TokenFactory.getRStar();
         }
-        return x + TokenFactory.regexStarString();
+        return x + TokenFactory.getRStar();
     }
 
     @Override
@@ -41,7 +41,7 @@ public class RegexStar implements RegularExpression {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RegexStar b = (RegexStar) o;
-        return x.getNfa().toDfa().minimize().equal(b.x.getNfa().toDfa().minimize());
+        return x.getNfa().toDfa().minimize().compare(b.x.getNfa().toDfa().minimize());
     }
 
     @Override

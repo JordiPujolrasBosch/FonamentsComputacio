@@ -838,7 +838,7 @@ public class Algorithms {
         pc.alphabet.addChar(Alphabet.getStackChar());
 
         for(char c : pc.alphabet.getSet()) pc.addMapper(c);
-        for(CfgVariable v : ccx.variables) pc.addMapper(v);
+        for(Gvar v : ccx.variables) pc.addMapper(v);
         pc.addMapper(Alphabet.getEmptyChar());
 
         int e = pc.getMapper(Alphabet.getEmptyChar());
@@ -860,7 +860,7 @@ public class Algorithms {
     private static class CfgToPdaPrivate {
         private static void buildRules(PdaConstructor pc, CfgConstructor ccx, State loop){
             int e = pc.getMapper(Alphabet.getEmptyChar());
-            for(CfgRule r : ccx.rules){
+            for(Grule r : ccx.rules){
                 if(r.getRight().length() == 0) {
                     pc.transition.add(loop, e, pc.getMapper(r.getLeft()), loop, e);
                 }
@@ -918,41 +918,127 @@ public class Algorithms {
 
     // TRANSFORMATIONS CFG
 
-    public static Cfg chomsky(Cfg x){
+    public static Cfg cgfNonEmptyToCfg(CfgNonEmpty x) {
+        CfgNonEmptyConstructor ccx = x.getConstructor();
+        CfgConstructor cc = new CfgConstructor();
+
+        cc.variables.addAll(ccx.variables);
+        cc.terminals.addAll(ccx.terminals);
+        cc.start = ccx.start;
+
+        for(GruleNonEmpty r : ccx.rules){
+            cc.rules.add(new Grule(r.getLeft(), r.getRight()));
+        }
+
+        if(ccx.acceptsEmptyWord) cc.rules.add(new Grule(ccx.start, new GramexEmpty()));
+
+        return cc.getCfg();
+    }
+
+    public static CfgNonEmpty chomsky(CfgNonEmpty x){
+        /*CfgNonEmptyConstructor ccx = x.getConstructor();
+
+        GrammarPrivate.addNewStart(ccx);
+        GrammarPrivate.eliminateEmptyRules(ccx);
+        GrammarPrivate.removeUnusedVars(ccx);
+        GrammarPrivate.removeUnitRules(ccx);
+        GrammarPrivate.makeRulesBinary(ccx);
+        GrammarPrivate.replaceBinaryTerminals(ccx);
+
+        return ccx.getCfgNonEmpty();*/
+        return null;
+    }
+
+    public static CfgNonEmpty griebach(CfgNonEmpty x) {
+        /*CfgNonEmptyConstructor ccx = simplifyGrammar(x).getConstructor();
+        GrammarPrivate.addNewStart(ccx);
+        GrammarPrivate.eliminateEmptyRules(ccx);
+        GrammarPrivate.removeUnusedVars(ccx);
+        //List<Gvar> order = GrammarPrivate.findOrderGriebach(ccx);
+        //GrammarPrivate.applySustitutionToCheckOrder(ccx);
+        //GrammarPrivate.applyGriebachInOrder(ccx,order);
+        //Substitute terminals in right
+        return ccx.getCfgNonEmpty();*/
+        return null;
+    }
+
+    public static CfgNonEmpty simplifyGrammar(Cfg x) {
+        //Remove no derivable vars (vars que no generan terminales)
+        //Remove unreachable vars (vars a los que no se puede llegar)
+        //Remove empty rules
+        //Remove unit rules
+        return null;
+    }
+
+    private static Cfg removeLeftRecursivity(Cfg x){
         CfgConstructor ccx = x.getConstructor();
+        Set<Grule> toRemove = new HashSet<>();
+        Set<Grule> toAdd = new HashSet<>();
 
-        ChomskyPrivate.addNewStart(ccx);
-        ChomskyPrivate.eliminateEmptyRules(ccx);
-        ChomskyPrivate.removeUnusedVars(ccx);
-        ChomskyPrivate.removeUnitRules(ccx);
-        ChomskyPrivate.makeRulesBinary(ccx);
-        ChomskyPrivate.replaceBinaryTerminals(ccx);
+        Map<Gvar, Set<Gramex>> mapper = GrammarTools.getMapperRules(x);
+        for(Gvar v : mapper.keySet()){
+            Set<Gramex> haveLeftRec = new HashSet<>();
+            Set<Gramex> noHaveLeftRec = new HashSet<>();
+            findLeftRecursivity(v, mapper.get(v), haveLeftRec, noHaveLeftRec);
+            if(!haveLeftRec.isEmpty()) buildNonRecursiveRules(ccx, v, haveLeftRec, noHaveLeftRec, toRemove, toAdd);
+        }
 
+        ccx.rules.removeAll(toRemove);
+        ccx.rules.addAll(toAdd);
         return ccx.getCfg();
     }
 
-    private static class ChomskyPrivate {
+    private static void findLeftRecursivity(Gvar v, Set<Gramex> bag, Set<Gramex> have, Set<Gramex> noHave){
+        for(Gramex g : bag){
+            if(g.type() == TypesGramex.EMPTY || g.type() == TypesGramex.CHAR) noHave.add(g);
+            else if(g.type() == TypesGramex.VAR && g.toGramexVar().getV().equals(v)) have.add(g);
+            else if(g.type() == TypesGramex.VAR) noHave.add(g);
+            else{
+                GramexNonEmpty gne = GrammarTools.getLeftMost(g.toGramexConcat());
+                if(gne.type() == TypesGramex.CHAR) noHave.add(g);
+                else if(gne.type() == TypesGramex.VAR && gne.toGramexVar().getV().equals(v)) have.add(g);
+                else noHave.add(g);
+            }
+        }
+    }
+
+    private static void buildNonRecursiveRules(CfgConstructor ccx, Gvar v, Set<Gramex> have, Set<Gramex> noHave, Set<Grule> remove, Set<Grule> toAdd){
+        Gvar newVar = ccx.generate(v);
+        for(Gramex g : noHave){
+            toAdd.add(new Grule(v, new GramexConcat(g.toGramexNonEmpty(), new GramexVar(newVar))));
+        }
+        for(Gramex g : have){
+            Gramex aux = GrammarTools.substituteLeftMost(g,v,new GramexEmpty());
+            toAdd.add(new Grule(newVar, aux));
+            if(aux.type() != TypesGramex.EMPTY){
+                toAdd.add(new Grule(newVar, new GramexConcat(aux.toGramexNonEmpty(),new GramexVar(newVar))));
+            }
+            remove.add(new Grule(v,g));
+        }
+    }
+
+    private static class GrammarPrivate {
         private static void addNewStart(CfgConstructor ccx) {
-            CfgVariable newStart = ccx.generate(ccx.start);
-            ccx.rules.add(new CfgRule(newStart, new GramexVar(ccx.start)));
+            Gvar newStart = ccx.generate(ccx.start);
+            ccx.rules.add(new Grule(newStart, new GramexVar(ccx.start)));
             ccx.start = newStart;
         }
 
         private static void eliminateEmptyRules(CfgConstructor ccx) {
-            Set<CfgRule> emptyRules = new HashSet<>();
-            for(CfgRule r : ccx.rules){
+            Set<Grule> emptyRules = new HashSet<>();
+            for(Grule r : ccx.rules){
                 if(r.getRight().type() == TypesGramex.EMPTY) emptyRules.add(r);
             }
 
-            Set<CfgRule> removed = new HashSet<>();
+            Set<Grule> removed = new HashSet<>();
             while(!emptyRules.isEmpty()){
                 if(emptyRules.size() == 1 && emptyRules.iterator().next().getLeft().equals(ccx.start)){
                     emptyRules.clear();
                 }
                 else{
                     //Get a rule
-                    Iterator<CfgRule> it = emptyRules.iterator();
-                    CfgRule act = it.next();
+                    Iterator<Grule> it = emptyRules.iterator();
+                    Grule act = it.next();
                     if(act.getLeft().equals(ccx.start)) act = it.next();
 
                     //Remove act
@@ -960,10 +1046,10 @@ public class Algorithms {
                     removed.add(act);
 
                     //Add rules with occurrences of act.left
-                    Set<CfgRule> toadd = new HashSet<>();
-                    for(CfgRule r : ccx.rules) toadd = rulesToAddStepTwo(r, act.getLeft(), removed);
+                    Set<Grule> toadd = new HashSet<>();
+                    for(Grule r : ccx.rules) toadd = rulesToAddStepTwo(r, act.getLeft(), removed);
                     ccx.rules.addAll(toadd);
-                    for(CfgRule r : toadd){
+                    for(Grule r : toadd){
                         if(r.getRight().type() == TypesGramex.EMPTY) emptyRules.add(r);
                     }
 
@@ -974,14 +1060,30 @@ public class Algorithms {
         }
 
         private static void removeUnusedVars(CfgConstructor ccx){
-            Set<CfgVariable> set = new HashSet<>(ccx.variables);
-            for(CfgRule r : ccx.rules) set.remove(r.getLeft());
+            Set<Gvar> set = new HashSet<>(ccx.variables);
+            for(Grule r : ccx.rules) set.remove(r.getLeft());
 
             ccx.variables.removeAll(set);
 
-            Set<CfgRule> rules = new HashSet<>();
-            for(CfgRule r : ccx.rules){
-                for(CfgVariable v : set){
+            Set<Grule> rules = new HashSet<>();
+            for(Grule r : ccx.rules){
+                for(Gvar v : set){
+                    if(GrammarTools.containsVar(r.getRight(), v)) rules.add(r);
+                }
+            }
+
+            ccx.rules.removeAll(rules);
+        }
+
+        private static void removeUnusedVars(CfgNonEmptyConstructor ccx){
+            Set<Gvar> set = new HashSet<>(ccx.variables);
+            for(GruleNonEmpty r : ccx.rules) set.remove(r.getLeft());
+
+            ccx.variables.removeAll(set);
+
+            Set<GruleNonEmpty> rules = new HashSet<>();
+            for(GruleNonEmpty r : ccx.rules){
+                for(Gvar v : set){
                     if(GrammarTools.containsVar(r.getRight(), v)) rules.add(r);
                 }
             }
@@ -990,15 +1092,15 @@ public class Algorithms {
         }
 
         private static void removeUnitRules(CfgConstructor ccx) {
-            Set<CfgRule> unitRules = new HashSet<>();
-            for(CfgRule r : ccx.rules){
+            Set<Grule> unitRules = new HashSet<>();
+            for(Grule r : ccx.rules){
                 if(r.getRight().type() == TypesGramex.VAR) unitRules.add(r);
             }
 
-            Set<CfgRule> removed = new HashSet<>();
+            Set<Grule> removed = new HashSet<>();
             while(!unitRules.isEmpty()){
-                CfgRule rule = unitRules.iterator().next();
-                CfgVariable ri = rule.getRight().toGramexVar().getV();
+                Grule rule = unitRules.iterator().next();
+                Gvar ri = rule.getRight().toGramexVar().getV();
 
                 if(rule.getLeft().equals(ri)){
                     ccx.rules.remove(rule);
@@ -1006,10 +1108,10 @@ public class Algorithms {
                     unitRules.remove(rule);
                 }
                 else{
-                    Set<CfgRule> toadd = new HashSet<>();
-                    for(CfgRule r : ccx.rules){
+                    Set<Grule> toadd = new HashSet<>();
+                    for(Grule r : ccx.rules){
                         if(r.getLeft().equals(ri)){
-                            CfgRule aux = new CfgRule(rule.getLeft(), r.getRight());
+                            Grule aux = new Grule(rule.getLeft(), r.getRight());
                             if(aux.getRight().type() != TypesGramex.VAR) toadd.add(aux);
                             else if(!removed.contains(aux)){
                                 toadd.add(aux);
@@ -1030,9 +1132,9 @@ public class Algorithms {
             boolean foundNonBinaryRule = true;
             while(foundNonBinaryRule){
                 foundNonBinaryRule = false;
-                CfgRule nonBinaryRule = null;
+                Grule nonBinaryRule = null;
 
-                Iterator<CfgRule> it = ccx.rules.iterator();
+                Iterator<Grule> it = ccx.rules.iterator();
                 while(it.hasNext() && !foundNonBinaryRule){
                     nonBinaryRule = it.next();
                     foundNonBinaryRule = nonBinaryRule.getRight().length() > 2;
@@ -1040,15 +1142,15 @@ public class Algorithms {
 
                 if(foundNonBinaryRule){
                     GramexConcat pair = GrammarTools.getRightMostPair(nonBinaryRule.getRight().toGramexConcat());
-                    CfgRule newRule = new CfgRule(ccx.generate(new CfgVariable('Z',0)), pair);
+                    Grule newRule = new Grule(ccx.generate(new Gvar('Z',0)), pair);
 
-                    Set<CfgRule> toremove = new HashSet<>();
-                    Set<CfgRule> toadd = new HashSet<>();
-                    for(CfgRule r : ccx.rules){
+                    Set<Grule> toremove = new HashSet<>();
+                    Set<Grule> toadd = new HashSet<>();
+                    for(Grule r : ccx.rules){
                         if(GrammarTools.containsPair(r.getRight(), pair)){
                             Gramex substituted = GrammarTools.substituteConcats(r.getRight().toGramexConcat(), pair, newRule.getLeft());
                             toremove.add(r);
-                            toadd.add(new CfgRule(r.getLeft(), substituted));
+                            toadd.add(new Grule(r.getLeft(), substituted));
                         }
                     }
                     ccx.rules.addAll(toadd);
@@ -1062,9 +1164,9 @@ public class Algorithms {
             boolean foundBinaryTerminalRules = true;
             while(foundBinaryTerminalRules){
                 foundBinaryTerminalRules = false;
-                CfgRule binaryTerminalRule = null;
+                Grule binaryTerminalRule = null;
 
-                Iterator<CfgRule> it = ccx.rules.iterator();
+                Iterator<Grule> it = ccx.rules.iterator();
                 while(it.hasNext() && !foundBinaryTerminalRules){
                     binaryTerminalRule = it.next();
                     foundBinaryTerminalRules = binaryTerminalRule.getRight().length() == 2 && GrammarTools.containsChar(binaryTerminalRule.getRight());
@@ -1076,15 +1178,15 @@ public class Algorithms {
                     if(rc.getA().type() == TypesGramex.CHAR) c = rc.getA().toGramexChar().getC();
                     else c = rc.getB().toGramexChar().getC();
 
-                    CfgRule newRule = new CfgRule(ccx.generate(new CfgVariable('Z',0)), new GramexChar(c));
+                    Grule newRule = new Grule(ccx.generate(new Gvar('Z',0)), new GramexChar(c));
 
-                    Set<CfgRule> toremove = new HashSet<>();
-                    Set<CfgRule> toadd = new HashSet<>();
-                    for(CfgRule r : ccx.rules){
+                    Set<Grule> toremove = new HashSet<>();
+                    Set<Grule> toadd = new HashSet<>();
+                    for(Grule r : ccx.rules){
                         if(r.getRight().length() == 2 && GrammarTools.containsChar(r.getRight(), c)){
                             Gramex substituted = GrammarTools.substituteAllChars(r.getRight(), c, newRule.getLeft());
                             toremove.add(r);
-                            toadd.add(new CfgRule(r.getLeft(), substituted));
+                            toadd.add(new Grule(r.getLeft(), substituted));
                         }
                     }
                     ccx.rules.addAll(toadd);
@@ -1094,18 +1196,18 @@ public class Algorithms {
             }
         }
 
-        private static Set<CfgRule> rulesToAddStepTwo(CfgRule rule, CfgVariable toremove, Set<CfgRule> removed){
+        private static Set<Grule> rulesToAddStepTwo(Grule rule, Gvar toremove, Set<Grule> removed){
             if(!GrammarTools.containsVar(rule.getRight(), toremove)) return new HashSet<>();
 
-            Set<CfgRule> set = new HashSet<>();
+            Set<Grule> set = new HashSet<>();
             if(rule.getRight().type() == TypesGramex.VAR){
-                CfgRule aux = new CfgRule(rule.getLeft(), new GramexEmpty());
+                Grule aux = new Grule(rule.getLeft(), new GramexEmpty());
                 if(!removed.contains(aux)) set.add(aux);
             }
             else{
                 Set<Gramex> setright = stepTwoIm(rule.getRight().toGramexConcat(), toremove);
                 for(Gramex r : setright){
-                    CfgRule aux = new CfgRule(rule.getLeft(), r);
+                    Grule aux = new Grule(rule.getLeft(), r);
                     if(r.type() == TypesGramex.EMPTY && !removed.contains(aux)) set.add(aux);
                     else set.add(aux);
                 }
@@ -1113,7 +1215,7 @@ public class Algorithms {
             return set;
         }
 
-        private static Set<Gramex> stepTwoIm(GramexConcat right, CfgVariable toremove){
+        private static Set<Gramex> stepTwoIm(GramexConcat right, Gvar toremove){
             Set<Gramex> set = new HashSet<>();
 
             TypesGramex var = TypesGramex.VAR;
@@ -1146,7 +1248,7 @@ public class Algorithms {
             return set;
         }
 
-        private static Set<Gramex> stepTwoConA(GramexConcat right, CfgVariable toremove){
+        private static Set<Gramex> stepTwoConA(GramexConcat right, Gvar toremove){
             Set<Gramex> set = new HashSet<>();
             for(Gramex r : stepTwoIm(right.getA().toGramexConcat(), toremove)){
                 if(r.type() == TypesGramex.EMPTY) set.add(right.getB());
@@ -1155,7 +1257,7 @@ public class Algorithms {
             return set;
         }
 
-        private static Set<Gramex> stepTwoConB(GramexConcat right, CfgVariable toremove){
+        private static Set<Gramex> stepTwoConB(GramexConcat right, Gvar toremove){
             Set<Gramex> set = new HashSet<>();
             for(Gramex r : stepTwoIm(right.getB().toGramexConcat(), toremove)){
                 if(r.type() == TypesGramex.EMPTY) set.add(right.getA());
@@ -1164,7 +1266,7 @@ public class Algorithms {
             return set;
         }
 
-        private static Set<Gramex> stepTwoConAB(GramexConcat right, CfgVariable toremove){
+        private static Set<Gramex> stepTwoConAB(GramexConcat right, Gvar toremove){
             Set<Gramex> set = new HashSet<>();
             for(Gramex ra : stepTwoIm(right.getA().toGramexConcat(), toremove)){
                 for(Gramex rb : stepTwoIm(right.getB().toGramexConcat(), toremove)){
@@ -1177,6 +1279,12 @@ public class Algorithms {
             return set;
         }
 
+    }
+
+    // CFG == CFG
+
+    public static boolean equalsCfgs(CfgNonEmpty a, CfgNonEmpty b) {
+        return false;
     }
 
     // CHECK WORD

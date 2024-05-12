@@ -36,7 +36,7 @@ public class RegexUnion implements RegularExpression {
 
     @Override
     public String toString() {
-        return a + TokenFactory.regexUnionString() + b;
+        return a + TokenFactory.getRUnion() + b;
     }
 
     @Override
@@ -44,7 +44,7 @@ public class RegexUnion implements RegularExpression {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RegexUnion b = (RegexUnion) o;
-        return getNfa().toDfa().minimize().equal(b.getNfa().toDfa().minimize());
+        return getNfa().toDfa().minimize().compare(b.getNfa().toDfa().minimize());
     }
 
     @Override

@@ -40,6 +40,34 @@ public class IntegerInf {
         return new IntegerInf(n * x.n);
     }
 
+    //Comparisons
+
+    public boolean isGreaterThan(IntegerInf x) {
+        if(x.inf) return false;
+        if(inf) return true;
+        return n > x.n;
+    }
+
+    public boolean isLesserThan(IntegerInf x) {
+        if(inf) return false;
+        if(x.inf) return true;
+        return n < x.n;
+    }
+
+    public boolean isEqual(IntegerInf x){
+        if(inf && x.inf) return true;
+        if(inf != x.inf) return false;
+        return n == x.n;
+    }
+
+    public boolean isLesserEqualThan(IntegerInf x) {
+        return isLesserThan(x) || isEqual(x);
+    }
+
+    public boolean isGreaterEqualThan(IntegerInf x){
+        return isGreaterThan(x) || isEqual(x);
+    }
+
     //Equals
 
     @Override

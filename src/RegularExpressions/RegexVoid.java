@@ -21,7 +21,7 @@ public class RegexVoid implements RegularExpression {
 
     @Override
     public String toString() {
-        return TokenFactory.regexVoidString();
+        return TokenFactory.getRVoid();
     }
 
     @Override

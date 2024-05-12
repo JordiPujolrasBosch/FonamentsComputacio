@@ -10,14 +10,22 @@ import java.util.List;
  * Test all
  *
  * Regex builder
- * Right
  * Chomsky
  * Algorithms
  * TokenFactory
- *
+ * Cfg(ne): LL checks
  * Article CFG==CFG
  * */
 
+/*
+ * DONE
+ * Automatons
+ * Elements
+ * Exceptions
+ * Grammars
+ * RegularExpressions
+ * Utils
+ * */
 
 public class Main {
     public static void main(String[] args) {

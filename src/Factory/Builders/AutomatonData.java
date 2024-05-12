@@ -68,7 +68,7 @@ public class AutomatonData {
 
     public void addRule(int o, String s, int d) throws Exception {
         if(s.length() == 1) transition.add(new RuleData(o,d,s.charAt(0)));
-        else if(TokenFactory.btokensContains(s)) transition.add(new RuleData(o,d,TokenFactory.btokensGet(s)));
+        else if(TokenFactory.isBChar(s)) transition.add(new RuleData(o,d, TokenFactory.getBChar(s)));
         else throw new Exception();
     }
 
@@ -168,8 +168,9 @@ public class AutomatonData {
         while (it.hasNext() && ok){
             String s = it.next();
             if(s.length() == 1) alphabet.addChar(s.charAt(0));
-            else if(TokenFactory.atokensContains(s)) alphabet.addAll(TokenFactory.atokensGet(s));
-            else ok = false;
+            else if(TokenFactory.isAChar(s)) alphabet.addChar(TokenFactory.getAChar(s));
+            else if(TokenFactory.isAGroup(s)) alphabet.addAll(TokenFactory.getAGroup(s));
+            else if(!s.equals(TokenFactory.getANothing())) ok = false;
         }
         return ok;
     }

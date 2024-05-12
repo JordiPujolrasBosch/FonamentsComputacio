@@ -2,11 +2,11 @@ package Elements.Grammars;
 
 import java.util.Objects;
 
-public class CfgVariable {
+public class Gvar {
     private final char c;
     private final int n;
 
-    public CfgVariable(char c, int n){
+    public Gvar(char c, int n){
         this.c = c;
         this.n = n;
     }
@@ -32,7 +32,7 @@ public class CfgVariable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CfgVariable that = (CfgVariable) o;
+        Gvar that = (Gvar) o;
         return c == that.c && n == that.n;
     }
 

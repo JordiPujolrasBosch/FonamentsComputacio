@@ -2,8 +2,8 @@ package Factory.Builders;
 
 import Elements.Alphabet;
 import Grammars.*;
-import Elements.Grammars.CfgRule;
-import Elements.Grammars.CfgVariable;
+import Elements.Grammars.Grule;
+import Elements.Grammars.Gvar;
 import Factory.TokenFactory;
 
 import java.util.*;
@@ -15,14 +15,14 @@ public class GrammarData {
 
     private boolean variablesRead;
     private List<String> variables;
-    private final Set<CfgVariable> setvar;
+    private final Set<Gvar> setvar;
 
     private boolean startRead;
     private String startString;
-    private CfgVariable start;
+    private Gvar start;
 
     private final List<List<String>> rulesString;
-    private final List<CfgRule> rules;
+    private final List<Grule> rules;
 
     public GrammarData(){
         terminalElementsRead = false;
@@ -90,8 +90,9 @@ public class GrammarData {
         while (it.hasNext() && ok){
             String s = it.next();
             if(s.length() == 1) alphabet.addChar(s.charAt(0));
-            else if(TokenFactory.atokensContains(s)) alphabet.addAll(TokenFactory.atokensGet(s));
-            else ok = false;
+            else if(TokenFactory.isAChar(s)) alphabet.addChar(TokenFactory.getAChar(s));
+            else if(TokenFactory.isAGroup(s)) alphabet.addAll(TokenFactory.getAGroup(s));
+            else if(!s.equals(TokenFactory.getANothing())) ok = false;
         }
         return ok;
     }
@@ -150,9 +151,9 @@ public class GrammarData {
 
         if(!correctFormRight(list)) return false;
 
-        CfgVariable left = toVariable(leftString);
+        Gvar left = toVariable(leftString);
         List<Gramex> listRight = getListRight(list);
-        for(Gramex right : listRight) rules.add(new CfgRule(left, right));
+        for(Gramex right : listRight) rules.add(new Grule(left, right));
         return true;
     }
 
@@ -163,16 +164,16 @@ public class GrammarData {
             String act = list.get(i);
             boolean isFirst = i == 0;
             boolean isLast = i == list.size()-1;
-            String union = TokenFactory.getGrammarUnion();
-            String empty = TokenFactory.getGrammarEmpty();
+            String union = TokenFactory.getGUnion();
+            String empty = TokenFactory.getGEmptyChar();
 
             if(isVariable(act)){
                 ok = setvar.contains(toVariable(act));
             }
-            else if(TokenFactory.gtokenCharContains(act)){
-                ok = alphabet.contains(TokenFactory.gtokenCharGet(act));
+            else if(TokenFactory.isGChar(act)){
+                ok = alphabet.contains(TokenFactory.getGChar(act));
             }
-            else if(TokenFactory.gtokenGroupContains(act)){
+            else if(TokenFactory.isGGroup(act)){
                 ok = alphabet.getSet().containsAll(TokenFactory.gtokenGroupSet(act));
                 if(ok){
                     if(isFirst) ok = list.get(i+1).equals(union);
@@ -215,17 +216,17 @@ public class GrammarData {
                 if(right == null) right = new GramexVar(toVariable(act));
                 else right = new GramexConcat(right, new GramexVar(toVariable(act)));
             }
-            else if(TokenFactory.gtokenCharContains(act)){
-                if(right == null) right = new GramexChar(TokenFactory.gtokenCharGet(act));
-                else right = new GramexConcat(right, new GramexChar(TokenFactory.gtokenCharGet(act)));
+            else if(TokenFactory.isGChar(act)){
+                if(right == null) right = new GramexChar(TokenFactory.getGChar(act));
+                else right = new GramexConcat(right, new GramexChar(TokenFactory.getGChar(act)));
             }
-            else if(TokenFactory.gtokenGroupContains(act)){
+            else if(TokenFactory.isGGroup(act)){
                 for(char c : TokenFactory.gtokenGroupSet(act)) listRight.add(new GramexChar(c));
             }
-            else if(act.equals(TokenFactory.getGrammarEmpty())){
+            else if(act.equals(TokenFactory.getGEmptyChar())){
                 listRight.add(new GramexEmpty());
             }
-            else if(act.equals(TokenFactory.getGrammarUnion())){
+            else if(act.equals(TokenFactory.getGUnion())){
                 listRight.add(right);
                 right = null;
             }
@@ -245,8 +246,8 @@ public class GrammarData {
         return s.length() > 1 && s.charAt(0) >= 'A' && s.charAt(0) <= 'Z' && isNumber(s.substring(1));
     }
 
-    private CfgVariable toVariable(String s) {
-        return new CfgVariable(s.charAt(0), Integer.parseInt(s.substring(1)));
+    private Gvar toVariable(String s) {
+        return new Gvar(s.charAt(0), Integer.parseInt(s.substring(1)));
     }
 
     private boolean isGroupOne(String s) {
@@ -257,9 +258,9 @@ public class GrammarData {
         return c1 && c2 && s.charAt(0) < s.charAt(2);
     }
 
-    private Set<CfgVariable> toVariablesOne(String s) {
-        Set<CfgVariable> set = new HashSet<>();
-        for(char c = s.charAt(0); c <= s.charAt(2); c++) set.add(new CfgVariable(c, 0));
+    private Set<Gvar> toVariablesOne(String s) {
+        Set<Gvar> set = new HashSet<>();
+        for(char c = s.charAt(0); c <= s.charAt(2); c++) set.add(new Gvar(c, 0));
         return set;
     }
 
@@ -270,11 +271,11 @@ public class GrammarData {
         return c && isNumber(pair[0]) && isNumber(pair[1]) && Integer.parseInt(pair[0]) < Integer.parseInt(pair[1]);
     }
 
-    private Set<CfgVariable> toVariablesTwo(String s) {
+    private Set<Gvar> toVariablesTwo(String s) {
         char c = s.charAt(0);
         String[] pair = s.substring(1).split("-");
-        Set<CfgVariable> set = new HashSet<>();
-        for(int i = Integer.parseInt(pair[0]); i <= Integer.parseInt(pair[1]); i++) set.add(new CfgVariable(c, i));
+        Set<Gvar> set = new HashSet<>();
+        for(int i = Integer.parseInt(pair[0]); i <= Integer.parseInt(pair[1]); i++) set.add(new Gvar(c, i));
         return set;
     }
 

@@ -61,11 +61,6 @@ public class GramexConcat implements GramexNonEmpty {
         return list;
     }
 
-    public Gramex get(int n){
-        if(n < 0 || n >= length()) return new GramexEmpty();
-        else return toList().get(n);
-    }
-
 
     @Override
     public boolean equals(Object o) {

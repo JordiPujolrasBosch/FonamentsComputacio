@@ -1,23 +1,23 @@
 package GrammarComparisonArticle;
 
-import Elements.Grammars.CfgVariable;
+import Elements.Grammars.Gvar;
 import Factory.GrammarTools;
 import Grammars.*;
 
 import java.util.*;
 
-public class Beta {
-    public static boolean compare(Cfg a, Cfg b) {
+public class GrammarComparator {
+    public static boolean compare(CfgNonEmpty a, CfgNonEmpty b) {
+        CfgNonEmpty aRenamed = GrammarTools.renameVars(a,b);
         AlgorithmData data = new AlgorithmData();
-        data.gta = new GrammarTools(a);
-        data.gtb = new GrammarTools(b);
-        data.gena = new Alpha(a);
-        data.genb = new Alpha(b);
-        data.gtb.renameVars(data.gta);
+        data.cfga = aRenamed;
+        data.cfgb = b;
+        data.gena = new WordsGenerator(aRenamed);
+        data.genb = new WordsGenerator(b);
 
-        if(!checkGrammars(data.gta, data.gtb)) return false;
+        if(!data.cfga.getTerminals().equals(data.cfgb.getTerminals())) return false;
 
-        Comparison start = new Comparison(data.gta.startVar(), data.gtb.startVar(), true);
+        Comparison start = new Comparison(new GramexVar(a.getStart()), new GramexVar(b.getStart()), true);
         Set<Comparison> context = new HashSet<>();
         Set<Comparison> toProve = verifyBranch(start,context,data);
 
@@ -89,24 +89,18 @@ public class Beta {
         return equals;
     }
 
-    private static boolean checkGrammars(GrammarTools gta, GrammarTools gtb){
-        boolean eq = gta.getTerminals().equals(gtb.getTerminals());
-        eq = eq && !gta.hasEmptyRules() && !gtb.hasEmptyRules();
-        return eq;
-    }
-
     //Derivative
 
-    public static Set<Gramex> derivative(String word, Gramex rule, GrammarTools gt){
+    public static Set<Gramex> derivative(String word, Gramex rule, CfgNonEmpty cfg){
         Set<Gramex> set = new HashSet<>();
         if(GrammarTools.terminalPrefix(rule).startsWith(word)) set.add(GrammarTools.cut(rule, word.length()).getB());
-        else set.addAll(gt.findSuffixes(rule, word));
+        else set.addAll(GrammarTools.findSuffixes(cfg, rule, word));
         return set;
     }
 
-    private static Set<Gramex> derivativeOfSet(String word, Set<Gramex> rules, GrammarTools gt) {
+    private static Set<Gramex> derivativeOfSet(String word, Set<Gramex> rules, CfgNonEmpty cfg) {
         Set<Gramex> set = new HashSet<>();
-        for(Gramex r : rules) set.addAll(derivative(word, r, gt));
+        for(Gramex r : rules) set.addAll(derivative(word, r, cfg));
         return set;
     }
 
@@ -183,21 +177,21 @@ public class Beta {
     //Rule branch
 
     public static Set<Comparison> verifyBranch(Comparison comp, Set<Comparison> context, AlgorithmData data){
-        GrammarTools gtl, gtr;
-        boolean leftIsA = GrammarTools.correctVars(data.gta, data.gtb, comp.getLeft(), comp.getRight());
+        CfgNonEmpty cfgl, cfgr;
+        boolean leftIsA = GrammarTools.correctVars(data.cfga, data.cfgb, comp.getLeft(), comp.getRight());
         if(leftIsA){
-            gtl = data.gta;
-            gtr = data.gtb;
+            cfgl = data.cfga;
+            cfgr = data.cfgb;
         }
         else{
-            gtl = data.gtb;
-            gtr = data.gta;
+            cfgl = data.cfgb;
+            cfgr = data.cfga;
         }
 
         Set<Comparison> set = new HashSet<>();
-        for(char c : gtl.getTerminals()){
-            Set<Gramex> dl = derivativeOfSet(Character.toString(c), comp.getLeft(), gtl);
-            Set<Gramex> dr = derivativeOfSet(Character.toString(c), comp.getRight(), gtr);
+        for(char c : cfgl.getTerminals().getSet()){
+            Set<Gramex> dl = derivativeOfSet(Character.toString(c), comp.getLeft(), cfgl);
+            Set<Gramex> dr = derivativeOfSet(Character.toString(c), comp.getRight(), cfgr);
             set.add(new Comparison(dl, dr, comp.isEquivalence()));
         }
         if(!set.isEmpty()) context.add(comp);
@@ -215,20 +209,20 @@ public class Beta {
     }
 
     public static Set<Comparison> verifySplit(Comparison comp, Set<Comparison> context, AlgorithmData data){
-        GrammarTools gtl, gtr;
-        boolean leftIsA = GrammarTools.correctVars(data.gta, data.gtb, comp.getLeft(), comp.getRight());
+        CfgNonEmpty cfgl, cfgr;
+        boolean leftIsA = GrammarTools.correctVars(data.cfga, data.cfgb, comp.getLeft(), comp.getRight());
         if(leftIsA){
-            gtl = data.gta;
-            gtr = data.gtb;
+            cfgl = data.cfga;
+            cfgr = data.cfgb;
         }
         else{
-            gtl = data.gtb;
-            gtr = data.gta;
+            cfgl = data.cfga;
+            cfgr = data.cfgb;
         }
 
         Gramex r = comp.getLeft().iterator().next();
-        CfgVariable v = GrammarTools.getLeftMostVar(r.toGramexNonEmpty());
-        String shortWord = gtl.shortestWordOfVar(v);
+        Gvar v = GrammarTools.getLeftMostVar(r.toGramexNonEmpty());
+        String shortWord = GrammarTools.shortestWordOfVar(cfgl, v);
         Gramex gamma = GrammarTools.cut(r, 1).getB();
 
         boolean everyOmegaCanDeriveShort = true;
@@ -241,7 +235,7 @@ public class Beta {
         while(it.hasNext() && everyOmegaCanDeriveShort){
             Gramex w = it.next();
             SplitElement spe = new SplitElement(w);
-            everyOmegaCanDeriveShort = findOmegaBetaRo(spe, shortWord, gtr);
+            everyOmegaCanDeriveShort = findOmegaBetaRo(spe, shortWord, cfgr);
             if(everyOmegaCanDeriveShort){
                 list.add(spe);
                 everyBetaIsNonEmpty = everyBetaIsNonEmpty && (spe.beta.type() != TypesGramex.EMPTY);
@@ -270,7 +264,7 @@ public class Beta {
         return set;
     }
 
-    private static boolean findOmegaBetaRo(SplitElement spe, String x, GrammarTools gtr){
+    private static boolean findOmegaBetaRo(SplitElement spe, String x, CfgNonEmpty gtr){
         // w = omega-beta
         // d(x,w) = ro-beta
         Set<Gramex> set = derivative(x,spe.w, gtr);
@@ -311,17 +305,17 @@ public class Beta {
     }
 
     public static Comparison verifyTestcases(Comparison comp, AlgorithmData data){
-        GrammarTools gtr, gtl;
-        Alpha alphal;
-        boolean leftIsA = GrammarTools.correctVars(data.gta, data.gtb, comp.getLeft(), comp.getRight());
+        CfgNonEmpty cfgr, cfgl;
+        WordsGenerator alphal;
+        boolean leftIsA = GrammarTools.correctVars(data.cfga, data.cfgb, comp.getLeft(), comp.getRight());
         if(leftIsA){
-            gtl = data.gta;
-            gtr = data.gtb;
+            cfgl = data.cfga;
+            cfgr = data.cfgb;
             alphal = data.gena;
         }
         else{
-            gtl = data.gtb;
-            gtr = data.gta;
+            cfgl = data.cfgb;
+            cfgr = data.cfga;
             alphal = data.genb;
         }
 
@@ -330,18 +324,18 @@ public class Beta {
         Iterator<Gramex> it = comp.getRight().iterator();
         boolean found = false;
         while(it.hasNext() && !found){
-            Gramex s = it.next();
-            found = gtr.acceptsAllWords(s, alphal.generateWords(gtl.recommendedBagSize(),left));
+            GramexNonEmpty s = it.next().toGramexNonEmpty();
+            found = GrammarTools.acceptsAllWords(cfgr, s, alphal.generateWords(GrammarTools.recommendedBagSize(cfgl),left));
             if(found) res = new Comparison(comp.getLeft(), s, false);
         }
         return res;
     }
 
     private static class AlgorithmData{
-        public GrammarTools gta;
-        public GrammarTools gtb;
-        public Alpha gena;
-        public Alpha genb;
+        public CfgNonEmpty cfga;
+        public CfgNonEmpty cfgb;
+        public WordsGenerator gena;
+        public WordsGenerator genb;
         public AlgorithmData(){}
     }
 

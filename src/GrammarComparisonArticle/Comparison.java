@@ -9,7 +9,7 @@ import java.util.Set;
 public class Comparison {
     private final Set<Gramex> left;
     private final Set<Gramex> right;
-    private final boolean opEq; //true = equivalence, false = inclusion
+    private final boolean opEq; //true = equivalence (l==r), false = inclusion (l in r)
 
     //Constructors
 

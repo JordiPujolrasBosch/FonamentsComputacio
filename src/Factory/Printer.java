@@ -3,8 +3,8 @@ package Factory;
 import Automatons.Dfa;
 import Automatons.Nfa;
 import Elements.Alphabet;
-import Elements.Grammars.CfgRule;
-import Elements.Grammars.CfgVariable;
+import Elements.Grammars.Grule;
+import Elements.Grammars.Gvar;
 import Elements.Rule;
 import Elements.State;
 import Factory.Constructors.CfgConstructor;
@@ -57,7 +57,7 @@ public class Printer {
         res = res + alphabetPrinter(cc.terminals, "terminals") + "\n";
         res = res + variablesCfgPrinter(cc.variables) + "\n";
         res = res + "start: " + cc.start + "\n";
-        for(CfgRule rule : cc.rules) res = res + rule + "\n";
+        for(Grule rule : cc.rules) res = res + rule + "\n";
         return res;
     }
 
@@ -81,7 +81,7 @@ public class Printer {
         String res = "";
         for(Rule r : rules){
             String character = Character.toString(r.getCharacter());
-            if(TokenFactory.btokensReverseContains(r.getCharacter())) character = TokenFactory.btokensReverseGet(r.getCharacter());
+            if(TokenFactory.isBString(r.getCharacter())) character = TokenFactory.getBString(r.getCharacter());
             res = res + mapper.get(r.getOrigin()) + " " + character + " " + mapper.get(r.getDestiny()) + "\n";
         }
         return res;
@@ -101,11 +101,11 @@ public class Printer {
         return res;
     }
 
-    private static String variablesCfgPrinter(Set<CfgVariable> variables){
+    private static String variablesCfgPrinter(Set<Gvar> variables){
         String res = "variables: ";
-        Iterator<CfgVariable> it = variables.iterator();
+        Iterator<Gvar> it = variables.iterator();
         while(it.hasNext()){
-            CfgVariable act = it.next();
+            Gvar act = it.next();
             if(it.hasNext()) res = res + act + ", ";
             else res = res + act;
         }
@@ -115,13 +115,13 @@ public class Printer {
     private static String alphabetPrinter(Alphabet alphabet, String name){
         String res = name + ": ";
         if(alphabet.containsEmptyChar()){
-            res = res + TokenFactory.atokensGetEmptyChar() + ", ";
+            res = res + TokenFactory.getAEmptyChar() + ", ";
         }
         for(char c : alphabet.getSet()){
-            if(TokenFactory.atokensReverseContains(c)) res = res + TokenFactory.atokensReverseGet(c) + ", ";
+            if(TokenFactory.isAString(c)) res = res + TokenFactory.getAString(c) + ", ";
             else res = res + c + ", ";
         }
-        res = res + TokenFactory.atokensGetNothing();
+        res = res + TokenFactory.getANothing();
         return res;
     }
 

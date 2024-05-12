@@ -1,39 +1,42 @@
 package Factory.Constructors;
 
 import Elements.Alphabet;
-import Grammars.Cfg;
-import Elements.Grammars.Grule;
+import Elements.Grammars.GruleNonEmpty;
 import Elements.Grammars.Gvar;
+import Grammars.CfgNonEmpty;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class CfgConstructor {
+public class CfgNonEmptyConstructor {
     public Alphabet terminals;
     public Set<Gvar> variables;
     public Gvar start;
-    public Set<Grule> rules;
+    public Set<GruleNonEmpty> rules;
+    public boolean acceptsEmptyWord;
 
-    private final Map<Character, Integer> generator;
+    private final Map<Character,Integer> generator;
 
-    public CfgConstructor(){
+    public CfgNonEmptyConstructor(){
         this.terminals = new Alphabet();
         this.variables = new HashSet<>();
         this.start = null;
         this.rules = new HashSet<>();
+        this.acceptsEmptyWord = false;
 
         this.generator = new HashMap<>();
     }
 
-    public CfgConstructor(Alphabet terminals, Set<Gvar> variables, Gvar start, Set<Grule> rules){
+    public CfgNonEmptyConstructor(Alphabet terminals, Set<Gvar> variables, Gvar start, Set<GruleNonEmpty> rules, boolean empty){
         this.terminals = new Alphabet();
         this.terminals.addAll(terminals);
 
         this.variables = new HashSet<>(variables);
         this.start = start;
         this.rules = new HashSet<>(rules);
+        this.acceptsEmptyWord = empty;
 
         generator = new HashMap<>();
         for(Gvar var : variables){
@@ -43,7 +46,7 @@ public class CfgConstructor {
     }
 
     public Gvar generate(Gvar v){
-        if(!generator.containsKey(v.getC())) {
+        if(!generator.containsKey(v.getC())){
             generator.put(v.getC(), v.getN());
             variables.add(v);
             return v;
@@ -54,7 +57,7 @@ public class CfgConstructor {
         return ret;
     }
 
-    public Cfg getCfg(){
-        return new Cfg(terminals, variables, start, rules);
+    public CfgNonEmpty getCfgNonEmpty(){
+        return new CfgNonEmpty(terminals, variables, start, rules, acceptsEmptyWord);
     }
 }

@@ -1,17 +1,17 @@
 package Grammars;
 
-import Elements.Grammars.CfgVariable;
+import Elements.Grammars.Gvar;
 
 import java.util.Objects;
 
 public class GramexVar implements GramexNonEmpty {
-    private final CfgVariable v;
+    private final Gvar v;
 
-    public GramexVar(CfgVariable v){
+    public GramexVar(Gvar v){
         this.v = v;
     }
 
-    public CfgVariable getV(){
+    public Gvar getV(){
         return v;
     }
 

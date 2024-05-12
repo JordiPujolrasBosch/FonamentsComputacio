@@ -6,17 +6,17 @@ import Elements.Grammars.*;
 import Factory.Algorithms;
 import Factory.Constructors.CfgConstructor;
 import Factory.Printer;
-import GrammarComparisonArticle.Beta;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class Cfg {
     private final Alphabet terminals;
-    private final Set<CfgVariable> variables;
-    private final CfgVariable start;
-    private final Set<CfgRule> rules;
+    private final Set<Gvar> variables;
+    private final Gvar start;
+    private final Set<Grule> rules;
 
-    public Cfg(Alphabet terminals, Set<CfgVariable> variables, CfgVariable start, Set<CfgRule> rules){
+    public Cfg(Alphabet terminals, Set<Gvar> variables, Gvar start, Set<Grule> rules){
         this.terminals = terminals;
         this.variables = variables;
         this.start = start;
@@ -27,18 +27,37 @@ public class Cfg {
         return new CfgConstructor(terminals, variables, start, rules);
     }
 
+    //Getters
+
+    public Alphabet getTerminals(){
+        Alphabet x = new Alphabet();
+        x.addAll(terminals);
+        return x;
+    }
+
+    public Set<Gvar> getVariables(){
+        return new HashSet<>(variables);
+    }
+
+    public Gvar getStart(){
+        return start;
+    }
+
+    public Set<Grule> getRules(){
+        return new HashSet<>(rules);
+    }
+
+    //Transformations
+
     public Pda toPda(){
         return Algorithms.cfgToPda(this);
     }
 
-    public Cfg toChomsky(){
-        return Algorithms.chomsky(this);
+    public CfgNonEmpty simplify(){
+        return Algorithms.simplifyGrammar(this);
     }
 
-    public Cfg toGriebach(){
-        return null;
-    }
-
+    /*
     // LL -> LL + Greibach ?
 
     public boolean isLL(){
@@ -56,7 +75,7 @@ public class Cfg {
     public boolean compare(Cfg x){
         return Beta.compare(this, x);
     }
-
+    */
     @Override
     public String toString() {
         return Printer.stringOfGrammar(this);

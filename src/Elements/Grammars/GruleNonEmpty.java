@@ -1,26 +1,26 @@
 package Elements.Grammars;
 
 import Factory.TokenFactory;
-import Grammars.Gramex;
+import Grammars.GramexNonEmpty;
 
 import java.util.Objects;
 
-public class CfgRule {
-    private final CfgVariable left;
-    private final Gramex right;
+public class GruleNonEmpty {
+    private final Gvar left;
+    private final GramexNonEmpty right;
 
-    public CfgRule(CfgVariable l, Gramex r){
+    public GruleNonEmpty(Gvar l, GramexNonEmpty r){
         left = l;
         right = r;
     }
 
     //Getters
 
-    public CfgVariable getLeft(){
+    public Gvar getLeft() {
         return left;
     }
 
-    public Gramex getRight() {
+    public GramexNonEmpty getRight() {
         return right;
     }
 
@@ -35,8 +35,8 @@ public class CfgRule {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CfgRule cfgRule = (CfgRule) o;
-        return Objects.equals(left, cfgRule.left) && Objects.equals(right, cfgRule.right);
+        GruleNonEmpty that = (GruleNonEmpty) o;
+        return Objects.equals(left, that.left) && Objects.equals(right, that.right);
     }
 
     @Override

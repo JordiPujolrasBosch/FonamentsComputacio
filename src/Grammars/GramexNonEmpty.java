@@ -1,4 +1,3 @@
 package Grammars;
 
-public interface GramexNonEmpty extends Gramex {
-}
+public interface GramexNonEmpty extends Gramex {}

@@ -21,7 +21,7 @@ public class RegexEmptyChar implements RegularExpression {
 
     @Override
     public String toString() {
-        return TokenFactory.regexEmptyCharString();
+        return TokenFactory.getREmptyChar();
     }
 
     @Override

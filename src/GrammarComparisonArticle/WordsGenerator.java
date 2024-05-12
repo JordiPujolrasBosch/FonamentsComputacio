@@ -1,33 +1,57 @@
 package GrammarComparisonArticle;
 
-import Elements.Grammars.CfgRule;
-import Elements.Grammars.CfgVariable;
-import Exceptions.AlphaException;
+import Elements.Grammars.*;
 import Factory.GrammarTools;
+import GrammarComparisonArticle.Enumerators.*;
 import Grammars.*;
-import Utils.IntegerInf;
-import Utils.Pair;
+import Utils.*;
 
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
 
-public class Alpha {
-    private final GrammarTools gt;
+public class WordsGenerator {
+    private final CfgNonEmpty cfg;
+    private InnerHt innerHt;
+    private Map<GramexNonEmpty,IntegerInf> htMapper;
     private InnerChoose innerChoose;
-    private final InnerHt innerHt;
 
-    public Alpha(Cfg cfg){
-        gt = new GrammarTools(cfg);
-        innerChoose = null;
-        innerHt = new InnerHt();
+    public WordsGenerator(CfgNonEmpty cfg){
+        this.cfg = cfg;
+        build();
     }
 
     public List<String> generateWords(int n, Gramex rule) {
         return null;
     }
 
-    public Enumerator enumFunction(GramexNonEmpty r, int n) throws AlphaException {
+    private void build(){
+        innerHt = new InnerHt();
+        htMapper = new HashMap<>();
+
+        for(char t : cfg.getTerminals().getSet()){
+            GramexChar g = new GramexChar(t);
+            htMapper.put(g, ht(g));
+        }
+        for(Gvar v : cfg.getVariables()){
+            GramexVar g = new GramexVar(v);
+            htMapper.put(g, ht(g));
+        }
+        for(GruleNonEmpty r : cfg.getRules()){
+            GramexNonEmpty g = r.getRight();
+            if(!htMapper.containsKey(g)) htMapper.put(g, ht(g));
+        }
+
+        innerChoose = new InnerChoose();
+        innerChoose.build(this);
+    }
+
+    private Enumerator enumFunction(GramexNonEmpty r, int n) {
         if(r.type() == TypesGramex.CHAR){
-            if(n != 0) throw new AlphaException();
+            if(n != 0) return null;
             return new EnumeratorLeaf(r.toGramexChar());
         }
         else if(r.type() == TypesGramex.VAR){
@@ -42,27 +66,26 @@ public class Alpha {
         }
     }
 
-    public Pair<GramexNonEmpty,Integer> chooseFunction(GramexVar r, int a) throws AlphaException {
-        if(innerChoose == null) {
-            innerChoose = new InnerChoose();
-            innerChoose.build(this);
-        }
-        //int n = cfg.getNumberRulesLeft(r.v());
-        //int k = innerChoose.findK(r,a);
-        //int qq = Math.floorDiv(a - innerChoose.getI(r.v(),k), n - k);
-        //int rr = (a - innerChoose.getI(r.v(),k)) % (n - k);
-        //return new Pair<RightNonEmpty, Integer>(innerChoose.getRight(r.v(),k+rr),innerChoose.getB(r.v(),k) + qq);
-        return null;
+    private Pair<GramexNonEmpty,Integer> chooseFunction(GramexVar r, int a) {
+        Gvar v = r.getV();
+        int n = GrammarTools.getRulesVar(cfg, v).size();
+        int k = innerChoose.findK(v,a);
+        int ik = innerChoose.getI(v,k);
+        int qq = (a-ik)/(n-k);
+        int rr = (a-ik)%(n-k);
+        return new Pair<>(innerChoose.getGramex(v,k+rr),qq+innerChoose.getB(v,k));
     }
 
-    public IntegerInf ht(GramexNonEmpty g){
+    private IntegerInf ht(GramexNonEmpty g){
+        if(htMapper.containsKey(g)) return htMapper.get(g);
+
         innerHt.active = true;
         IntegerInf x = tau(g);
         innerHt.clear();
         return x;
     }
 
-    public IntegerInf tau(GramexNonEmpty g){
+    private IntegerInf tau(GramexNonEmpty g){
         if(innerHt.loop && innerHt.active) return new IntegerInf(true);
 
         if(g.type() == TypesGramex.CHAR) {
@@ -76,34 +99,39 @@ public class Alpha {
             return n;
         }
         else{
-            CfgVariable v = g.toGramexVar().getV();
+            Gvar v = g.toGramexVar().getV();
             innerHt.start(v);
             IntegerInf n = new IntegerInf(0);
-            for(Gramex gv : gt.getRulesRightVar(v)){
-                n = n.add(tau(gv.toGramexNonEmpty()));
+            for(GramexNonEmpty gv : GrammarTools.getRulesRightVar(cfg,v)){
+                n = n.add(tau(gv));
             }
             innerHt.finish(v);
             return n;
         }
     }
 
+    //Private classes
 
     private static class InnerHt{
         public boolean active;
-        public Set<CfgVariable> bag;
+        public Set<Gvar> bag;
         public boolean loop;
+
         public InnerHt(){
             active = false;
             loop = false;
             bag = new HashSet<>();
         }
-        public void start(CfgVariable v){
+
+        public void start(Gvar v){
             if(active && !bag.contains(v)) bag.add(v);
             else if(active && bag.contains(v)) loop = true;
         }
-        public void finish(CfgVariable v){
+
+        public void finish(Gvar v){
             if(active) bag.remove(v);
         }
+
         public void clear(){
             active = false;
             bag.clear();
@@ -112,74 +140,108 @@ public class Alpha {
     }
 
     private static class InnerChoose {
-        private Map<CfgVariable, List<GramexNonEmpty>> orderedRights;
-        private Map<CfgVariable, List<IntegerInf>> bs;
-        private Map<CfgVariable, List<IntegerInf>> is;
-        private Map<Gramex, IntegerInf> mapper;
-        private Alpha a;
+        private Map<Gvar, List<GramexNonEmpty>> orderedRights;
+        private Map<Gvar, List<IntegerInf>> bs;
+        private Map<Gvar, List<IntegerInf>> is;
+        private WordsGenerator a;
 
         public InnerChoose(){}
 
-        public void build(Alpha a) throws AlphaException {
-            if(a.gt.hasEmptyRules()) throw new AlphaException();
+        public void build(WordsGenerator a) {
             this.a = a;
-            buildMapper();
             buildLists();
             orderLists();
             buildBs();
             buildIs();
         }
 
-        private void buildMapper(){
-            mapper = new HashMap<>();
-            for(CfgRule r : a.gt.getAllRules()){
-                mapper.put(r.getRight(), a.ht(r.getRight().toGramexNonEmpty()));
-            }
-        }
-
         private void buildLists(){
             orderedRights = new HashMap<>();
-            for(CfgVariable v : a.gt.getVars()){
+            for(Gvar v : a.cfg.getVariables()){
                 orderedRights.put(v, new ArrayList<>());
-                for(Gramex g : a.gt.getRulesRightVar(v)){
-                    orderedRights.get(v).add(g.toGramexNonEmpty());
+                for(GramexNonEmpty g : GrammarTools.getRulesRightVar(a.cfg, v)){
+                    orderedRights.get(v).add(g);
                 }
             }
         }
 
         private void orderLists(){
-
+            for(Gvar v : a.cfg.getVariables()){
+                List<GramexNonEmpty> list = orderedRights.get(v);
+                for(int i = 0; i<list.size()-1; i++){
+                    for(int j = i+1; j<list.size(); j++){
+                        if(a.htMapper.get(list.get(i)).isGreaterThan(a.htMapper.get(list.get(j)))){
+                            GramexNonEmpty aux = list.get(i);
+                            list.set(i, list.get(j));
+                            list.set(j, aux);
+                        }
+                    }
+                }
+            }
         }
 
         private void buildBs(){
             bs = new HashMap<>();
-            for(CfgVariable v : a.gt.getVars()){
+            for(Gvar v : a.cfg.getVariables()){
                 bs.put(v, new ArrayList<>());
                 bs.get(v).add(new IntegerInf(0));
-                for(Gramex g : orderedRights.get(v)){
-                    bs.get(v).add(mapper.get(g));
+                for(GramexNonEmpty g : orderedRights.get(v)){
+                    bs.get(v).add(a.htMapper.get(g));
                 }
             }
         }
 
         private void buildIs(){
             is = new HashMap<>();
-            for(CfgVariable v : a.gt.getVars()){
-                int n = a.gt.getRulesVar(v).size();
+            for(Gvar v : a.cfg.getVariables()){
+                int n = GrammarTools.getRulesVar(a.cfg, v).size();
                 is.put(v, new ArrayList<>());
                 for(int m = 0; m <= n; m++){
-                    IntegerInf k = bs.get(v).get(m).multiply(new IntegerInf(n-m+1));
-                    is.get(v).add(k);
                     IntegerInf adder = new IntegerInf(0);
                     for(int i=0; i<m; i++) adder = adder.add(bs.get(v).get(i));
-                    is.get(v).set(m, is.get(v).get(m).add(adder));
+
+                    IntegerInf k = bs.get(v).get(m).multiply(new IntegerInf(n-m+1)).add(adder);
+                    is.get(v).add(k);
                 }
             }
         }
+
+        //Find k
+
+        public int findK(Gvar v, int mid) {
+            boolean found = false;
+            int k = 0;
+            int j = 0;
+            while(j < orderedRights.get(v).size()){
+                IntegerInf ik1 = is.get(v).get(j);
+                IntegerInf ik2 = is.get(v).get(j+1);
+                IntegerInf a = new IntegerInf(mid);
+                found = ik1.isLesserEqualThan(a) && a.isLesserThan(ik2);
+                if(found) k = j;
+                j++;
+            }
+            if(!found) return 0;
+            else return k;
+        }
+
+        //Getters
+
+        public int getI(Gvar v, int pos) {
+            return is.get(v).get(pos).getValue();
+        }
+
+        public GramexNonEmpty getGramex(Gvar v, int pos) {
+            return orderedRights.get(v).get(pos);
+        }
+
+        public int getB(Gvar v, int pos) {
+            return bs.get(v).get(pos).getValue();
+        }
     }
 
+    // Function pi(z,xb,yb)
 
-    public Pair<Integer,Integer> pi(int z, IntegerInf xb, IntegerInf yb){
+    private Pair<Integer,Integer> pi(int z, IntegerInf xb, IntegerInf yb){
         double dxb;
         if(xb.isInfinity()) dxb = inf();
         else dxb = xb.getValue();
@@ -197,7 +259,7 @@ public class Alpha {
         return new Pair<>(x,y);
     }
 
-    public Pair<Double, Double> pi(double z){
+    private Pair<Double, Double> pi(double z){
         Pair<Double,Double> tw = simple(z);
         double t = tw.getA();
         double w = tw.getB();
@@ -206,7 +268,7 @@ public class Alpha {
         return new Pair<>(x,y);
     }
 
-    public Pair<Double,Double> piDouble(double z, double xb, double yb){
+    private Pair<Double,Double> piDouble(double z, double xb, double yb){
         double zb = zb(xb,yb);
         double zx = zx(xb);
         double zy = zy(yb);
@@ -222,7 +284,7 @@ public class Alpha {
         return new Pair<>(x,y);
     }
 
-    public Pair<Double,Double> bskip(double z, double xb, double yb){
+    private Pair<Double,Double> bskip(double z, double xb, double yb){
         double sb = xb*xb+yb*yb;
         double wb = xb+yb;
         double r = 2*wb+1;
@@ -231,33 +293,33 @@ public class Alpha {
         return new Pair<>(t,w);
     }
 
-    public Pair<Double,Double> yskip(double z, double yb){
+    private Pair<Double,Double> yskip(double z, double yb){
         double w = Math.floor((2*z+yb*yb-yb)/(2*yb));
         double t = (2*w*yb-yb*yb+yb)/2;
         return new Pair<>(t,w);
     }
 
-    public Pair<Double,Double> xskip(double z, double xb){
+    private Pair<Double,Double> xskip(double z, double xb){
         double w = Math.floor((2*z+xb*xb+xb)/(2*(xb+1)));
         double t = (2*w*xb-xb*xb+xb)/2;
         return new Pair<>(t,w);
     }
 
-    public Pair<Double,Double> simple(double z){
+    private Pair<Double,Double> simple(double z){
         double w = Math.floor((Math.floor(Math.sqrt(8 * z + 1))-1)/2);
         double t = (w * (w + 1)) / 2;
         return new Pair<>(t,w);
     }
 
-    public double zy(double yb){
+    private double zy(double yb){
         return (yb*(yb+1))/2;
     }
 
-    public double zx(double xb){
+    private double zx(double xb){
         return ((xb+1)*(xb+2))/2;
     }
 
-    public double zb(double xb, double yb){
+    private double zb(double xb, double yb){
         double zy = zy(yb);
         double zx = zx(xb);
         if(xb > yb-1) return yb*(xb-yb+1)+zy;
@@ -265,7 +327,7 @@ public class Alpha {
         else return zy;
     }
 
-    public double inf(){
+    private double inf(){
         return Double.POSITIVE_INFINITY;
     }
 

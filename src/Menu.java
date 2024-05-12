@@ -14,7 +14,7 @@ public class Menu {
         try {
             Dfa a = Reader.readAutomatonFile(fa).toDfa().minimize();
             Dfa b = Reader.readAutomatonFile(fb).toDfa().minimize();
-            if (a.equal(b)) System.out.println(Printer.equal(fa,fb));
+            if (a.compare(b)) System.out.println(Printer.equal(fa,fb));
             else System.out.println(Printer.nonequal(fa,fb));
         }
         catch (Exception ex) {
@@ -27,7 +27,7 @@ public class Menu {
         try{
             Dfa a = Reader.readAutomatonFile(fa).toDfa().minimize();
             Dfa b = Reader.readAutomatonFile(fb).toNfa().toDfa().minimize();
-            if (a.equal(b)) System.out.println(Printer.equal(fa,fb));
+            if (a.compare(b)) System.out.println(Printer.equal(fa,fb));
             else System.out.println(Printer.nonequal(fa,fb));
         }
         catch (Exception ex){
@@ -39,7 +39,7 @@ public class Menu {
         try{
             Dfa a = Reader.readAutomatonFile(fa).toDfa().minimize();
             Dfa b = Reader.readRegularExpressionFile(fb).getNfa().toDfa().minimize();
-            if (a.equal(b)) System.out.println(Printer.equal(fa,fb));
+            if (a.compare(b)) System.out.println(Printer.equal(fa,fb));
             else System.out.println(Printer.nonequal(fa,fb));
         }
         catch (Exception ex){
@@ -51,7 +51,7 @@ public class Menu {
         try{
             Dfa a = Reader.readAutomatonFile(fa).toNfa().toDfa().minimize();
             Dfa b = Reader.readAutomatonFile(fb).toNfa().toDfa().minimize();
-            if (a.equal(b)) System.out.println(Printer.equal(fa,fb));
+            if (a.compare(b)) System.out.println(Printer.equal(fa,fb));
             else System.out.println(Printer.nonequal(fa,fb));
         }
         catch (Exception ex){
@@ -63,7 +63,7 @@ public class Menu {
         try{
             Dfa a = Reader.readAutomatonFile(fa).toNfa().toDfa().minimize();
             Dfa b = Reader.readRegularExpressionFile(fb).getNfa().toDfa().minimize();
-            if (a.equal(b)) System.out.println(Printer.equal(fa,fb));
+            if (a.compare(b)) System.out.println(Printer.equal(fa,fb));
             else System.out.println(Printer.nonequal(fa,fb));
         }
         catch (Exception ex){
@@ -75,7 +75,7 @@ public class Menu {
         try{
             Dfa a = Reader.readRegularExpressionFile(fa).getNfa().toDfa().minimize();
             Dfa b = Reader.readRegularExpressionFile(fb).getNfa().toDfa().minimize();
-            if (a.equal(b)) System.out.println(Printer.equal(fa,fb));
+            if (a.compare(b)) System.out.println(Printer.equal(fa,fb));
             else System.out.println(Printer.nonequal(fa,fb));
         }
         catch (Exception ex){
@@ -253,7 +253,7 @@ public class Menu {
 
     public static void transformChomsky(String f){
         try{
-            System.out.println(Reader.readGrammarFile(f).toChomsky());
+            System.out.println(Reader.readGrammarFile(f).simplify().toChomsky());
         }
         catch (Exception ex){
             System.out.println(ex.toString());
