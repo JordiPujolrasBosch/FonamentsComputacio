@@ -935,6 +935,18 @@ public class Algorithms {
         return cc.getCfg();
     }
 
+    public static CfgNonEmpty simplifyGrammar(Cfg x) {
+        CfgConstructor ccx = x.getConstructor();
+        GrammarPrivate.addNewStart(ccx);
+        GrammarPrivate.removeNonDerivableVars(ccx);
+        if(!GrammarPrivate.startIsDerivable(ccx)) return new CfgNonEmpty();
+        GrammarPrivate.removeNonReachableVarsAndTerminals(ccx);
+        GrammarPrivate.removeEmptyRules(ccx);
+        //Remove empty rules
+        //Remove unit rules
+        return null;
+    }
+
     public static CfgNonEmpty chomsky(CfgNonEmpty x){
         /*CfgNonEmptyConstructor ccx = x.getConstructor();
 
@@ -959,14 +971,6 @@ public class Algorithms {
         //GrammarPrivate.applyGriebachInOrder(ccx,order);
         //Substitute terminals in right
         return ccx.getCfgNonEmpty();*/
-        return null;
-    }
-
-    public static CfgNonEmpty simplifyGrammar(Cfg x) {
-        //Remove no derivable vars (vars que no generan terminales)
-        //Remove unreachable vars (vars a los que no se puede llegar)
-        //Remove empty rules
-        //Remove unit rules
         return null;
     }
 
@@ -1018,11 +1022,152 @@ public class Algorithms {
     }
 
     private static class GrammarPrivate {
-        private static void addNewStart(CfgConstructor ccx) {
+        static void addNewStart(CfgConstructor ccx) {
             Gvar newStart = ccx.generate(ccx.start);
             ccx.rules.add(new Grule(newStart, new GramexVar(ccx.start)));
             ccx.start = newStart;
         }
+
+        static void removeNonDerivableVars(CfgConstructor ccx){
+            for(Gvar v : findNonDerivableVars(ccx)) removeVar(ccx, v);
+        }
+
+        static boolean startIsDerivable(CfgConstructor ccx){
+            return ccx.variables.contains(ccx.start);
+        }
+
+        static void removeNonReachableVarsAndTerminals(CfgConstructor ccx){
+            Set<Gvar> unusedVars = new HashSet<>();
+            Set<Character> unusedTerminals = new HashSet<>();
+            findUnreachableVarsAndTerminals(ccx, unusedVars, unusedTerminals);
+
+            if(!unusedTerminals.isEmpty()){
+                Alphabet res = new Alphabet();
+                for(char c : ccx.terminals.getSet()){
+                    if(!unusedTerminals.contains(c)) res.addChar(c);
+                }
+                if(ccx.terminals.containsEmptyChar() && !unusedTerminals.contains(Alphabet.getEmptyChar())) res.addEmptyChar();
+                ccx.terminals = res;
+            }
+
+            for(Gvar v : unusedVars) removeVar(ccx, v);
+        }
+
+        static void removeEmptyRules(CfgConstructor ccx){
+            Set<Gvar> anulable = findAnulableVars(ccx);
+            if(!anulable.isEmpty()){
+
+            }
+        }
+
+        //Inner
+
+        static Set<Gvar> findNonDerivableVars(CfgConstructor ccx){
+            Cfg cfg = ccx.getCfg();
+
+            Set<Gvar> toRemove = new HashSet<>(ccx.variables);
+            for(Grule r : ccx.rules){
+                if(!GrammarTools.containsVar(r.getRight())) toRemove.remove(r.getLeft());
+            }
+
+            boolean consolidated = toRemove.isEmpty();
+            while (!consolidated){
+                consolidated = true;
+                Set<Gvar> notRemove = new HashSet<>();
+                for (Gvar v : toRemove) {
+                    boolean foundDerivableRule = false;
+                    Iterator<Grule> itr = GrammarTools.getRulesVar(cfg,v).iterator();
+                    while(itr.hasNext() && !foundDerivableRule){
+                        Gramex g = itr.next().getRight();
+                        if(g.type() == TypesGramex.VAR && !toRemove.contains(g.toGramexVar().getV())){
+                            foundDerivableRule = true;
+                        }
+                        else if(g.type() == TypesGramex.CONCAT){
+                            boolean foundNonDerivable = false;
+                            Iterator<GramexNonEmpty> itc = g.toGramexConcat().toList().iterator();
+                            while(itc.hasNext() && !foundNonDerivable){
+                                GramexNonEmpty gne = itc.next();
+                                foundNonDerivable = gne.type() == TypesGramex.VAR && toRemove.contains(gne.toGramexVar().getV());
+                            }
+                            foundDerivableRule = !foundNonDerivable;
+                        }
+                    }
+                    if(foundDerivableRule){
+                        notRemove.add(v);
+                        consolidated = false;
+                    }
+                }
+                toRemove.removeAll(notRemove);
+                if(toRemove.isEmpty()) consolidated = true;
+            }
+
+            return toRemove;
+        }
+
+        static void findUnreachableVarsAndTerminals(CfgConstructor ccx, Set<Gvar> unusedVars, Set<Character> unusedTerminals){
+            Cfg cfg = ccx.getCfg();
+
+            unusedVars.addAll(ccx.variables);
+            unusedVars.remove(ccx.start);
+            unusedTerminals.addAll(ccx.terminals.getSet());
+            if(ccx.terminals.containsEmptyChar()) unusedTerminals.add(Alphabet.getEmptyChar());
+
+            boolean consolidated = false;
+            while (!consolidated){
+                consolidated = true;
+                Set<Grule> checking = GrammarTools.getRulesVar(cfg, ccx.start);
+                Set<Grule> nextCheck = new HashSet<>();
+                for(Grule r : checking){
+                    if(r.getRight().type() == TypesGramex.EMPTY && unusedTerminals.contains(Alphabet.getEmptyChar())){
+                        consolidated = false;
+                        unusedTerminals.remove(Alphabet.getEmptyChar());
+                    }
+                    else if(r.getRight().type() == TypesGramex.CHAR && unusedTerminals.contains(r.getRight().toGramexChar().getC())){
+                        consolidated = false;
+                        unusedTerminals.remove(r.getRight().toGramexChar().getC());
+                    }
+                    else if(r.getRight().type() == TypesGramex.VAR && unusedVars.contains(r.getRight().toGramexVar().getV())){
+                        consolidated = false;
+                        Gvar v = r.getRight().toGramexVar().getV();
+                        unusedVars.remove(v);
+                        nextCheck.addAll(GrammarTools.getRulesVar(cfg, v));
+                    }
+                    else if(r.getRight().type() == TypesGramex.CONCAT){
+                        for(GramexNonEmpty g : r.getRight().toGramexConcat().toList()){
+                            if(g.type() == TypesGramex.CHAR && unusedTerminals.contains(g.toGramexChar().getC())){
+                                consolidated = false;
+                                unusedTerminals.remove(g.toGramexChar().getC());
+                            }
+                            else if(g.type() == TypesGramex.VAR && unusedVars.contains(g.toGramexVar().getV())) {
+                                consolidated = false;
+                                Gvar v = g.toGramexVar().getV();
+                                unusedVars.remove(v);
+                                nextCheck.addAll(GrammarTools.getRulesVar(cfg, v));
+                            }
+                        }
+                    }
+                }
+                checking.clear();
+                checking.addAll(nextCheck);
+                nextCheck.clear();
+            }
+        }
+
+        static void removeVar(CfgConstructor ccx, Gvar v){
+            Set<Grule> toRemove = new HashSet<>();
+            ccx.variables.remove(v);
+            for(Grule r : ccx.rules){
+                if(r.getLeft().equals(v)) toRemove.add(r);
+                else if(GrammarTools.containsVar(r.getRight(), v)) toRemove.add(r);
+            }
+            ccx.rules.removeAll(toRemove);
+        }
+
+        static Set<Gvar> findAnulableVars(CfgConstructor ccx){return null;}
+
+        //==============================================================
+
+
 
         private static void eliminateEmptyRules(CfgConstructor ccx) {
             Set<Grule> emptyRules = new HashSet<>();
@@ -1059,37 +1204,6 @@ public class Algorithms {
             }
         }
 
-        private static void removeUnusedVars(CfgConstructor ccx){
-            Set<Gvar> set = new HashSet<>(ccx.variables);
-            for(Grule r : ccx.rules) set.remove(r.getLeft());
-
-            ccx.variables.removeAll(set);
-
-            Set<Grule> rules = new HashSet<>();
-            for(Grule r : ccx.rules){
-                for(Gvar v : set){
-                    if(GrammarTools.containsVar(r.getRight(), v)) rules.add(r);
-                }
-            }
-
-            ccx.rules.removeAll(rules);
-        }
-
-        private static void removeUnusedVars(CfgNonEmptyConstructor ccx){
-            Set<Gvar> set = new HashSet<>(ccx.variables);
-            for(GruleNonEmpty r : ccx.rules) set.remove(r.getLeft());
-
-            ccx.variables.removeAll(set);
-
-            Set<GruleNonEmpty> rules = new HashSet<>();
-            for(GruleNonEmpty r : ccx.rules){
-                for(Gvar v : set){
-                    if(GrammarTools.containsVar(r.getRight(), v)) rules.add(r);
-                }
-            }
-
-            ccx.rules.removeAll(rules);
-        }
 
         private static void removeUnitRules(CfgConstructor ccx) {
             Set<Grule> unitRules = new HashSet<>();

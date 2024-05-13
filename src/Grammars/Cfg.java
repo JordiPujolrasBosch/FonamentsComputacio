@@ -3,6 +3,7 @@ package Grammars;
 import Elements.Alphabet;
 import Automatons.Pda;
 import Elements.Grammars.*;
+import Exceptions.GrammarReaderException;
 import Factory.Algorithms;
 import Factory.Constructors.CfgConstructor;
 import Factory.Printer;
@@ -53,7 +54,7 @@ public class Cfg {
         return Algorithms.cfgToPda(this);
     }
 
-    public CfgNonEmpty simplify(){
+    public CfgNonEmpty simplify() {
         return Algorithms.simplifyGrammar(this);
     }
 

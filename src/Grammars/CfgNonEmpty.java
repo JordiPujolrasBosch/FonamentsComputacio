@@ -16,6 +16,15 @@ public class CfgNonEmpty {
     private final Set<GruleNonEmpty> rules;
     private final boolean acceptsEmptyWord;
 
+    public CfgNonEmpty(){
+        terminals = new Alphabet();
+        start = new Gvar('A',0);
+        variables = new HashSet<>();
+        variables.add(start);
+        rules = new HashSet<>();
+        acceptsEmptyWord = false;
+    }
+
     public CfgNonEmpty(Alphabet terminals, Set<Gvar> variables, Gvar start, Set<GruleNonEmpty> rules, boolean empty){
         this.terminals = terminals;
         this.variables = variables;

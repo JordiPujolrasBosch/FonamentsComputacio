@@ -52,7 +52,7 @@ alphabet: [alphabet-tokens]
 **Conditions:**
 * Each token in the list must be a character or an `[a-token]`.
 
-**Examples:** `$\, 0, 1`, `$0, $c, $\, +, -`, `$a, $A, $s, .`, `$w` ...
+**Examples:** `$/, 0, 1`, `$0, $c, $/, +, -`, `$a, $A, $s, .`, `$w` ...
 
 #### 5) [transitions]
 
@@ -70,8 +70,8 @@ alphabet: [alphabet-tokens]
 * `[c]` Character of the transition.
 
 **Conditions:**
-* `[o] >= 0` and `[o] <= [number-states]`.
-* `[d] >= 0` and `[d] <= [number-states]`.
+* `[o] >= 0` and `[o] < [number-states]`.
+* `[d] >= 0` and `[d] < [number-states]`.
 * `[c]` must be a character or a `[b-token]`.
 * `[c]` must be a character included in `[alphabet-tokens]`.
 
@@ -186,7 +186,7 @@ start: [start-variable]
 **Conditions:**
 * Each token in the list must be a character or an `[a-token]`.
 
-**Examples:** `$\, 0, 1`, `$0, $c, $\, +, -`, `$a, $A, $s, .`, `$w` ...
+**Examples:** `$/, 0, 1`, `$0, $c, $/, +, -`, `$a, $A, $s, .`, `$w` ...
 
 #### 2) [variables-list]
 
@@ -238,7 +238,7 @@ start: [start-variable]
 
 #### 6) [cfg-rules]
 
-**Description:** List of [grammar-rule]. Each element of the list must be on a different line.
+**Description:** List of `[grammar-rule]`. Each element of the list must be on a different line.
 
 #### 7) [grammar-rule]
 
@@ -248,7 +248,7 @@ start: [start-variable]
 
 **Elements:**
 * `[left]`: `[cfg-variable]` to substitute.
-* `[right]`: possible substitutions of `[left]`.
+* `[right]`: possible substitutions of `[left]`. The possible substitutions of left are separated with `|`.
 
 **Conditions:**
 * `[left]` must be a variable included in `[variables-list]`.
@@ -300,9 +300,9 @@ start: [start-variable]
 
 * `$s`: Character space `' '`
 * `$$`: Character `$`
-* `$0`: Union of numbers: `0|1|2|3|4|5|6|7|8|9`
-* `$a`: Union of letters: `a|b|c| ... |x|y|z`
-* `$A`: Union of letters: `A|B|C| ... |X|Y|Z`
+* `$0`: Union of numbers: `(0|1|2|3|4|5|6|7|8|9)`
+* `$a`: Union of letters: `(a|b|c| ... |x|y|z)`
+* `$A`: Union of letters: `(A|B|C| ... |X|Y|Z)`
 
 `$?` is ilegal where `?` is not: `()|*+#/s$0aA`
 
