@@ -63,6 +63,8 @@ public class GrammarData {
         rulesString.add(l);
     }
 
+    //Check
+
     public boolean hasBasic() {
         return terminalElementsRead && variablesRead && startRead;
     }
@@ -77,6 +79,8 @@ public class GrammarData {
 
         return ok;
     }
+
+    //Transform
 
     public Cfg getCfg() {
         return new Cfg(alphabet, setvar, start, new HashSet<>(rules));
@@ -103,19 +107,16 @@ public class GrammarData {
         while(it.hasNext() && ok){
             String s = it.next();
             char last = s.charAt(s.length()-1);
-            boolean m = s.contains("-");
-            boolean lastNumber = last >= '0' && last <= '9';
-            boolean lastLetter = last >= 'A' && last <= 'Z';
 
-            if(!m){
+            if(!s.contains("-")){
                 ok = isVariable(s);
                 if(ok) setvar.add(toVariable(s));
             }
-            else if(lastLetter){
+            else if(last >= 'A' && last <= 'Z'){
                 ok = isGroupOne(s);
                 if(ok) setvar.addAll(toVariablesOne(s));
             }
-            else if(lastNumber){
+            else if(last >= '0' && last <= '9'){
                 ok = isGroupTwo(s);
                 if(ok) setvar.addAll(toVariablesTwo(s));
             }
@@ -146,7 +147,7 @@ public class GrammarData {
 
         String leftString = list.remove(0);
         String arrow = list.remove(0);
-        boolean ok = isVariable(leftString) && setvar.contains(toVariable(leftString)) && arrow.equals("->");
+        boolean ok = isVariable(leftString) && setvar.contains(toVariable(leftString)) && arrow.equals(TokenFactory.getGArrow());
         if(!ok) return false;
 
         if(!correctFormRight(list)) return false;
@@ -157,7 +158,7 @@ public class GrammarData {
         return true;
     }
 
-    public boolean correctFormRight(List<String> list){
+    private boolean correctFormRight(List<String> list){
         boolean ok = true;
         int i = 0;
         while(ok && i < list.size()){
@@ -174,11 +175,10 @@ public class GrammarData {
                 ok = alphabet.contains(TokenFactory.getGChar(act));
             }
             else if(TokenFactory.isGGroup(act)){
-                ok = alphabet.getSet().containsAll(TokenFactory.gtokenGroupSet(act));
+                ok = alphabet.getSet().containsAll(TokenFactory.getGGroup(act));
                 if(ok){
-                    if(isFirst) ok = list.get(i+1).equals(union);
-                    else if(isLast) ok = list.get(i-1).equals(union);
-                    else ok = list.get(i-1).equals(union) && list.get(i+1).equals(union);
+                    if(!isFirst) ok = list.get(i-1).equals(union);
+                    if(!isLast)  ok = ok && list.get(i+1).equals(union);
                 }
             }
             else if(act.equals(union)){
@@ -188,9 +188,8 @@ public class GrammarData {
             else if(act.equals(empty)){
                 ok = alphabet.containsEmptyChar();
                 if(ok){
-                    if(isFirst) ok = list.get(i+1).equals(union);
-                    else if(isLast) ok = list.get(i-1).equals(union);
-                    else ok = list.get(i-1).equals(union) && list.get(i+1).equals(union);
+                    if(!isFirst) ok = list.get(i-1).equals(union);
+                    if(!isLast)  ok = ok && list.get(i+1).equals(union);
                 }
             }
             else if(act.length()==1){
@@ -221,7 +220,7 @@ public class GrammarData {
                 else right = new GramexConcat(right, new GramexChar(TokenFactory.getGChar(act)));
             }
             else if(TokenFactory.isGGroup(act)){
-                for(char c : TokenFactory.gtokenGroupSet(act)) listRight.add(new GramexChar(c));
+                for(char c : TokenFactory.getGGroup(act)) listRight.add(new GramexChar(c));
             }
             else if(act.equals(TokenFactory.getGEmptyChar())){
                 listRight.add(new GramexEmpty());
@@ -265,6 +264,7 @@ public class GrammarData {
     }
 
     private boolean isGroupTwo(String s) {
+        if(s.length()<4) return false;
         boolean c = s.charAt(0) >= 'A' && s.charAt(0) <= 'Z';
         String[] pair = s.substring(1).split("-");
         if(pair.length != 2) return false;

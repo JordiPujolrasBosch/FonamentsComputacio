@@ -44,7 +44,7 @@ public class Reader {
         Scanner sc = new Scanner(new File(filename));
         StringBuilder r = new StringBuilder();
         while(sc.hasNextLine()) r.append(sc.nextLine());
-        return RegexBuilder.buildRegex(r.toString().replace(" ", ""));
+        return RegexBuilder.buildRegex(r.toString().replace(" ", ""), filename);
     }
 
     public static List<String> readWordsFile(String filename) throws FileNotFoundException {

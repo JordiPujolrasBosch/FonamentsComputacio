@@ -9,11 +9,7 @@ import java.util.List;
  * TODO
  * Test all
  *
- * Regex builder
- * Chomsky
  * Algorithms
- * TokenFactory
- * Cfg(ne): LL checks
  * Article CFG==CFG
  * */
 

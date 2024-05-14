@@ -1,6 +1,7 @@
 package Factory.Builders;
 
 import Exceptions.RegexReaderException;
+import Factory.Printer;
 import Factory.TokenFactory;
 import RegularExpressions.*;
 
@@ -8,7 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RegexBuilder {
-    public static RegularExpression buildRegex(String r) throws RegexReaderException {
+    private static String file;
+
+    public static RegularExpression buildRegex(String r, String filename) throws RegexReaderException {
+        file = filename;
         checkParenthesis(r);
         List<BuildRegex> list = buildList(r);
         while(list.size() != 1) step(list);
@@ -26,7 +30,7 @@ public class RegexBuilder {
                 String xy = "" + x + r.charAt(++i);
                 if(TokenFactory.isRChar(xy)) list.add(new BuildRegexChar(TokenFactory.getRChar(xy)));
                 else if(TokenFactory.isRGroup(xy)) list.add(new BuildRegexUnion(TokenFactory.getRGroup(xy)));
-                else throw new RegexReaderException();
+                else throw new RegexReaderException(Printer.regexCheck(file));
             }
             else if(x != ' ') list.add(new BuildRegexChar(x));
             i++;
@@ -34,7 +38,7 @@ public class RegexBuilder {
         if(i == r.length()-1){
             char x = r.charAt(i);
             if(TokenFactory.isROperator(x)) list.add(new BuildRegexOperator(TokenFactory.getROperator(x)));
-            else if(x == TokenFactory.getSpecialChar()) throw new RegexReaderException();
+            else if(x == TokenFactory.getSpecialChar()) throw new RegexReaderException(Printer.regexCheck(file));
             else if (x != ' ') list.add(new BuildRegexChar(x));
         }
 
@@ -48,22 +52,23 @@ public class RegexBuilder {
             if(r.charAt(i) == '(') depth++;
             else if(r.charAt(i) == ')'){
                 depth--;
-                if(depth<0) throw new RegexReaderException();
+                if(depth<0) throw new RegexReaderException(Printer.regexCheck(file));
             }
             i++;
         }
-        if(depth != 0) throw new RegexReaderException();
+        if(depth != 0) throw new RegexReaderException(Printer.regexCheck(file));
     }
 
     private static void step(List<BuildRegex> list) throws RegexReaderException {
+        String p = Printer.regexCheck(file);
         int n = list.size();
-        if(n == 0) throw new RegexReaderException();
+        if(n == 0) throw new RegexReaderException(p);
 
         BuildRegex last = list.get(n-1);
         BuildRegex preLast = null;
         if(n>1) preLast = list.get(n-2);
 
-        if(n == 2 && isPattern_xc(list)) throw new RegexReaderException();  // x)
+        if(n == 2 && isPattern_xc(list)) throw new RegexReaderException(p); // x)
         else if(n == 3 && isPattern_xux(list)) stepUnion(list);             // x|x
         else if(n>3 && isPattern_xux(list)){
             if(list.get(n-4).isOpen()) stepUnion(list);                     //.(x|x
@@ -76,28 +81,28 @@ public class RegexBuilder {
             else stepLastOne(list);                                         //.?x)
         }
         else if(n>1 && last.isStar()){
-            if(preLast.isStar()) throw new RegexReaderException();          //.**
-            else if(preLast.isPlus()) throw new RegexReaderException();     //.+*
+            if(preLast.isStar()) throw new RegexReaderException(p);         //.**
+            else if(preLast.isPlus()) throw new RegexReaderException(p);    //.+*
             else if(preLast.isNotOperator()) stepStar(list);                //.x*
             else stepLastOne(list);                                         //.?*
         }
         else if(n>1 && last.isPlus()){
-            if(preLast.isStar()) throw new RegexReaderException();          //.*+
-            else if(preLast.isPlus()) throw new RegexReaderException();     //.++
+            if(preLast.isStar()) throw new RegexReaderException(p);         //.*+
+            else if(preLast.isPlus()) throw new RegexReaderException(p);    //.++
             else if(preLast.isNotOperator()) stepPlus(list);                //.x+
             else stepLastOne(list);                                         //.?+
         }
         else if(n>1 && last.isNotOperator()){
-            if(preLast.isOpen()) throw new RegexReaderException();          //.(x
+            if(preLast.isOpen()) throw new RegexReaderException(p);         //.(x
             else if(preLast.isNotOperator()) stepConcat(list);              //.xx
             else stepLastOne(list);                                         //.?x
         }
         else if(n>1 && last.isClose()) stepLastOne(list);                   //.?)
         else if(last.isVoid()) stepVoid(list);                              //.#
         else if(last.isEmpty()) stepEmpty(list);                            //./
-        else if(last.isOpen()) throw new RegexReaderException();            //.(
-        else if(last.isUnion()) throw new RegexReaderException();           //.|
-        else throw new RegexReaderException();
+        else if(last.isOpen()) throw new RegexReaderException(p);           //.(
+        else if(last.isUnion()) throw new RegexReaderException(p);          //.|
+        else throw new RegexReaderException(p);
     }
 
     //Private step
@@ -204,7 +209,7 @@ public class RegexBuilder {
         public RegularExpression toRegex() throws RegexReaderException {
             if(isEmpty()) return new RegexEmptyChar();
             if(isVoid()) return new RegexVoid();
-            throw new RegexReaderException();
+            throw new RegexReaderException(Printer.regexCheck(file));
         }
     }
     private static class BuildRegexChar extends BuildRegex {

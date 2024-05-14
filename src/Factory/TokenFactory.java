@@ -13,35 +13,6 @@ import RegularExpressions.RegularExpression;
 import java.util.*;
 
 public class TokenFactory {
-
-    private final static Map<String, Set<Character>> gtokenGroup = buildGTokensGroup();
-
-    public static Set<Character> gtokenGroupSet(String act) {
-        return gtokenGroup.get(act);
-    }
-
-    private static Map<String, Set<Character>> buildGTokensGroup(){
-        Map<String, Set<Character>> mapper = new HashMap<>();
-        Set<Character> set = null;
-
-        set = new HashSet<>();
-        for(char c = 'a'; c <= 'z'; c++) set.add(c);
-        mapper.put("$a", set);
-
-        set = new HashSet<>();
-        for(char c = 'A'; c <= 'Z'; c++) set.add(c);
-        mapper.put("$A", set);
-
-        set = new HashSet<>();
-        for(char c = '0'; c <= '9'; c++) set.add(c);
-        mapper.put("$0", set);
-
-        return mapper;
-    }
-
-
-
-
     public static char getSpecialChar(){return '$';}
 
     //A-TOKENS
@@ -324,17 +295,17 @@ public class TokenFactory {
        $0 => 0|..|9
     */
 
-    private final static Map<String, GramexNonEmpty> gGroup = buildGGroup();
-    private static Map<String, GramexNonEmpty> buildGGroup(){
-        Map<String, GramexNonEmpty> mapper = new HashMap<>();
+    private final static Map<String, Set<Character>> gGroup = buildGGroup();
+    private static Map<String, Set<Character>> buildGGroup(){
+        Map<String, Set<Character>> mapper = new HashMap<>();
 
-        GramexNonEmpty lower = new GramexChar('a');
-        GramexNonEmpty upper = new GramexChar('A');
-        GramexNonEmpty numbers = new GramexChar('0');
+        Set<Character> lower = new HashSet<>();
+        Set<Character> upper = new HashSet<>();
+        Set<Character> numbers = new HashSet<>();
 
-        for(char c = 'b'; c <= 'z'; c++) lower = new GramexConcat(lower, new GramexChar(c));
-        for(char c = 'B'; c <= 'Z'; c++) upper = new GramexConcat(upper, new GramexChar(c));
-        for(char c = '1'; c <= '9'; c++) numbers = new GramexConcat(numbers, new GramexChar(c));
+        for(char c = 'a'; c <= 'z'; c++) lower.add(c);
+        for(char c = 'A'; c <= 'Z'; c++) upper.add(c);
+        for(char c = '0'; c <= '9'; c++) numbers.add(c);
 
         mapper.put("$a", lower);
         mapper.put("$A", upper);
@@ -344,6 +315,6 @@ public class TokenFactory {
     }
 
     public static boolean isGGroup(String x){return gGroup.containsKey(x);}
-    public static GramexNonEmpty getGGroup(String x){return gGroup.get(x);}
+    public static Set<Character> getGGroup(String x){return gGroup.get(x);}
 
 }

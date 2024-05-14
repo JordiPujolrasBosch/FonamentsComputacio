@@ -205,6 +205,19 @@ public class GrammarTools {
         return x;
     }
 
+    public static GramexChar getLeftMostChar(GramexNonEmpty r){
+        GramexChar x = null;
+        switch (r.type()){
+            case CHAR -> x = r.toGramexChar();
+            case CONCAT -> {
+                GramexConcat c = r.toGramexConcat();
+                if(containsChar(c.getA())) x = getLeftMostChar(c.getA());
+                else x = getLeftMostChar(c.getB());
+            }
+        }
+        return x;
+    }
+
     public static GramexConcat getRightMostPair(GramexConcat g){
         if(g.getB().length() == 2) return g.getB().toGramexConcat();
         if(g.getB().length() > 2)  return getRightMostPair(g.getB().toGramexConcat());

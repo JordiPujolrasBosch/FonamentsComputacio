@@ -248,7 +248,7 @@ start: [start-variable]
 
 **Elements:**
 * `[left]`: `[cfg-variable]` to substitute.
-* `[right]`: possible substitutions of `[left]`. The possible substitutions of left are separated with `|`.
+* `[right]`: possible substitutions of `[left]` separated with `|`.
 
 **Conditions:**
 * `[left]` must be a variable included in `[variables-list]`.
@@ -256,7 +256,7 @@ start: [start-variable]
   * Characters included in `[alphabet-tokens]`
   * Variables included in `[variables-list]`
   * `[g-token]`
-* All the elements in right must be separated with spaces.
+* All the elements in `[right]` must be separated with spaces.
 * Cannot be concatenated: `/`, `$a`, `$A`, `$0`.
 
 **Examples:** `A0 -> A1 A2`, `B0 -> A1 c B3 | / | a b`, 

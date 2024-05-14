@@ -23,7 +23,7 @@ public class Printer {
     }
 
     public static String automatonNondeterministic(String filename) {
-        return "The automaton of file " + filename + " is nondeterministic";
+        return "The automaton in file " + filename + " is nondeterministic";
     }
 
     public static String equal(String fa, String fb) {
@@ -35,7 +35,11 @@ public class Printer {
     }
 
     public static String grammarCheck(String filename) {
-        return "Incorrect format for the grammar file " + filename;
+        return "Incorrect format for the grammar in file " + filename;
+    }
+
+    public static String regexCheck(String filename){
+        return "Incorrect format for the regular expression in file " + filename;
     }
 
     //Automatons and grammars
