@@ -7,6 +7,264 @@ import Grammars.*;
 import java.util.*;
 
 public class GrammarComparator {
+    public static boolean compareAux(CfgNonEmpty a, CfgNonEmpty b) {
+        if(a.getRules().isEmpty() && b.getRules().isEmpty()) return a.acceptsEmpty() == b.acceptsEmpty();
+        if(a.getRules().isEmpty() || b.getRules().isEmpty()) return false;
+        if(a.acceptsEmpty() != b.acceptsEmpty()) return false;
+        if(!a.getTerminals().equals(b.getTerminals())) return false;
+
+
+        GrammarComparatorDataAux data = new GrammarComparatorDataAux();
+        data.cfga = GrammarTools.renameVars(a,b);
+        data.cfgb = b;
+        data.wga = new WordsGenerator(data.cfga);
+        data.wgb = new WordsGenerator(data.cfgb);
+        data.counter = 0;
+        data.split = new SplitData();
+        data.testcases = new TestcasesData();
+
+        Comparison start = new Comparison(new GramexVar(data.cfga.getStart()), new GramexVar(data.cfgb.getStart()), true);
+        Set<Comparison> context = new HashSet<>();
+        Set<Comparison> toProve = verifyBranch(start, context, data);
+
+        boolean stop = toProve.isEmpty();
+        boolean equal = false;
+        while(!stop){
+            Comparison act = toProve.iterator().next();
+            toProve.remove(act);
+
+            if(data.counter > 70000) stop = true;
+            else if(canApplyInclusion2(act) && previousCheckInclusion2(act))   toProve.addAll(verifyInclusion2(act));
+            else if(canApplySplit2(act) && checkSplitData2(act,data))          toProve.addAll(verifySplit2(act, context, data));
+            else if(canApplyEmptyOne2(act))                                    toProve.addAll(verifyEmpty2());
+            else if(canApplyEmptyTwo2(act))                                    toProve.addAll(verifyEmpty2());
+            else if(canApplyInduct2(act, context))                             toProve.addAll(verifyInduct2());
+            else if(canApplyEpsilon2(act))                                     toProve.add(verifyEpsilon2(act));
+            else if(canApplyDist2(act))                                        toProve.addAll(verifyDist2(act));
+            else if(canApplyTestcases2(act) && checkTestcasesData2(act, data)) toProve.add(verifyTestcases2(data));
+            else if(canApplyInclusion2(act))                                   toProve.addAll(verifyInclusion2(act));
+            else if(canApplyBranch2(act, context, data))                       toProve.addAll(verifyBranch2(act, context, data));
+            else stop = true;
+
+            data.counter++;
+            if(toProve.isEmpty()){
+                stop = true;
+                equal = true;
+            }
+        }
+
+        return equal;
+    }
+
+    private static class GrammarComparatorDataAux {
+        public GrammarComparatorDataAux(){}
+        public CfgNonEmpty cfga;
+        public CfgNonEmpty cfgb;
+        public WordsGenerator wga;
+        public WordsGenerator wgb;
+        public int counter;
+        public SplitData split;
+        public TestcasesData testcases;
+    }
+
+    private static class SplitData{
+        public SplitData(){}
+        public List<SplitElement> list;
+        public Gramex gamma;
+        public Gvar leftVar;
+        public boolean everyBetaIsNonEmpty;
+    }
+
+    private static class TestcasesData{
+        public TestcasesData(){}
+        public Comparison result;
+    }
+
+    //Rules empty
+
+    public static boolean canApplyEmptyOne2(Comparison comp){
+        // empty == empty
+        return comp.getLeft().isEmpty() && comp.getRight().isEmpty() && comp.isEquivalence();
+    }
+
+    public static boolean canApplyEmptyTwo2(Comparison comp){
+        // empty in x
+        return comp.getLeft().isEmpty() && comp.isInclusion();
+    }
+
+    private static Set<Comparison> verifyEmpty2(){
+        return new HashSet<>();
+    }
+
+    //Rule epsilon
+
+    private static boolean canApplyEpsilon2(Comparison comp){
+        // {e} op {e}
+        return comp.getLeft().contains(new GramexEmpty()) && comp.getRight().contains(new GramexEmpty());
+    }
+
+    private static Comparison verifyEpsilon2(Comparison comp){
+        // {e} op {e}
+        Set<Gramex> left  = new HashSet<>(comp.getLeft());
+        left.remove(new GramexEmpty());
+        Set<Gramex> right = new HashSet<>(comp.getRight());
+        right.remove(new GramexEmpty());
+        return new Comparison(left, right, comp.isEquivalence());
+    }
+
+    //Rule induct
+
+    private static boolean canApplyInduct2(Comparison comp, Set<Comparison> context){
+        // check in context
+        Set<Gramex> left  = comp.getLeft();
+        Set<Gramex> right = comp.getRight();
+
+        Comparison xeqy = new Comparison(left, right, true);
+        Comparison yeqx = new Comparison(right, left, true);
+        Comparison xiny = new Comparison(left, right, false);
+
+        if(comp.isEquivalence()) return context.contains(xeqy) || context.contains(yeqx);
+        return context.contains(xeqy) || context.contains(yeqx) || context.contains(xiny);
+    }
+
+    private static Set<Comparison> verifyInduct2(){
+        return new HashSet<>();
+    }
+
+    //Rule dist
+
+    private static boolean canApplyDist2(Comparison comp){
+        return comp.getLeft().size() > 1 && comp.isInclusion();
+    }
+
+    public static Set<Comparison> verifyDist2(Comparison comp){
+        Set<Comparison> set = new HashSet<>();
+        for(Gramex x : comp.getLeft()){
+            set.add(new Comparison(x, comp.getRight(), false));
+        }
+        return set;
+    }
+
+    //Rule inclusion
+
+    private static boolean canApplyInclusion2(Comparison comp){
+        return comp.isEquivalence();
+    }
+
+    private static boolean previousCheckInclusion2(Comparison comp){
+        return comp.getLeft().size() > 1 || comp.getRight().size() > 1;
+    }
+
+    private static Set<Comparison> verifyInclusion2(Comparison comp){
+        Set<Comparison> set = new HashSet<>();
+        set.add(new Comparison(comp.getLeft(), comp.getRight(), false));
+        set.add(new Comparison(comp.getRight(), comp.getLeft(), false));
+        return set;
+    }
+
+    //Rule testcases
+
+    private static boolean canApplyTestcases2(Comparison comp){
+        return comp.getLeft().size() == 1 && comp.getRight().size() > 1 && comp.isInclusion();
+    }
+
+    private static boolean checkTestcasesData2(Comparison comp, GrammarComparatorDataAux data){
+        CfgNonEmpty cfgr = data.getCfgRight(comp);
+        CfgNonEmpty cfgl = data.getCfgLeft(comp);
+        WordsGenerator alphal = data.getWordsGeneratorLeft(comp);
+
+        Comparison res = null;
+        Gramex left = comp.getLeft().iterator().next();
+        List<String> wordsBag = alphal.generateWords(GrammarTools.recommendedBagSize(cfgl), left.toGramexNonEmpty());
+        Iterator<Gramex> it = comp.getRight().iterator();
+        boolean found = false;
+        while(it.hasNext() && !found){
+            GramexNonEmpty s = it.next().toGramexNonEmpty();
+            found = GrammarTools.acceptsAllWords(cfgr, s, wordsBag);
+            if(found) res = new Comparison(comp.getLeft(), s, false);
+        }
+
+        data.testcases.result = res;
+        return found;
+    }
+
+    private static Comparison verifyTestcases2(GrammarComparatorDataAux data){
+        return data.testcases.result;
+    }
+
+    //Rule split
+
+    public static boolean canApplySplit2(Comparison comp){
+        boolean ok = comp.getLeft().size() == 1;
+        Gramex left = comp.getLeft().iterator().next();
+        ok = ok && left.length() > 1;
+        ok = ok && GrammarTools.startsWithVar(left);
+        return ok;
+    }
+
+    public static boolean checkSplitData2(Comparison comp, GrammarComparatorDataAux data){
+        CfgNonEmpty cfgl = data.getCfgLeft(comp);
+        CfgNonEmpty cfgr = data.getCfgRight(comp);
+
+        Gramex r = comp.getLeft().iterator().next();
+        Gvar v = GrammarTools.getLeftMostVar(r.toGramexNonEmpty());
+        String shortWord = GrammarTools.shortestWordOfVar(cfgl, v);
+        Gramex gamma = GrammarTools.cut(r, 1).getB();
+
+        boolean everyOmegaCanDeriveShort = true;
+        boolean everyBetaIsNonEmpty = true;
+        List<SplitElement> list = new ArrayList<>();
+
+        //Iterate
+
+        Iterator<Gramex> it = comp.getRight().iterator();
+        while(it.hasNext() && everyOmegaCanDeriveShort){
+            Gramex w = it.next();
+            SplitElement spe = new SplitElement(w);
+            everyOmegaCanDeriveShort = findOmegaBetaRo(spe, shortWord, cfgr);
+            if(everyOmegaCanDeriveShort){
+                list.add(spe);
+                everyBetaIsNonEmpty = everyBetaIsNonEmpty && (spe.beta.type() != TypesGramex.EMPTY);
+            }
+        }
+
+        data.split.list = list;
+        data.split.gamma = gamma;
+        data.split.leftVar = v;
+        data.split.everyBetaIsNonEmpty = everyBetaIsNonEmpty;
+        return everyOmegaCanDeriveShort;
+    }
+
+    public static Set<Comparison> verifySplit2(Comparison comp, Set<Comparison> context, GrammarComparatorDataAux data){
+        Set<Comparison> set = new HashSet<>();
+        for(SplitElement spe : data.split.list){
+            boolean betaIsEmpty = spe.beta.type() == TypesGramex.EMPTY;
+            GramexNonEmpty ro = spe.ro.toGramexNonEmpty();
+            GramexNonEmpty beta = null;
+            if(!betaIsEmpty) beta = spe.beta.toGramexNonEmpty();
+            boolean op = comp.isEquivalence();
+
+            if(betaIsEmpty) set.add(new Comparison(data.split.gamma, ro, op));
+            else set.add(new Comparison(data.split.gamma, new GramexConcat(ro, beta), op));
+            set.add(new Comparison(new GramexConcat(new GramexVar(data.split.leftVar), ro) , spe.omega, op));
+        }
+
+        if(data.split.everyBetaIsNonEmpty) context.add(comp);
+
+        return set;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
     public static boolean compare(CfgNonEmpty a, CfgNonEmpty b) {
         CfgNonEmpty aRenamed = GrammarTools.renameVars(a,b);
         AlgorithmData data = new AlgorithmData();

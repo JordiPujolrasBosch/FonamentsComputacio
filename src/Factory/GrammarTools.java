@@ -306,6 +306,7 @@ public class GrammarTools {
     //More
 
     public static CfgNonEmpty renameVars(CfgNonEmpty a, CfgNonEmpty b){
+        //Renames a
         CfgNonEmptyConstructor generator = b.getConstructor();
         Map<Gvar, Gvar> mapper = new HashMap<>();
         for(Gvar act : a.getVariables()){
