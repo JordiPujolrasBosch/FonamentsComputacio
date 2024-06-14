@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Random;
 
 public class WordsGenerator {
     private final CfgNonEmpty cfg;
@@ -24,8 +25,21 @@ public class WordsGenerator {
         build();
     }
 
-    public List<String> generateWords(int n, Gramex rule) {
-        return null;
+    public List<String> generateWords(int n, GramexNonEmpty rule) {
+        List<String> list = new ArrayList<>();
+        IntegerInf ht = ht(rule);
+        if(ht.isInfinity()){
+            Random rand = new Random();
+            for(int i=1; i<=n; i++) list.add(enumFunction(rule, rand.nextInt(100000)).getWord());
+        }
+        else if(n >= ht.getValue()) {
+            for (int i = 0; i < ht.getValue(); i++) list.add(enumFunction(rule, i).getWord());
+        }
+        else{
+            Random rand = new Random();
+            for(int i=1; i<=n; i++) list.add(enumFunction(rule, rand.nextInt(ht.getValue())).getWord());
+        }
+        return list;
     }
 
     private void build(){
@@ -82,6 +96,8 @@ public class WordsGenerator {
         innerHt.active = true;
         IntegerInf x = tau(g);
         innerHt.clear();
+
+        if(!htMapper.containsKey(g)) htMapper.put(g,x);
         return x;
     }
 
@@ -170,7 +186,7 @@ public class WordsGenerator {
                 List<GramexNonEmpty> list = orderedRights.get(v);
                 for(int i = 0; i<list.size()-1; i++){
                     for(int j = i+1; j<list.size(); j++){
-                        if(a.htMapper.get(list.get(i)).isGreaterThan(a.htMapper.get(list.get(j)))){
+                        if(a.ht(list.get(i)).isGreaterThan(a.ht(list.get(j)))){
                             GramexNonEmpty aux = list.get(i);
                             list.set(i, list.get(j));
                             list.set(j, aux);
@@ -186,7 +202,7 @@ public class WordsGenerator {
                 bs.put(v, new ArrayList<>());
                 bs.get(v).add(new IntegerInf(0));
                 for(GramexNonEmpty g : orderedRights.get(v)){
-                    bs.get(v).add(a.htMapper.get(g));
+                    bs.get(v).add(a.ht(g));
                 }
             }
         }

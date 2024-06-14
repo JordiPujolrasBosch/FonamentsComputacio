@@ -21,6 +21,7 @@ public class GrammarComparator {
         Set<Comparison> context = new HashSet<>();
         Set<Comparison> toProve = verifyBranch(start,context,data);
 
+        int counter = 0;
         int threshold = 2;
         Set<Comparison> naySplit = new HashSet<>();
         Set<Comparison> nayTestcases = new HashSet<>();
@@ -84,6 +85,8 @@ public class GrammarComparator {
                 finished = true;
             }
             midStop = false;
+            counter++;
+            if(counter == 70000) finished = true;
         }
 
         return equals;
@@ -325,7 +328,7 @@ public class GrammarComparator {
         boolean found = false;
         while(it.hasNext() && !found){
             GramexNonEmpty s = it.next().toGramexNonEmpty();
-            found = GrammarTools.acceptsAllWords(cfgr, s, alphal.generateWords(GrammarTools.recommendedBagSize(cfgl),left));
+            found = GrammarTools.acceptsAllWords(cfgr, s, alphal.generateWords(GrammarTools.recommendedBagSize(cfgl),left.toGramexNonEmpty()));
             if(found) res = new Comparison(comp.getLeft(), s, false);
         }
         return res;

@@ -1,0 +1,6 @@
+terminals: a,b
+variables: S0, A0, B0
+start: S0
+S0 -> A0 B0 a | A0 a | a | A0 A0 | A0 A0 A0
+A0 -> A0 B0 a | A0 a | a
+B0 -> A0 B0 a | A0 a | A0 b

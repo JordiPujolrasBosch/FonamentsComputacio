@@ -966,15 +966,7 @@ public class Algorithms {
             Set<Character> unusedTerminals = new HashSet<>();
             findUnreachableVarsAndTerminals(ccx, unusedVars, unusedTerminals);
 
-            if(!unusedTerminals.isEmpty()){
-                Alphabet res = new Alphabet();
-                for(char c : ccx.terminals.getSet()){
-                    if(!unusedTerminals.contains(c)) res.addChar(c);
-                }
-                if(ccx.terminals.containsEmptyChar() && !unusedTerminals.contains(Alphabet.getEmptyChar())) res.addEmptyChar();
-                ccx.terminals = res;
-            }
-
+            for(char c : unusedTerminals) ccx.terminals.removeChar(c);
             for(Gvar v : unusedVars) removeVar(ccx, v);
         }
 
@@ -993,6 +985,7 @@ public class Algorithms {
                 Set<Grule> toCheck = new HashSet<>(ccx.rules);
 
                 if(anulable.contains(ccx.start)) checked.add(new Grule(ccx.start, new GramexEmpty()));
+                else ccx.terminals.removeEmptyChar();
 
                 while(!toCheck.isEmpty()){
                     Grule act = toCheck.iterator().next();
@@ -1001,8 +994,7 @@ public class Algorithms {
                     if(act.getRight().type() == TypesGramex.CHAR) checked.add(act);
                     else if(act.getRight().type() == TypesGramex.VAR){
                         Gvar v = act.getRight().toGramexVar().getV();
-                        if(!anulable.contains(v)) checked.add(act);
-                        else if(!onlyAnulable.contains(v)) checked.add(act);
+                        if(!onlyAnulable.contains(v)) checked.add(act);
                     }
                     else if(act.getRight().type() == TypesGramex.CONCAT){
                         Set<Gramex> sc = removeAnulableInConcat(act.getRight().toGramexConcat(), anulable, onlyAnulable);
@@ -1026,27 +1018,22 @@ public class Algorithms {
                 Grule rule = unitRules.iterator().next();
                 Gvar v = rule.getRight().toGramexVar().getV();
 
-                if(rule.getLeft().equals(v)){
-                    ccx.rules.remove(rule);
-                    removed.add(rule);
-                    unitRules.remove(rule);
-                }
-                else{
+                if (!rule.getLeft().equals(v)) {
                     Set<Grule> toAdd = new HashSet<>();
-                    for(Grule r : GrammarTools.getRulesVar(ccx.getCfg(), v)){
+                    for (Grule r : GrammarTools.getRulesVar(ccx.getCfg(), v)) {
                         Grule aux = new Grule(rule.getLeft(), r.getRight());
-                        if(aux.getRight().type() != TypesGramex.VAR) toAdd.add(aux);
-                        else if(!removed.contains(aux)){
+                        if (aux.getRight().type() != TypesGramex.VAR) toAdd.add(aux);
+                        else if (!removed.contains(aux)) {
                             toAdd.add(aux);
                             unitRules.add(aux);
                         }
                     }
 
                     ccx.rules.addAll(toAdd);
-                    ccx.rules.remove(rule);
-                    removed.add(rule);
-                    unitRules.remove(rule);
                 }
+                ccx.rules.remove(rule);
+                removed.add(rule);
+                unitRules.remove(rule);
             }
         }
 
@@ -1069,86 +1056,90 @@ public class Algorithms {
         //Inner
 
         static Set<Gvar> findNonDerivableVars(CfgConstructor ccx){
-            Cfg cfg = ccx.getCfg();
-
             Set<Gvar> toRemove = new HashSet<>(ccx.variables);
+
+            //Start
             for(Grule r : ccx.rules){
                 if(!GrammarTools.containsVar(r.getRight())) toRemove.remove(r.getLeft());
             }
 
+            //Recursion
+            Cfg cfg = ccx.getCfg();
             boolean consolidated = toRemove.isEmpty();
             while (!consolidated){
                 consolidated = true;
-                Set<Gvar> notRemove = new HashSet<>();
+                Set<Gvar> derivables = new HashSet<>();
                 for (Gvar v : toRemove) {
-                    boolean foundDerivableRule = false;
-                    Iterator<Grule> itr = GrammarTools.getRulesVar(cfg,v).iterator();
-                    while(itr.hasNext() && !foundDerivableRule){
-                        Gramex g = itr.next().getRight();
-                        if(g.type() == TypesGramex.VAR && !toRemove.contains(g.toGramexVar().getV())){
-                            foundDerivableRule = true;
-                        }
-                        else if(g.type() == TypesGramex.CONCAT){
-                            boolean foundNonDerivable = false;
-                            Iterator<GramexNonEmpty> itc = g.toGramexConcat().toList().iterator();
-                            while(itc.hasNext() && !foundNonDerivable){
-                                GramexNonEmpty gne = itc.next();
-                                foundNonDerivable = gne.type() == TypesGramex.VAR && toRemove.contains(gne.toGramexVar().getV());
-                            }
-                            foundDerivableRule = !foundNonDerivable;
-                        }
-                    }
-                    if(foundDerivableRule){
-                        notRemove.add(v);
+                    if(hasDerivableRule(GrammarTools.getRulesVar(cfg,v), toRemove)){
+                        derivables.add(v);
                         consolidated = false;
                     }
                 }
-                toRemove.removeAll(notRemove);
+                toRemove.removeAll(derivables);
                 if(toRemove.isEmpty()) consolidated = true;
             }
 
             return toRemove;
         }
 
-        static void findUnreachableVarsAndTerminals(CfgConstructor ccx, Set<Gvar> unusedVars, Set<Character> unusedTerminals){
-            Cfg cfg = ccx.getCfg();
+        static boolean hasDerivableRule(Set<Grule> rules, Set<Gvar> nonDerivableVars){
+            boolean found = false;
+            Iterator<Grule> it = rules.iterator();
+            while(it.hasNext() && !found){
+                Gramex g = it.next().getRight();
+                switch (g.type()){
+                    case EMPTY, CHAR -> found = true;
+                    case VAR -> found = !nonDerivableVars.contains(g.toGramexVar().getV());
+                    case CONCAT -> {
+                        boolean foundNonDerivableVarInConcat = false;
+                        Iterator<GramexNonEmpty> itc = g.toGramexConcat().toList().iterator();
+                        while(itc.hasNext() && !foundNonDerivableVarInConcat){
+                            GramexNonEmpty gne = itc.next();
+                            foundNonDerivableVarInConcat = gne.type() == TypesGramex.VAR && nonDerivableVars.contains(gne.toGramexVar().getV());
+                        }
+                        found = !foundNonDerivableVarInConcat;
+                    }
+                }
+            }
+            return found;
+        }
 
-            unusedVars.addAll(ccx.variables);
-            unusedVars.remove(ccx.start);
-            unusedTerminals.addAll(ccx.terminals.getSet());
-            if(ccx.terminals.containsEmptyChar()) unusedTerminals.add(Alphabet.getEmptyChar());
+        static void findUnreachableVarsAndTerminals(CfgConstructor ccx, Set<Gvar> unusedVars, Set<Character> unusedTerminals){
+            Set<Character> reachedTerminals = new HashSet<>();
+            Set<Gvar> reachedVars = new HashSet<>();
+            reachedVars.add(ccx.start);
+
+            Cfg cfg = ccx.getCfg();
+            Set<Grule> checking = GrammarTools.getRulesVar(cfg, ccx.start);
+            Set<Grule> nextCheck = new HashSet<>();
 
             boolean consolidated = false;
-            while (!consolidated){
+            while(!consolidated){
                 consolidated = true;
-                Set<Grule> checking = GrammarTools.getRulesVar(cfg, ccx.start);
-                Set<Grule> nextCheck = new HashSet<>();
-                for(Grule r : checking){
-                    if(r.getRight().type() == TypesGramex.EMPTY && unusedTerminals.contains(Alphabet.getEmptyChar())){
+                for(Grule g : checking){
+                    if(g.getRight().type() == TypesGramex.EMPTY && !reachedTerminals.contains(Alphabet.getEmptyChar())){
+                        reachedTerminals.add(Alphabet.getEmptyChar());
                         consolidated = false;
-                        unusedTerminals.remove(Alphabet.getEmptyChar());
                     }
-                    else if(r.getRight().type() == TypesGramex.CHAR && unusedTerminals.contains(r.getRight().toGramexChar().getC())){
+                    else if(g.getRight().type() == TypesGramex.CHAR && !reachedTerminals.contains(g.getRight().toGramexChar().getC())){
+                        reachedTerminals.add(g.getRight().toGramexChar().getC());
                         consolidated = false;
-                        unusedTerminals.remove(r.getRight().toGramexChar().getC());
                     }
-                    else if(r.getRight().type() == TypesGramex.VAR && unusedVars.contains(r.getRight().toGramexVar().getV())){
+                    else if(g.getRight().type() == TypesGramex.VAR && !reachedVars.contains(g.getRight().toGramexVar().getV())){
+                        reachedVars.add(g.getRight().toGramexVar().getV());
+                        nextCheck.addAll(GrammarTools.getRulesVar(cfg, g.getRight().toGramexVar().getV()));
                         consolidated = false;
-                        Gvar v = r.getRight().toGramexVar().getV();
-                        unusedVars.remove(v);
-                        nextCheck.addAll(GrammarTools.getRulesVar(cfg, v));
                     }
-                    else if(r.getRight().type() == TypesGramex.CONCAT){
-                        for(GramexNonEmpty g : r.getRight().toGramexConcat().toList()){
-                            if(g.type() == TypesGramex.CHAR && unusedTerminals.contains(g.toGramexChar().getC())){
+                    else if(g.getRight().type() == TypesGramex.CONCAT){
+                        for(GramexNonEmpty gne : g.getRight().toGramexConcat().toList()){
+                            if(gne.type() == TypesGramex.CHAR && !reachedTerminals.contains(gne.toGramexChar().getC())){
+                                reachedTerminals.add(gne.toGramexChar().getC());
                                 consolidated = false;
-                                unusedTerminals.remove(g.toGramexChar().getC());
                             }
-                            else if(g.type() == TypesGramex.VAR && unusedVars.contains(g.toGramexVar().getV())) {
+                            else if(gne.type() == TypesGramex.VAR && !reachedVars.contains(gne.toGramexVar().getV())){
+                                reachedVars.add(gne.toGramexVar().getV());
+                                nextCheck.addAll(GrammarTools.getRulesVar(cfg, gne.toGramexVar().getV()));
                                 consolidated = false;
-                                Gvar v = g.toGramexVar().getV();
-                                unusedVars.remove(v);
-                                nextCheck.addAll(GrammarTools.getRulesVar(cfg, v));
                             }
                         }
                     }
@@ -1157,20 +1148,26 @@ public class Algorithms {
                 checking.addAll(nextCheck);
                 nextCheck.clear();
             }
+
+            unusedVars.addAll(ccx.variables);
+            unusedVars.removeAll(reachedVars);
+
+            unusedTerminals.addAll(ccx.terminals.getSet());
+            if(ccx.terminals.containsEmptyChar()) unusedTerminals.add(Alphabet.getEmptyChar());
+            unusedTerminals.removeAll(reachedTerminals);
         }
 
         static void removeVar(CfgConstructor ccx, Gvar v){
             Set<Grule> toRemove = new HashSet<>();
             ccx.variables.remove(v);
             for(Grule r : ccx.rules){
-                if(r.getLeft().equals(v)) toRemove.add(r);
-                else if(GrammarTools.containsVar(r.getRight(), v)) toRemove.add(r);
+                if(r.getLeft().equals(v) || GrammarTools.containsVar(r.getRight(), v)) toRemove.add(r);
             }
             ccx.rules.removeAll(toRemove);
         }
 
         static void findAnulableVars(CfgConstructor ccx, Set<Gvar> anulable, Set<Gvar> onlyAnulable){
-            Map<Gvar,Set<Gramex>> mapper =  GrammarTools.getMapperRules(ccx.getCfg());
+            Map<Gvar,Set<Gramex>> mapper = GrammarTools.getMapperRules(ccx.getCfg());
 
             for(Grule g : ccx.rules){
                 if(g.getRight().type() == TypesGramex.EMPTY) anulable.add(g.getLeft());
@@ -1180,46 +1177,55 @@ public class Algorithms {
             while(!consolidated){
                 consolidated = true;
                 for(Gvar v : ccx.variables){
-                    if(!anulable.contains(v)){
-                        Iterator<Gramex> it = mapper.get(v).iterator();
-                        boolean found = false;
-                        while(it.hasNext() && !found){
-                            Gramex g = it.next();
-                            if(g.type() == TypesGramex.VAR && anulable.contains(g.toGramexVar().getV())) found = true;
-                            else if(g.type() == TypesGramex.CONCAT) {
-                                boolean eveyOneIsAnulable = true;
-                                Iterator<GramexNonEmpty> itc = g.toGramexConcat().toList().iterator();
-                                while(itc.hasNext() && eveyOneIsAnulable){
-                                    GramexNonEmpty gne = itc.next();
-                                    if(gne.type() == TypesGramex.CHAR) eveyOneIsAnulable = false;
-                                    else if(gne.type() == TypesGramex.VAR) eveyOneIsAnulable = anulable.contains(gne.toGramexVar().getV());
-                                }
-                                found = eveyOneIsAnulable;
-                            }
-                        }
-                        if(found) anulable.add(v);
+                    if(!anulable.contains(v) && isAnulable(ccx, v, anulable)){
+                        anulable.add(v);
+                        consolidated = false;
                     }
                 }
             }
 
             for(Gvar v : anulable){
-                boolean foundNotAnulable = false;
-                Iterator<Gramex> it = mapper.get(v).iterator();
-                while (it.hasNext() && !foundNotAnulable){
-                    Gramex g = it.next();
-                    if(g.type() == TypesGramex.CHAR) foundNotAnulable = true;
-                    else if(g.type() == TypesGramex.VAR) foundNotAnulable = !anulable.contains(g.toGramexVar().getV());
-                    else if(g.type() == TypesGramex.CONCAT){
-                        Iterator<GramexNonEmpty> itc = g.toGramexConcat().toList().iterator();
-                        while (itc.hasNext() && !foundNotAnulable){
-                            GramexNonEmpty gne = itc.next();
-                            if(gne.type() == TypesGramex.CHAR) foundNotAnulable = true;
-                            else if(gne.type() == TypesGramex.VAR) foundNotAnulable = !anulable.contains(gne.toGramexVar().getV());
-                        }
+                if(isOnlyAnulable(ccx, v, anulable)) onlyAnulable.add(v);
+            }
+        }
+
+        static boolean isAnulable(CfgConstructor ccx, Gvar v, Set<Gvar> anulable){
+            boolean found = false;
+            Iterator<Grule> it = GrammarTools.getRulesVar(ccx.getCfg(), v).iterator();
+            while(it.hasNext() && !found){
+                Grule r = it.next();
+                if(r.getRight().type() == TypesGramex.VAR && anulable.contains(r.getRight().toGramexVar().getV())) found = true;
+                else if(r.getRight().type() == TypesGramex.CONCAT){
+                    boolean foundNotAnulableInConcat = false;
+                    Iterator<GramexNonEmpty> itc = r.getRight().toGramexConcat().toList().iterator();
+                    while(itc.hasNext() && !foundNotAnulableInConcat){
+                        GramexNonEmpty gne = itc.next();
+                        if(gne.type() == TypesGramex.CHAR) foundNotAnulableInConcat = true;
+                        else if(!anulable.contains(gne.toGramexVar().getV())) foundNotAnulableInConcat = true;
+                    }
+                    found = !foundNotAnulableInConcat;
+                }
+            }
+            return found;
+        }
+
+        static boolean isOnlyAnulable(CfgConstructor ccx, Gvar v, Set<Gvar> anulable){
+            boolean foundNotAnulable = false;
+            Iterator<Grule> it = GrammarTools.getRulesVar(ccx.getCfg(), v).iterator();
+            while(it.hasNext() && !foundNotAnulable){
+                Grule r = it.next();
+                if(r.getRight().type() == TypesGramex.CHAR) foundNotAnulable = true;
+                else if(r.getRight().type() == TypesGramex.VAR) foundNotAnulable = !isOnlyAnulable(ccx, r.getRight().toGramexVar().getV(), anulable);
+                else if(r.getRight().type() == TypesGramex.CONCAT){
+                    Iterator<GramexNonEmpty> itc = r.getRight().toGramexConcat().toList().iterator();
+                    while(itc.hasNext() && !foundNotAnulable){
+                        GramexNonEmpty gne = itc.next();
+                        if(gne.type() == TypesGramex.CHAR) foundNotAnulable = true;
+                        else if(!anulable.contains(gne.toGramexVar().getV())) foundNotAnulable = true;
                     }
                 }
-                if(!foundNotAnulable) onlyAnulable.add(v);
             }
+            return !foundNotAnulable;
         }
 
         static Set<Gramex> removeAnulableInConcat(GramexConcat gc, Set<Gvar> anulable, Set<Gvar> onlyAnulable){

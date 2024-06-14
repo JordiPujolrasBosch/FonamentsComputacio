@@ -1,0 +1,9 @@
+terminals: a, b, d, $/
+variables: S0, A-E
+start: S0
+S0 -> A0 | A0 A0 | A0 A0 A0
+A0 -> A0 B0 a | A0 C0 a | a
+B0 -> A0 B0 a | A0 b | /
+C0 -> C0 a b | C0 C0
+D0 -> C0 D0 | C0 d | C0 E0 a
+E0 -> b

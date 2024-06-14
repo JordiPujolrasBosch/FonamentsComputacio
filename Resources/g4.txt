@@ -1,0 +1,12 @@
+terminals: $a
+variables: S0, A-H
+start: S0
+S0 -> a A0 b | c H0 B0 | C0 H0
+A0 -> d B0 H0 | e e C0
+B0 -> f f | D0
+C0 -> g F0 B0 | a h
+D0 -> i
+E0 -> j F0
+F0 -> d c G0 G0 G0 | c F0
+G0 -> k F0
+H0 -> H0 l m

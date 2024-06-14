@@ -251,9 +251,27 @@ public class Menu {
 
     //CFG transformations
 
+    public static void simplifyGrammar(String f){
+        try{
+            System.out.println(Reader.readGrammarFile(f).simplify());
+        }
+        catch (Exception ex){
+            System.out.println(ex.toString());
+        }
+    }
+
     public static void transformChomsky(String f){
         try{
             System.out.println(Reader.readGrammarFile(f).simplify().toChomsky());
+        }
+        catch (Exception ex){
+            System.out.println(ex.toString());
+        }
+    }
+
+    public static void transformGriebach(String f){
+        try{
+            System.out.println(Reader.readGrammarFile(f).simplify().toGriebach());
         }
         catch (Exception ex){
             System.out.println(ex.toString());

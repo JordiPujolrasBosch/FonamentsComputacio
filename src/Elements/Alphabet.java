@@ -35,6 +35,11 @@ public class Alphabet {
         hasEmptyChar = true;
     }
 
+    public void removeChar(char c){
+        if(getEmptyChar() == c) hasEmptyChar = false;
+        else set.remove(c);
+    }
+
     public void removeEmptyChar() {
         hasEmptyChar = false;
     }

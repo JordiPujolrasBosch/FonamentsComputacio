@@ -226,7 +226,7 @@ public class GrammarData {
                 listRight.add(new GramexEmpty());
             }
             else if(act.equals(TokenFactory.getGUnion())){
-                listRight.add(right);
+                if(right != null) listRight.add(right);
                 right = null;
             }
             else if(act.length()==1){

@@ -25,13 +25,7 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        try{
-            String s = Reader.readRegularExpressionFile("Resources/x1_regex.txt").toString();
-            System.out.println(s);
-        }
-        catch (Exception ex){
-            System.out.println(ex.toString());
-        }
+        Menu.transformGriebach("Resources/g5.txt");
     }
 
 }
