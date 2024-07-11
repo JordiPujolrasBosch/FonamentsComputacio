@@ -24,7 +24,7 @@ public class RegexStar implements RegularExpression {
     public RegularExpression simplify() {
         x = x.simplify();
         if(x.type() == TypesRegex.EMPTY || x.type() == TypesRegex.STAR) return x;
-        if(x.type() == TypesRegex.VOID) return new RegexEmptyChar();
+        if(x.type() == TypesRegex.VOID) return RegexEmptyChar.getInstance();
         return this;
     }
 

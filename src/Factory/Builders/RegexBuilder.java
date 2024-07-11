@@ -207,8 +207,8 @@ public class RegexBuilder {
         boolean isVoid()  {return op == RegexOperator.VOID;}
 
         public RegularExpression toRegex() throws RegexReaderException {
-            if(isEmpty()) return new RegexEmptyChar();
-            if(isVoid()) return new RegexVoid();
+            if(isEmpty()) return RegexEmptyChar.getInstance();
+            if(isVoid()) return RegexVoid.getInstance();
             throw new RegexReaderException(Printer.regexCheck(file));
         }
     }
@@ -238,7 +238,7 @@ public class RegexBuilder {
             b = new BuildRegexVoid();
         }
         public BuildRegexUnion(BuildRegex a, BuildRegex b){
-            r = new RegexVoid();
+            r = RegexVoid.getInstance();
             rgroup = false;
             this.a = a;
             this.b = b;
@@ -260,11 +260,11 @@ public class RegexBuilder {
     }
     private static class BuildRegexVoid extends BuildRegex {
         public BuildRegexVoid(){}
-        public RegularExpression toRegex(){return new RegexVoid();}
+        public RegularExpression toRegex(){return RegexVoid.getInstance();}
     }
     private static class BuildRegexEmpty extends BuildRegex {
         public BuildRegexEmpty(){}
-        public RegularExpression toRegex(){return new RegexEmptyChar();}
+        public RegularExpression toRegex(){return RegexEmptyChar.getInstance();}
     }
 
 }

@@ -603,13 +603,13 @@ public class Algorithms {
         gc.alphabet.addAll(ncx.alphabet);
 
         gc.transition = new Gntf(gc.start, gc.accept, gc.states);
-        gc.transition.addReplace(gc.start, ncx.start, new RegexEmptyChar());
+        gc.transition.addReplace(gc.start, ncx.start, RegexEmptyChar.getInstance());
         for(State s : ncx.finalStates){
-            gc.transition.addReplace(s, gc.accept, new RegexEmptyChar());
+            gc.transition.addReplace(s, gc.accept, RegexEmptyChar.getInstance());
         }
         for(Rule r : ncx.transition.getRules()){
             if(r.getCharacter() == Alphabet.getEmptyChar()){
-                gc.transition.addUnion(r.getOrigin(), r.getDestiny(), new RegexEmptyChar());
+                gc.transition.addUnion(r.getOrigin(), r.getDestiny(), RegexEmptyChar.getInstance());
             }
             else{
                 gc.transition.addUnion(r.getOrigin(), r.getDestiny(), new RegexChar(r.getCharacter()));
@@ -930,7 +930,7 @@ public class Algorithms {
             cc.rules.add(new Grule(r.getLeft(), r.getRight()));
         }
 
-        if(ccx.acceptsEmptyWord) cc.rules.add(new Grule(ccx.start, new GramexEmpty()));
+        if(ccx.acceptsEmptyWord) cc.rules.add(new Grule(ccx.start, GramexEmpty.getInstance()));
 
         return cc.getCfg();
     }
@@ -943,6 +943,7 @@ public class Algorithms {
         SimplifyGrammarPrivate.removeNonReachableVarsAndTerminals(ccx);
         SimplifyGrammarPrivate.removeEmptyRules(ccx);
         SimplifyGrammarPrivate.removeUnitRules(ccx);
+        SimplifyGrammarPrivate.removeNonReachableVarsAndTerminals(ccx);
         return SimplifyGrammarPrivate.cfgToCfgNonEmpty(ccx).getCfgNonEmpty();
     }
 
@@ -976,7 +977,7 @@ public class Algorithms {
             findAnulableVars(ccx, anulable, onlyAnulable);
             if(onlyAnulable.contains(ccx.start)){
                 ccx.rules.clear();
-                ccx.rules.add(new Grule(ccx.start, new GramexEmpty()));
+                ccx.rules.add(new Grule(ccx.start, GramexEmpty.getInstance()));
                 ccx.variables.clear();
                 ccx.variables.add(ccx.start);
             }
@@ -984,7 +985,7 @@ public class Algorithms {
                 Set<Grule> checked = new HashSet<>();
                 Set<Grule> toCheck = new HashSet<>(ccx.rules);
 
-                if(anulable.contains(ccx.start)) checked.add(new Grule(ccx.start, new GramexEmpty()));
+                if(anulable.contains(ccx.start)) checked.add(new Grule(ccx.start, GramexEmpty.getInstance()));
                 else ccx.terminals.removeEmptyChar();
 
                 while(!toCheck.isEmpty()){
@@ -1040,7 +1041,7 @@ public class Algorithms {
         static CfgNonEmptyConstructor cfgToCfgNonEmpty(CfgConstructor ccx){
             CfgNonEmptyConstructor cnec = new CfgNonEmptyConstructor();
 
-            cnec.acceptsEmptyWord = ccx.rules.contains(new Grule(ccx.start, new GramexEmpty()));
+            cnec.acceptsEmptyWord = ccx.rules.contains(new Grule(ccx.start, GramexEmpty.getInstance()));
             cnec.start = ccx.start;
             cnec.terminals.addAll(ccx.terminals);
             cnec.variables.addAll(ccx.variables);
@@ -1237,10 +1238,10 @@ public class Algorithms {
                 case CONCAT -> resA.addAll(removeAnulableInConcat(gc.getA().toGramexConcat(), anulable, onlyAnulable));
                 case VAR -> {
                     if(onlyAnulable.contains(gc.getA().toGramexVar().getV())){
-                        resA.add(new GramexEmpty());
+                        resA.add(GramexEmpty.getInstance());
                     }
                     else if(anulable.contains(gc.getA().toGramexVar().getV())){
-                        resA.add(new GramexEmpty());
+                        resA.add(GramexEmpty.getInstance());
                         resA.add(gc.getA());
                     }
                     else{
@@ -1254,10 +1255,10 @@ public class Algorithms {
                 case CONCAT -> resB.addAll(removeAnulableInConcat(gc.getB().toGramexConcat(), anulable, onlyAnulable));
                 case VAR -> {
                     if(onlyAnulable.contains(gc.getB().toGramexVar().getV())){
-                        resB.add(new GramexEmpty());
+                        resB.add(GramexEmpty.getInstance());
                     }
                     else if(anulable.contains(gc.getB().toGramexVar().getV())){
-                        resB.add(new GramexEmpty());
+                        resB.add(GramexEmpty.getInstance());
                         resB.add(gc.getB());
                     }
                     else{
@@ -1461,7 +1462,7 @@ public class Algorithms {
                 toAdd.add(new GruleNonEmpty(v, new GramexConcat(g.getRight(), new GramexVar(newVar))));
             }
             for(GruleNonEmpty g : have){
-                GramexNonEmpty aux = GrammarTools.substituteLeftMost(g.getRight(), v, new GramexEmpty()).toGramexNonEmpty();
+                GramexNonEmpty aux = GrammarTools.substituteLeftMost(g.getRight(), v, GramexEmpty.getInstance()).toGramexNonEmpty();
                 toAdd.add(new GruleNonEmpty(newVar, aux));
                 toAdd.add(new GruleNonEmpty(newVar, new GramexConcat(aux, new GramexVar(newVar))));
             }
@@ -1507,12 +1508,6 @@ public class Algorithms {
                 ccx.rules.remove(incorrectRule);
             }
         }
-    }
-
-    // CFG == CFG
-
-    public static boolean equalsCfgs(CfgNonEmpty a, CfgNonEmpty b) {
-        return false;
     }
 
     // CHECK WORD

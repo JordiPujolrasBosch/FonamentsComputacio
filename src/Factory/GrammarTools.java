@@ -187,6 +187,12 @@ public class GrammarTools {
 
     //Getters gramex
 
+    private static GramexNonEmpty getRightMostElement(GramexNonEmpty g) {
+        GramexNonEmpty x = g;
+        if(g.type() == TypesGramex.CONCAT) x = getRightMostElement(g.toGramexConcat().getB());
+        return x;
+    }
+
     public static GramexNonEmpty getLeftMost(GramexConcat g){
         if(g.getA().type() != TypesGramex.CONCAT) return g.getA();
         return getLeftMost(g.getA().toGramexConcat());
@@ -240,11 +246,11 @@ public class GrammarTools {
     }
 
     public static Pair<Gramex, Gramex> cut(Gramex r, int n) {
-        Pair<Gramex, Gramex> p = new Pair<>(new GramexEmpty(), new GramexEmpty());
+        Pair<Gramex, Gramex> p = new Pair<>(GramexEmpty.getInstance(), GramexEmpty.getInstance());
         switch (r.type()){
             case VAR, CHAR -> {
-                if(n > 0) p = new Pair<>(r, new GramexEmpty());
-                else p = new Pair<>(new GramexEmpty(), r);
+                if(n > 0) p = new Pair<>(r, GramexEmpty.getInstance());
+                else p = new Pair<>(GramexEmpty.getInstance(), r);
             }
             case CONCAT -> {
                 GramexConcat c = r.toGramexConcat();
@@ -277,31 +283,24 @@ public class GrammarTools {
     }
 
     public static Gramex commonSuffix(Gramex a, Gramex b) {
-        Gramex x = new GramexEmpty();
-        if(a.equals(b)) x = a;
-        else if(a.type() == TypesGramex.CHAR && b.type() == TypesGramex.CONCAT){
-            x = null;
+        if(a.type() == TypesGramex.EMPTY || b.type() == TypesGramex.EMPTY) return GramexEmpty.getInstance();
+
+        GramexNonEmpty gnea = getRightMostElement(a.toGramexNonEmpty());
+        GramexNonEmpty gneb = getRightMostElement(b.toGramexNonEmpty());
+
+        if(gnea.type() != gneb.type()) return GramexEmpty.getInstance();
+
+        if(gnea.type() == TypesGramex.CHAR){
+            if(gnea.toGramexChar().getC() == gneb.toGramexChar().getC()) return gnea;
+            else return GramexEmpty.getInstance();
         }
-        return null;
-        /*
-        empty empty  -> empty
-        empty char   -> empty
-        empty var    -> empty
-        empty concat -> empty
-        char empty   -> empty
-        char char    -> empty || char if a=b
-        char var     -> empty
-        char concat  -> empty || char if concat.endsWith-char
-        var empty    -> empty
-        var char     -> empty
-        var var      -> empty || var if a=b
-        var concat   -> empty || var if concat.endswith-var
-        concat empty -> empty
-        concat char  -> empty || char if a.endswith-char
-        concat var   -> empty || var if a.endswith-var
-        concat concat->
-         */
+        else{
+            if(gnea.toGramexVar().getV().equals(gneb.toGramexVar().getV())) return gneb;
+            else return GramexEmpty.getInstance();
+        }
     }
+
+
 
     //More
 
@@ -330,7 +329,6 @@ public class GrammarTools {
 
     public static boolean correctVars(CfgNonEmpty cfga, CfgNonEmpty cfgb, Set<Gramex> left, Set<Gramex> right) {
         Gvar varLeft = null;
-        Gvar varRight = null;
 
         Iterator<Gramex> itl = left.iterator();
         while(itl.hasNext() && varLeft == null){
@@ -338,16 +336,17 @@ public class GrammarTools {
             if(containsVar(k)) varLeft = getLeftMostVar(k.toGramexNonEmpty());
         }
 
+        if(varLeft != null) return cfga.getVariables().contains(varLeft);
+
+        Gvar varRight = null;
+
         Iterator<Gramex> itr = right.iterator();
         while(itr.hasNext() && varRight == null){
             Gramex k = itr.next();
             if(containsVar(k)) varRight = getLeftMostVar(k.toGramexNonEmpty());
         }
 
-        if(varLeft != null && cfga.getVariables().contains(varLeft)) return true;
-        if(varLeft != null && cfgb.getVariables().contains(varLeft)) return false;
-        if(varRight != null && cfga.getVariables().contains(varRight)) return false;
-        if(varRight != null && cfgb.getVariables().contains(varRight)) return true;
+        if(varRight != null) return cfgb.getVariables().contains(varRight);
         return true;
     }
 
@@ -374,7 +373,7 @@ public class GrammarTools {
         }
 
         for(Gramex ri : expanded){
-            if(terminalPrefix(ri).startsWith(prefix)) set.add(cut(r,prefix.length()).getB());
+            if(terminalPrefix(ri).startsWith(prefix)) set.add(cut(ri,prefix.length()).getB());
         }
 
         return set;
@@ -392,11 +391,7 @@ public class GrammarTools {
     }
 
     public static String shortestWordOfVar(CfgNonEmpty cfg, Gvar v) {
-        Map<Gvar, Set<Gramex>> mapper = new HashMap<>();
-        for(GruleNonEmpty rule : cfg.getRules()){
-            if(!mapper.containsKey(rule.getLeft())) mapper.put(rule.getLeft(), new HashSet<>());
-            mapper.get(rule.getLeft()).add(rule.getRight());
-        }
+        Map<Gvar, Set<GramexNonEmpty>> mapper = getMapperRules(cfg);
 
         Gramex shortest = null;
         Set<Gramex> pre = new HashSet<>();

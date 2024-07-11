@@ -3,7 +3,13 @@ package Grammars;
 import Factory.TokenFactory;
 
 public class GramexEmpty implements Gramex {
-    public GramexEmpty(){}
+    private GramexEmpty(){}
+
+    private static final GramexEmpty instance = new GramexEmpty();
+
+    public static GramexEmpty getInstance(){
+        return instance;
+    }
 
     public TypesGramex type() {
         return TypesGramex.EMPTY;
@@ -39,7 +45,12 @@ public class GramexEmpty implements Gramex {
 
     @Override
     public boolean equals(Object obj) {
-        return obj != null && getClass() == obj.getClass();
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
     @Override

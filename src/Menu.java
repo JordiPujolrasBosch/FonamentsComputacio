@@ -3,10 +3,25 @@ import Automatons.Pda;
 import Factory.Algorithms;
 import Factory.Printer;
 import Factory.Reader;
+import Grammars.CfgNonEmpty;
 
 import java.util.List;
 
 public class Menu {
+
+    //ARTICLE
+
+    public static void equalCfgCfgArticle(String fa, String fb){
+        try{
+            CfgNonEmpty a = Reader.readGrammarFile(fa).simplify().toGriebach();
+            CfgNonEmpty b = Reader.readGrammarFile(fb).simplify().toGriebach();
+            if(a.compare(b)) System.out.println(Printer.equal(fa,fb));
+            else System.out.println(Printer.nonequal(fa,fb));
+        }
+        catch (Exception ex){
+            System.out.println(ex.toString());
+        }
+    }
 
     //COMPARE
 
@@ -18,7 +33,6 @@ public class Menu {
             else System.out.println(Printer.nonequal(fa,fb));
         }
         catch (Exception ex) {
-            String m = ex.toString();
             System.out.println(ex.toString());
         }
     }

@@ -5,6 +5,7 @@ import Elements.Grammars.GruleNonEmpty;
 import Elements.Grammars.Gvar;
 import Factory.Algorithms;
 import Factory.Constructors.CfgNonEmptyConstructor;
+import GrammarComparisonArticle.GrammarComparator;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -38,7 +39,7 @@ public class CfgNonEmpty {
     }
 
     public boolean compare(CfgNonEmpty b){
-        return Algorithms.equalsCfgs(this,b);
+        return GrammarComparator.compare(this, b);
     }
 
     //Getters

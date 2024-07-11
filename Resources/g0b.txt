@@ -1,0 +1,5 @@
+terminals: a,b
+variables: P0, R0
+start: P0
+P0 -> a R0
+R0 -> a b b | a R0 b | b

@@ -2,6 +2,7 @@ package Grammars;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class GramexConcat implements GramexNonEmpty {
     private final GramexNonEmpty a;
@@ -79,6 +80,11 @@ public class GramexConcat implements GramexNonEmpty {
             i++;
         }
         return equal;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(a, b);
     }
 
     @Override

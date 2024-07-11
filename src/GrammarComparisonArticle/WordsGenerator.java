@@ -28,16 +28,23 @@ public class WordsGenerator {
     public List<String> generateWords(int n, GramexNonEmpty rule) {
         List<String> list = new ArrayList<>();
         IntegerInf ht = ht(rule);
+
         if(ht.isInfinity()){
             Random rand = new Random();
-            for(int i=1; i<=n; i++) list.add(enumFunction(rule, rand.nextInt(100000)).getWord());
+            for(int i=1; i<=n; i++){
+                list.add(enumFunction(rule, rand.nextInt(100000)).getWord());
+            }
         }
         else if(n >= ht.getValue()) {
-            for (int i = 0; i < ht.getValue(); i++) list.add(enumFunction(rule, i).getWord());
+            for (int i = 0; i < ht.getValue(); i++){
+                list.add(enumFunction(rule, i).getWord());
+            }
         }
         else{
             Random rand = new Random();
-            for(int i=1; i<=n; i++) list.add(enumFunction(rule, rand.nextInt(ht.getValue())).getWord());
+            for(int i=1; i<=n; i++) {
+                list.add(enumFunction(rule, rand.nextInt(ht.getValue())).getWord());
+            }
         }
         return list;
     }
@@ -272,6 +279,7 @@ public class WordsGenerator {
         int x = (int) dx;
         int y = (int) dy;
 
+        if(xb.getValue() == 1 && x == 1) return new Pair<>(0,y);
         return new Pair<>(x,y);
     }
 

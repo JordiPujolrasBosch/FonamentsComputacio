@@ -1,9 +1,12 @@
 import Automatons.Pda;
+import Elements.Grammars.Gvar;
 import Factory.Reader;
 import Grammars.Cfg;
+import Grammars.Gramex;
+import Grammars.GramexNonEmpty;
+import Grammars.GramexVar;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /*
  * TODO
@@ -25,7 +28,7 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        Menu.transformGriebach("Resources/g5.txt");
+        Menu.equalCfgCfgArticle("Resources/g0a.txt", "Resources/g0b.txt");
     }
 
 }

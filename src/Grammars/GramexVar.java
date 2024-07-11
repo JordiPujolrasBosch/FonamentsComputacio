@@ -51,8 +51,13 @@ public class GramexVar implements GramexNonEmpty {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        GramexVar rightVar = (GramexVar) o;
-        return Objects.equals(v, rightVar.v);
+        GramexVar that = (GramexVar) o;
+        return Objects.equals(v, that.v);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(v);
     }
 
     @Override

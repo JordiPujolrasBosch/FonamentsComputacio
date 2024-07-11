@@ -223,7 +223,7 @@ public class GrammarData {
                 for(char c : TokenFactory.getGGroup(act)) listRight.add(new GramexChar(c));
             }
             else if(act.equals(TokenFactory.getGEmptyChar())){
-                listRight.add(new GramexEmpty());
+                listRight.add(GramexEmpty.getInstance());
             }
             else if(act.equals(TokenFactory.getGUnion())){
                 if(right != null) listRight.add(right);

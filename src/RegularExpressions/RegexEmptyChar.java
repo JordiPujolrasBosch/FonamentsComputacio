@@ -5,7 +5,13 @@ import Automatons.Nfa;
 import Factory.TokenFactory;
 
 public class RegexEmptyChar implements RegularExpression {
-    public RegexEmptyChar(){}
+    private RegexEmptyChar(){}
+
+    private static final RegexEmptyChar instance = new RegexEmptyChar();
+
+    public static RegexEmptyChar getInstance(){
+        return instance;
+    }
 
     public Nfa getNfa(){
         return Algorithms.regexEmptyCharToNfa();
@@ -26,7 +32,7 @@ public class RegexEmptyChar implements RegularExpression {
 
     @Override
     public boolean equals(Object obj) {
-        return obj != null && getClass() == obj.getClass();
+        return super.equals(obj);
     }
 
     @Override

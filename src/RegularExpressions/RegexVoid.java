@@ -4,8 +4,16 @@ import Factory.Algorithms;
 import Automatons.Nfa;
 import Factory.TokenFactory;
 
+import java.util.Objects;
+
 public class RegexVoid implements RegularExpression {
-    public RegexVoid(){}
+    private RegexVoid(){}
+
+    private static final RegexVoid instance = new RegexVoid();
+
+    public static RegexVoid getInstance(){
+        return instance;
+    }
 
     public Nfa getNfa() {
         return Algorithms.regexVoidToNfa();
@@ -26,7 +34,7 @@ public class RegexVoid implements RegularExpression {
 
     @Override
     public boolean equals(Object obj) {
-        return obj != null && getClass() == obj.getClass();
+        return super.equals(obj);
     }
 
     @Override

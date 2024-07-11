@@ -28,7 +28,7 @@ public class Gntf {
 
         for(State o : ss){
             for(State d : ss){
-                if(o != accept && d != origin) addReplace(o, d, new RegexVoid());
+                if(o != accept && d != origin) addReplace(o, d, RegexVoid.getInstance());
             }
         }
     }
@@ -71,8 +71,8 @@ public class Gntf {
     //Step
 
     public RegularExpression step(State origin, State destiny){
-        if(!rules.containsKey(origin)) return new RegexVoid();
-        if(!rules.get(origin).containsKey(destiny)) return new RegexVoid();
+        if(!rules.containsKey(origin)) return RegexVoid.getInstance();
+        if(!rules.get(origin).containsKey(destiny)) return RegexVoid.getInstance();
         return rules.get(origin).get(destiny);
     }
 

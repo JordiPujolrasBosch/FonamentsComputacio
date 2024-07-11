@@ -2,6 +2,8 @@ package Grammars;
 
 import Factory.TokenFactory;
 
+import java.util.Objects;
+
 public class GramexChar implements GramexNonEmpty {
     private final char c;
 
@@ -52,10 +54,15 @@ public class GramexChar implements GramexNonEmpty {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(c);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        GramexChar rightChar = (GramexChar) o;
-        return c == rightChar.c;
+        GramexChar that = (GramexChar) o;
+        return c == that.c;
     }
 }
