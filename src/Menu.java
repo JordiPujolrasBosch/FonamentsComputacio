@@ -25,6 +25,25 @@ public class Menu {
         }
     }
 
+    public static void findCounterExampleCfgs(String fa, String fb){
+        try{
+            CfgNonEmpty a = Reader.readGrammarFile(fa).simplify().toGriebach();
+            CfgNonEmpty b = Reader.readGrammarFile(fb).simplify().toGriebach();
+            if(a.acceptsEmpty() != b.acceptsEmpty()){
+                System.out.println(Printer.nonequal(fa,fb) + " :: empty word");
+            }
+            else if(a.compare(b)){
+                System.out.println(Printer.equal(fa, fb));
+            }
+            else{
+                System.out.println(Printer.nonequal(fa,fb) + " :: " + Algorithms.findCounterExampleCfgs(a,b));
+            }
+        }
+        catch (Exception ex){
+            System.out.println(ex.toString());
+        }
+    }
+
     //COMPARE
 
     public static void equalDfaDfa(String fa, String fb) {

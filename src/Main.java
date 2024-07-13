@@ -9,14 +9,10 @@ import java.util.*;
  * TODO
  * Test all
  *
- * Algorithms
- * Article CFG==CFG
- *
- * Generate words CFG, Regex
- * Regex to CFG
- * Find counter-example
  * Enumerator fixed length words
- * CFG termination checks
+ * Ambiguity
+ * GUI
+ *
  * */
 
 /*
@@ -27,6 +23,11 @@ import java.util.*;
  * Grammars
  * RegularExpressions
  * Utils
+ * Algorithms
+ *
+ * Article CFG==CFG
+ * CFG termination checks
+ * Find counter-example
  * */
 
 public class Main {

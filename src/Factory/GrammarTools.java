@@ -300,7 +300,17 @@ public class GrammarTools {
         }
     }
 
+    public static String makeWord(Gramex g){
+        String out = "";
 
+        switch (g.type()){
+            case CONCAT -> out = makeWord(g.toGramexConcat().getA()) + makeWord(g.toGramexConcat().getB());
+            case CHAR -> out = String.valueOf(g.toGramexChar().getC());
+            case VAR -> out = g.toGramexVar().toString();
+        }
+
+        return out;
+    }
 
     //More
 
@@ -390,13 +400,14 @@ public class GrammarTools {
         return set;
     }
 
-    public static String shortestWordOfVar(CfgNonEmpty cfg, Gvar v) {
+    public static String shortestWordOfGramex(CfgNonEmpty cfg, Gramex g) {
+        if(!containsVar(g)) return makeWord(g);
         Map<Gvar, Set<GramexNonEmpty>> mapper = getMapperRules(cfg);
 
         Gramex shortest = null;
         Set<Gramex> pre = new HashSet<>();
         Set<Gramex> post = new HashSet<>();
-        pre.add(new GramexVar(v));
+        pre.add(g);
         while(!pre.isEmpty()){
             for(Gramex r : pre){
                 Gvar var = getLeftMostVar(r.toGramexNonEmpty());
@@ -416,7 +427,7 @@ public class GrammarTools {
             post.clear();
         }
 
-        return shortest.toString();
+        return makeWord(shortest);
     }
 
     public static boolean acceptsAllWords(CfgNonEmpty cfg, GramexNonEmpty rule, List<String> words) {

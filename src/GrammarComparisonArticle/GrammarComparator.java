@@ -1,5 +1,6 @@
 package GrammarComparisonArticle;
 
+import Automatons.Pda;
 import Elements.Grammars.Gvar;
 import Factory.GrammarTools;
 import Grammars.*;
@@ -25,7 +26,9 @@ public class GrammarComparator {
             Comparison act = toProve.iterator().next();
             toProve.remove(act);
 
-            if(data.counter > 70000) stop = true;
+            if(data.counter > 100000)                                        stop = true;
+            else if(canApplyLengthFilter(act) && !lengthFilter(act, data))   stop = true;
+            else if(canApplyTestFilter(act) && !testFilter(act, data))       stop = true;
             else if(canApplyEmptyOne(act))                                   toProve.addAll(verifyEmpty());
             else if(canApplyEmptyTwo(act))                                   toProve.addAll(verifyEmpty());
             else if(canApplyInduct(act, context))                            toProve.addAll(verifyInduct());
@@ -95,6 +98,11 @@ public class GrammarComparator {
         public WordsGenerator getWordsGeneratorLeft() {
             if(leftIsA) return wga;
             return wgb;
+        }
+
+        public WordsGenerator getWordsGeneratorRight(){
+            if(leftIsA) return wgb;
+            return wga;
         }
     }
 
@@ -271,7 +279,7 @@ public class GrammarComparator {
 
         Gramex r = comp.getLeft().iterator().next();
         Gvar v = GrammarTools.getLeftMostVar(r.toGramexNonEmpty());
-        String shortWord = GrammarTools.shortestWordOfVar(cfgl, v);
+        String shortWord = GrammarTools.shortestWordOfGramex(cfgl, new GramexVar(v));
         Gramex gamma = GrammarTools.cut(r, 1).getB();
 
         boolean everyOmegaCanDeriveShort = true;
@@ -371,4 +379,82 @@ public class GrammarComparator {
         return set;
     }
 
+    //Filters
+
+    private static boolean canApplyLengthFilter(Comparison comp){
+        return comp.getLeft().size() == 1 && comp.getRight().size() == 1 && comp.isEquivalence();
+    }
+
+    private static boolean lengthFilter(Comparison comp, GrammarComparatorDataAux data){
+        data.calculate(comp);
+        CfgNonEmpty cfgl = data.getCfgLeft();
+        CfgNonEmpty cfgr = data.getCfgRight();
+
+        Gramex l = comp.getLeft().iterator().next();
+        Gramex r = comp.getRight().iterator().next();
+
+        String shortl = GrammarTools.shortestWordOfGramex(cfgl, l);
+        String shortr = GrammarTools.shortestWordOfGramex(cfgr, r);
+
+        if(shortl.length() < r.length()) return false;
+        if(shortr.length() < l.length()) return false;
+        return true;
+    }
+
+    private static boolean canApplyTestFilter(Comparison comp){
+        boolean leftUnique  = comp.getLeft().size() == 1  && comp.getLeft().iterator().next().type() != TypesGramex.EMPTY;
+        boolean rightUnique = comp.getRight().size() == 1 && comp.getRight().iterator().next().type() != TypesGramex.EMPTY;
+
+        if(comp.isEquivalence() && rightUnique && leftUnique) return true;
+        if(comp.isEquivalence() && rightUnique) return true;
+        if(comp.isEquivalence() && leftUnique) return true;
+        if(comp.isInclusion() && rightUnique) return true;
+        return false;
+    }
+
+    private static boolean testFilter(Comparison comp, GrammarComparatorDataAux data){
+        data.calculate(comp);
+        CfgNonEmpty cfgl = data.getCfgLeft();
+        CfgNonEmpty cfgr = data.getCfgRight();
+        WordsGenerator wgl = data.getWordsGeneratorLeft();
+        WordsGenerator wgr = data.getWordsGeneratorRight();
+
+        boolean leftUnique  = comp.getLeft().size() == 1  && comp.getLeft().iterator().next().type() != TypesGramex.EMPTY;
+        boolean rightUnique = comp.getRight().size() == 1 && comp.getRight().iterator().next().type() != TypesGramex.EMPTY;
+
+        int sizeBag = 20;
+        boolean found = false;
+
+        if(comp.isEquivalence() && leftUnique && rightUnique){
+            GramexNonEmpty l = comp.getLeft().iterator().next().toGramexNonEmpty();
+            GramexNonEmpty r = comp.getRight().iterator().next().toGramexNonEmpty();
+
+            List<String> leftBag = wgl.generateWords(sizeBag, l);
+            List<String> rightBag = wgr.generateWords(sizeBag, r);
+
+            found = !GrammarTools.acceptsAllWords(cfgr, r, leftBag) || !GrammarTools.acceptsAllWords(cfgl, l, rightBag);
+        }
+        else if(comp.isEquivalence() && leftUnique){
+            GramexNonEmpty l = comp.getLeft().iterator().next().toGramexNonEmpty();
+
+            List<String> rightBag = new ArrayList<>();
+            for(Gramex g : comp.getRight()) {
+                if(g.type() != TypesGramex.EMPTY) rightBag.addAll(wgr.generateWords(sizeBag, g.toGramexNonEmpty()));
+            }
+
+            found = !GrammarTools.acceptsAllWords(cfgl, l, rightBag);
+        }
+        else if(rightUnique){
+            GramexNonEmpty r = comp.getRight().iterator().next().toGramexNonEmpty();
+
+            List<String> leftBag = new ArrayList<>();
+            for(Gramex g : comp.getLeft()){
+                if(g.type() != TypesGramex.EMPTY) leftBag.addAll(wgl.generateWords(sizeBag, g.toGramexNonEmpty()));
+            }
+
+            found = !GrammarTools.acceptsAllWords(cfgr, r, leftBag);
+        }
+
+        return !found;
+    }
 }

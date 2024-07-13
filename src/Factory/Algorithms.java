@@ -7,6 +7,7 @@ import Elements.Transitions.*;
 import Exceptions.*;
 import Factory.Builders.*;
 import Factory.Constructors.*;
+import GrammarComparisonArticle.WordsGenerator;
 import Grammars.*;
 import RegularExpressions.*;
 import Utils.IntegerInf;
@@ -1760,6 +1761,38 @@ public class Algorithms {
                 this.accept = accept;
             }
         }
+    }
+
+    public static String findCounterExampleCfgs(CfgNonEmpty a, CfgNonEmpty b) {
+        Pda parsera = a.toCfg().toPda();
+        Pda parserb = b.toCfg().toPda();
+
+        WordsGenerator wga = new WordsGenerator(a);
+        WordsGenerator wgb = new WordsGenerator(b);
+
+        boolean found = false;
+        int counter = 0;
+        Iterator<String> it;
+        String act = "";
+
+        while(!found && counter < 100000){
+            it = wga.generateWordsStart(100).iterator();
+            while(it.hasNext() && !found){
+                act = it.next();
+                found = !parserb.checkWord(act);
+                counter++;
+            }
+
+            it = wgb.generateWordsStart(100).iterator();
+            while(it.hasNext() && !found){
+                act = it.next();
+                found = !parsera.checkWord(act);
+                counter++;
+            }
+        }
+
+        if(found) return act;
+        return "Counter-example not found";
     }
 
 }
