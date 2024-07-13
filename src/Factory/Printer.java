@@ -65,6 +65,15 @@ public class Printer {
         return res;
     }
 
+    //Words file output
+
+    public static String stringOfWords(List<String> list){
+        String s = "";
+        for(int i = 0; i<list.size()-1; i++) s = s + list.get(i) + "\n";
+        s = s + list.get(list.size()-1);
+        return s;
+    }
+
     //Private
 
     private static String stringOfAutomaton(Set<State> states, Alphabet alphabet, State start, Set<State> finalStates, List<Rule> rules){

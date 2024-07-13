@@ -2,6 +2,8 @@ package RegularExpressions;
 
 import Factory.Algorithms;
 import Automatons.Nfa;
+import Grammars.Cfg;
+import Utils.IntegerInf;
 
 import java.util.Objects;
 
@@ -14,8 +16,18 @@ public class RegexConcat implements RegularExpression {
         this.b = b;
     }
 
-    public Nfa getNfa() {
-        return Algorithms.concatenation(a.getNfa(), b.getNfa());
+    public RegularExpression getA(){
+        return a;
+    }
+
+    public RegularExpression getB(){
+        return b;
+    }
+
+    //REGEX METHODS
+
+    public Nfa toNfa() {
+        return Algorithms.concatenation(a.toNfa(), b.toNfa());
     }
 
     public TypesRegex type() {
@@ -34,6 +46,16 @@ public class RegexConcat implements RegularExpression {
         return this;
     }
 
+    public Cfg toCfg() {
+        return Algorithms.regexToCfg(this);
+    }
+
+    public IntegerInf wordsCount() {
+        return a.wordsCount().multiply(b.wordsCount());
+    }
+
+    //TO STRING AND EQUALS
+
     @Override
     public String toString() {
         if(a.type() == b.type() && a.type() == TypesRegex.UNION) return "(" + a + ")(" + b + ")";
@@ -46,8 +68,8 @@ public class RegexConcat implements RegularExpression {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RegexConcat b = (RegexConcat) o;
-        return getNfa().toDfa().minimize().compare(b.getNfa().toDfa().minimize());
+        RegexConcat that = (RegexConcat) o;
+        return Objects.equals(a, that.a) && Objects.equals(b, that.b);
     }
 
     @Override

@@ -3,6 +3,8 @@ package RegularExpressions;
 import Factory.Algorithms;
 import Automatons.Nfa;
 import Factory.TokenFactory;
+import Grammars.Cfg;
+import Utils.IntegerInf;
 
 import java.util.Objects;
 
@@ -15,8 +17,18 @@ public class RegexUnion implements RegularExpression {
         this.b = b;
     }
 
-    public Nfa getNfa(){
-        return Algorithms.union(a.getNfa(),b.getNfa());
+    public RegularExpression getA() {
+        return a;
+    }
+
+    public RegularExpression getB() {
+        return b;
+    }
+
+    //REGEX METHODS
+
+    public Nfa toNfa(){
+        return Algorithms.union(a.toNfa(),b.toNfa());
     }
 
     public TypesRegex type() {
@@ -34,6 +46,16 @@ public class RegexUnion implements RegularExpression {
         return this;
     }
 
+    public Cfg toCfg() {
+        return Algorithms.regexToCfg(this);
+    }
+
+    public IntegerInf wordsCount() {
+        return a.wordsCount().add(b.wordsCount());
+    }
+
+    //TO STRING AND EQUALS
+
     @Override
     public String toString() {
         return a + TokenFactory.getRUnion() + b;
@@ -43,8 +65,8 @@ public class RegexUnion implements RegularExpression {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RegexUnion b = (RegexUnion) o;
-        return getNfa().toDfa().minimize().compare(b.getNfa().toDfa().minimize());
+        RegexUnion that = (RegexUnion) o;
+        return (Objects.equals(a, that.a) && Objects.equals(b, that.b)) || (Objects.equals(a, that.b) && Objects.equals(b, that.a));
     }
 
     @Override

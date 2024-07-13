@@ -3,6 +3,8 @@ package RegularExpressions;
 import Factory.Algorithms;
 import Automatons.Nfa;
 import Factory.TokenFactory;
+import Grammars.Cfg;
+import Utils.IntegerInf;
 
 import java.util.Objects;
 
@@ -13,7 +15,13 @@ public class RegexChar implements RegularExpression {
         this.c = c;
     }
 
-    public Nfa getNfa() {
+    public char getC(){
+        return c;
+    }
+
+    //REGEX METHODS
+
+    public Nfa toNfa() {
         return Algorithms.regexCharToNfa(c);
     }
 
@@ -24,6 +32,16 @@ public class RegexChar implements RegularExpression {
     public RegularExpression simplify() {
         return this;
     }
+
+    public Cfg toCfg() {
+        return Algorithms.regexToCfg(this);
+    }
+
+    public IntegerInf wordsCount() {
+        return new IntegerInf(1);
+    }
+
+    //TO STRING AND EQUALS
 
     @Override
     public String toString(){

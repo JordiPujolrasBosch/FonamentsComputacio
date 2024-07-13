@@ -9,6 +9,7 @@ import Factory.Builders.*;
 import Factory.Constructors.*;
 import Grammars.*;
 import RegularExpressions.*;
+import Utils.IntegerInf;
 
 import java.util.*;
 
@@ -82,7 +83,7 @@ public class Algorithms {
     }
 
     private static class MinimizePrivate {
-        private static void deleteUnusedStates(DfaConstructor dc){
+        static void deleteUnusedStates(DfaConstructor dc){
             Set<State> unused = new HashSet<>(dc.states);
             unused.remove(dc.start);
 
@@ -118,7 +119,7 @@ public class Algorithms {
             }
         }
 
-        private static Set<Set<State>> findPartition(DfaConstructor dc){
+        static Set<Set<State>> findPartition(DfaConstructor dc){
             Set<Set<State>> partition = new HashSet<>();
             Set<State> nonFinal = new HashSet<>();
             for(State s : dc.states){
@@ -166,7 +167,7 @@ public class Algorithms {
             return partition;
         }
 
-        private static Set<State> findWhichSetContains(Set<Set<State>> x, State s){
+        static Set<State> findWhichSetContains(Set<Set<State>> x, State s){
             boolean found = false;
             Set<State> act = null;
             Iterator<Set<State>> it = x.iterator();
@@ -177,7 +178,7 @@ public class Algorithms {
             return act;
         }
 
-        private static DfaConstructor defineMinimal(DfaConstructor dc, Set<Set<State>> partition){
+        static DfaConstructor defineMinimal(DfaConstructor dc, Set<Set<State>> partition){
             Map<Set<State>, State> mapper = new HashMap<>();
             for(Set<State> ss : partition) mapper.put(ss, new State());
 
@@ -210,7 +211,7 @@ public class Algorithms {
             return res;
         }
 
-        private static boolean conjunctionIsEmpty(Set<State> a, Set<State> b) {
+        static boolean conjunctionIsEmpty(Set<State> a, Set<State> b) {
             boolean found = false;
             Iterator<State> it = b.iterator();
             while(it.hasNext() && !found){
@@ -243,7 +244,7 @@ public class Algorithms {
     }
 
     private static class MinimizeTwoPrivate {
-        private static void deleteUnusedStates(DfaConstructor dc){
+        static void deleteUnusedStates(DfaConstructor dc){
             Set<State> unused = new HashSet<>(dc.states);
             unused.remove(dc.start);
 
@@ -279,7 +280,7 @@ public class Algorithms {
             }
         }
 
-        private static Map<State,Map<State,Boolean>> startMatrix(DfaConstructor dc, Map<Integer,State> reverse){
+        static Map<State,Map<State,Boolean>> startMatrix(DfaConstructor dc, Map<Integer,State> reverse){
             Map<State,Map<State,Boolean>> matrix = new HashMap<>();
             int n = dc.states.size();
 
@@ -299,7 +300,7 @@ public class Algorithms {
             return matrix;
         }
 
-        private static void iterateMatrix(DfaConstructor dc, Map<Integer,State> reverse, Map<State,Integer> mapper, Map<State,Map<State,Boolean>> matrix){
+        static void iterateMatrix(DfaConstructor dc, Map<Integer,State> reverse, Map<State,Integer> mapper, Map<State,Map<State,Boolean>> matrix){
             int n = dc.states.size();
 
             boolean consolidated = false;
@@ -329,7 +330,7 @@ public class Algorithms {
             }
         }
 
-        private static Set<Set<State>> buildPartition(DfaConstructor dc, Map<State,Integer> mapper, Map<State,Map<State,Boolean>> matrix){
+        static Set<Set<State>> buildPartition(DfaConstructor dc, Map<State,Integer> mapper, Map<State,Map<State,Boolean>> matrix){
             Set<State> bag = new HashSet<>(dc.states);
             Set<Set<State>> partition = new HashSet<>();
 
@@ -357,7 +358,7 @@ public class Algorithms {
             return partition;
         }
 
-        private static DfaConstructor defineMinimal(DfaConstructor dc, Set<Set<State>> partition){
+        static DfaConstructor defineMinimal(DfaConstructor dc, Set<Set<State>> partition){
             Map<Set<State>, State> mapper = new HashMap<>();
             for(Set<State> ss : partition) mapper.put(ss, new State());
 
@@ -390,7 +391,7 @@ public class Algorithms {
             return res;
         }
 
-        private static boolean conjunctionIsEmpty(Set<State> a, Set<State> b) {
+        static boolean conjunctionIsEmpty(Set<State> a, Set<State> b) {
             boolean found = false;
             Iterator<State> it = b.iterator();
             while(it.hasNext() && !found){
@@ -399,7 +400,7 @@ public class Algorithms {
             return !found;
         }
 
-        private static Set<State> findWhichSetContains(Set<Set<State>> x, State s){
+        static Set<State> findWhichSetContains(Set<Set<State>> x, State s){
             boolean found = false;
             Set<State> act = null;
             Iterator<Set<State>> it = x.iterator();
@@ -418,7 +419,7 @@ public class Algorithms {
     }
 
     private static class DeterminePrivate {
-        private static DfaConstructor defineDetermine(Nfa x, Set<Set<State>> dsss){
+        static DfaConstructor defineDetermine(Nfa x, Set<Set<State>> dsss){
             NfaConstructor nc = x.getConstructor();
             DfaConstructor dc = new DfaConstructor();
 
@@ -445,7 +446,7 @@ public class Algorithms {
             return dc;
         }
 
-        private static Set<State> destinyOf(NfaConstructor nc, Set<State> ss, char c){
+        static Set<State> destinyOf(NfaConstructor nc, Set<State> ss, char c){
             Set<State> res = new HashSet<>();
             for(State o : ss){
                 for(State d : nc.transition.step(o,c)){
@@ -455,7 +456,7 @@ public class Algorithms {
             return res;
         }
 
-        private static Set<Set<State>> findDeterminingSet(Nfa x){
+        static Set<Set<State>> findDeterminingSet(Nfa x){
             NfaConstructor nc = x.getConstructor();
             Set<Set<State>> before = new HashSet<>();
             Set<Set<State>> mid    = new HashSet<>();
@@ -483,7 +484,7 @@ public class Algorithms {
             return after;
         }
 
-        private static boolean conjunctionIsEmpty(Set<State> a, Set<State> b) {
+        static boolean conjunctionIsEmpty(Set<State> a, Set<State> b) {
             boolean found = false;
             Iterator<State> it = b.iterator();
             while(it.hasNext() && !found){
@@ -491,7 +492,6 @@ public class Algorithms {
             }
             return !found;
         }
-
     }
 
     // TRANSFORMATIONS BETWEEN AUTOMATONS
@@ -815,6 +815,154 @@ public class Algorithms {
         return nc.getNfa();
     }
 
+    // REGEX TO CFG
+
+    public static Cfg regexToCfg(RegularExpression regex){
+        CfgConstructor cc = new CfgConstructor();
+
+        Map<RegularExpression, Gvar> mapper = RegexToCfgPrivate.buildRegexCfgMapper(regex, cc);
+        cc.start = mapper.get(regex);
+
+        for(RegularExpression x : mapper.keySet()){
+            Gvar v = mapper.get(x);
+            cc.variables.add(v);
+
+            switch (x.type()){
+                case CHAR -> {
+                    RegexChar c = (RegexChar) x;
+                    cc.terminals.addChar(c.getC());
+                    cc.rules.add(new Grule(v, new GramexChar(c.getC())));
+                }
+                case EMPTY -> {
+                    cc.terminals.addEmptyChar();
+                    cc.rules.add(new Grule(v, GramexEmpty.getInstance()));
+                }
+                case CONCAT -> {
+                    RegexConcat c = (RegexConcat) x;
+                    GramexVar a = new GramexVar(mapper.get(c.getA()));
+                    GramexVar b = new GramexVar(mapper.get(c.getB()));
+                    cc.rules.add(new Grule(v, new GramexConcat(a, b)));
+                }
+                case STAR -> {
+                    RegexStar s = (RegexStar) x;
+                    GramexVar in = new GramexVar(mapper.get(s.getX()));
+                    cc.rules.add(new Grule(v, GramexEmpty.getInstance()));
+                    cc.rules.add(new Grule(v, new GramexConcat(in, new GramexVar(v))));
+                }
+                case UNION -> {
+                    RegexUnion u = (RegexUnion) x;
+                    GramexVar a = new GramexVar(mapper.get(u.getA()));
+                    GramexVar b = new GramexVar(mapper.get(u.getB()));
+                    cc.rules.add(new Grule(v, a));
+                    cc.rules.add(new Grule(v, b));
+                }
+            }
+        }
+
+        return cc.getCfg();
+    }
+
+    private static class RegexToCfgPrivate{
+        static Map<RegularExpression, Gvar> buildRegexCfgMapper(RegularExpression r, CfgConstructor cc){
+            Map<RegularExpression, Gvar> mapper = new HashMap<>();
+            Gvar v = new Gvar('R',0);
+            Set<RegularExpression> set = buildRegexSet(r);
+            for(RegularExpression x : set) mapper.put(x, cc.generate(v));
+            return mapper;
+        }
+
+        static Set<RegularExpression> buildRegexSet(RegularExpression r){
+            Set<RegularExpression> set = new HashSet<>();
+
+            set.add(r);
+            if(r.type() == TypesRegex.CONCAT){
+                RegexConcat c = (RegexConcat) r;
+                set.addAll(buildRegexSet(c.getA()));
+                set.addAll(buildRegexSet(c.getB()));
+            }
+            else if(r.type() == TypesRegex.STAR){
+                RegexStar s = (RegexStar) r;
+                set.addAll(buildRegexSet(s.getX()));
+            }
+            else if(r.type() == TypesRegex.UNION){
+                RegexUnion u = (RegexUnion) r;
+                set.addAll(buildRegexSet(u.getA()));
+                set.addAll(buildRegexSet(u.getB()));
+            }
+
+            return set;
+        }
+    }
+
+    // GENERATE WORDS REGEX
+
+    public static List<String> generateWords(RegularExpression regex, int n){
+        RegularExpression simplified = regex.simplify();
+        IntegerInf bagSize = simplified.wordsCount();
+        if(n <= 0 || bagSize.isZero()) return new ArrayList<>();
+
+        Set<String> set = new HashSet<>();
+
+        int m = n;
+        if(!bagSize.isInfinity() && bagSize.getValue() < n) m = bagSize.getValue();
+
+        int starSize = m;
+        if(Math.pow(10, GenerateWordsPrivate.starCounter(simplified)) > m) starSize = 20;
+
+        while(set.size() < m) set.add(GenerateWordsPrivate.generateOneWord(simplified, starSize));
+        return set.stream().toList();
+    }
+
+    private static class GenerateWordsPrivate{
+        static String generateOneWord(RegularExpression regex, int starSize){
+            String out = "";
+
+            switch (regex.type()){
+                case UNION -> {
+                    Random rand = new Random();
+                    RegexUnion u = (RegexUnion) regex;
+                    out = rand.nextBoolean() ? generateOneWord(u.getA(), starSize) : generateOneWord(u.getB(), starSize);
+                }
+                case STAR -> {
+                    Random rand = new Random();
+                    RegexStar s = (RegexStar) regex;
+                    for(int i=1; i <= rand.nextInt(starSize); i++) out = out + generateOneWord(s.getX(), starSize);
+                }
+                case CONCAT -> {
+                    RegexConcat c = (RegexConcat) regex;
+                    out = generateOneWord(c.getA(), starSize) + generateOneWord(c.getB(), starSize);
+                }
+                case CHAR -> {
+                    RegexChar c = (RegexChar) regex;
+                    out = String.valueOf(c.getC());
+                }
+            }
+
+            return out;
+        }
+
+        static int starCounter(RegularExpression regex){
+            int x = 0;
+
+            switch (regex.type()){
+                case STAR -> {
+                    RegexStar s = (RegexStar) regex;
+                    x = 1 + starCounter(s.getX());
+                }
+                case CONCAT -> {
+                    RegexConcat c = (RegexConcat) regex;
+                    x = starCounter(c.getA()) + starCounter(c.getB());
+                }
+                case UNION -> {
+                    RegexUnion u = (RegexUnion) regex;
+                    x = Math.min(starCounter(u.getA()), starCounter(u.getB()));
+                }
+            }
+
+            return x;
+        }
+    }
+
     // CFG TO PDA
 
     public static Pda cfgToPda(Cfg x) {
@@ -858,7 +1006,7 @@ public class Algorithms {
     }
 
     private static class CfgToPdaPrivate {
-        private static void buildRules(PdaConstructor pc, CfgConstructor ccx, State loop){
+        static void buildRules(PdaConstructor pc, CfgConstructor ccx, State loop){
             int e = pc.getMapper(Alphabet.getEmptyChar());
             for(Grule r : ccx.rules){
                 if(r.getRight().length() == 0) {
@@ -898,7 +1046,7 @@ public class Algorithms {
             }
         }
 
-        private static List<Integer> makeList(Gramex right, PdaConstructor pc) {
+        static List<Integer> makeList(Gramex right, PdaConstructor pc) {
             List<Integer> list = new ArrayList<>();
             if(right.type() == TypesGramex.VAR){
                 list.add(pc.getMapper(right.toGramexVar().getV()));
@@ -1554,7 +1702,7 @@ public class Algorithms {
     }
 
     private static class CheckWordPdaPrivate {
-        private static ExitStep runningStep(List<PdaRunningInstance> instances, String word, PdaConstructor pc){
+        static ExitStep runningStep(List<PdaRunningInstance> instances, String word, PdaConstructor pc){
             ExitStep exit = new ExitStep();
             int e = pc.getMapper(Alphabet.getEmptyChar());
             int c = e;
@@ -1577,7 +1725,7 @@ public class Algorithms {
             return exit;
         }
 
-        private static boolean shortWordInStack(Stack<Integer> stack, String word, PdaConstructor pc){
+        static boolean shortWordInStack(Stack<Integer> stack, String word, PdaConstructor pc){
             int charsCounter = 0;
             for(int i : stack){
                 if(pc.mapperChar.containsValue(i)) charsCounter++;

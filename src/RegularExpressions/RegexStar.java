@@ -3,6 +3,8 @@ package RegularExpressions;
 import Factory.Algorithms;
 import Automatons.Nfa;
 import Factory.TokenFactory;
+import Grammars.Cfg;
+import Utils.IntegerInf;
 
 import java.util.Objects;
 
@@ -13,8 +15,14 @@ public class RegexStar implements RegularExpression {
         this.x = x;
     }
 
-    public Nfa getNfa(){
-        return Algorithms.star(x.getNfa());
+    public RegularExpression getX() {
+        return x;
+    }
+
+    //REGEX METHODS
+
+    public Nfa toNfa(){
+        return Algorithms.star(x.toNfa());
     }
 
     public TypesRegex type() {
@@ -28,6 +36,16 @@ public class RegexStar implements RegularExpression {
         return this;
     }
 
+    public Cfg toCfg() {
+        return Algorithms.regexToCfg(this);
+    }
+
+    public IntegerInf wordsCount() {
+        return new IntegerInf(true);
+    }
+
+    //TO STRING AND EQUALS
+
     @Override
     public String toString() {
         if(x.type() == TypesRegex.CONCAT || x.type() == TypesRegex.STAR || x.type() == TypesRegex.UNION){
@@ -40,8 +58,8 @@ public class RegexStar implements RegularExpression {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RegexStar b = (RegexStar) o;
-        return x.getNfa().toDfa().minimize().compare(b.x.getNfa().toDfa().minimize());
+        RegexStar regexStar = (RegexStar) o;
+        return Objects.equals(x, regexStar.x);
     }
 
     @Override

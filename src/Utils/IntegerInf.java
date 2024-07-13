@@ -42,6 +42,10 @@ public class IntegerInf {
 
     //Comparisons
 
+    public boolean isZero(){
+        return !inf && n==0;
+    }
+
     public boolean isGreaterThan(IntegerInf x) {
         if(x.inf) return false;
         if(inf) return true;

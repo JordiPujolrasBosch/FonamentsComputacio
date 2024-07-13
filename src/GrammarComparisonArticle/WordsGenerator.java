@@ -26,6 +26,8 @@ public class WordsGenerator {
     }
 
     public List<String> generateWords(int n, GramexNonEmpty rule) {
+        if(n <= 0) return new ArrayList<>();
+
         List<String> list = new ArrayList<>();
         IntegerInf ht = ht(rule);
 
@@ -48,6 +50,23 @@ public class WordsGenerator {
         }
         return list;
     }
+
+    public List<String> generateWordsStart(int n) {
+        if(n <= 0) return new ArrayList<>();
+
+        List<String> list = new ArrayList<>();
+        GramexNonEmpty start = new GramexVar(cfg.getStart());
+
+        if(!cfg.acceptsEmpty()) list.addAll(generateWords(n, start));
+        else{
+            list.add("");
+            list.addAll(generateWords(n-1, start));
+        }
+
+        return list;
+    }
+
+    //Private functions
 
     private void build(){
         innerHt = new InnerHt();
@@ -279,7 +298,7 @@ public class WordsGenerator {
         int x = (int) dx;
         int y = (int) dy;
 
-        if(xb.getValue() == 1 && x == 1) return new Pair<>(0,y);
+        if(xb.getValue() > 0) x--;
         return new Pair<>(x,y);
     }
 

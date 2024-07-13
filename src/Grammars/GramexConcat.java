@@ -84,7 +84,7 @@ public class GramexConcat implements GramexNonEmpty {
 
     @Override
     public int hashCode() {
-        return Objects.hash(a, b);
+        return Objects.hash(toList());
     }
 
     @Override

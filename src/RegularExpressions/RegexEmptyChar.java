@@ -3,6 +3,8 @@ package RegularExpressions;
 import Factory.Algorithms;
 import Automatons.Nfa;
 import Factory.TokenFactory;
+import Grammars.Cfg;
+import Utils.IntegerInf;
 
 public class RegexEmptyChar implements RegularExpression {
     private RegexEmptyChar(){}
@@ -13,7 +15,9 @@ public class RegexEmptyChar implements RegularExpression {
         return instance;
     }
 
-    public Nfa getNfa(){
+    //REGEX METHODS
+
+    public Nfa toNfa(){
         return Algorithms.regexEmptyCharToNfa();
     }
 
@@ -24,6 +28,16 @@ public class RegexEmptyChar implements RegularExpression {
     public RegularExpression simplify() {
         return this;
     }
+
+    public Cfg toCfg() {
+        return Algorithms.regexToCfg(this);
+    }
+
+    public IntegerInf wordsCount() {
+        return new IntegerInf(1);
+    }
+
+    //TO STRING AND EQUALS
 
     @Override
     public String toString() {

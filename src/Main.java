@@ -1,10 +1,7 @@
 import Automatons.Pda;
 import Elements.Grammars.Gvar;
 import Factory.Reader;
-import Grammars.Cfg;
-import Grammars.Gramex;
-import Grammars.GramexNonEmpty;
-import Grammars.GramexVar;
+import Grammars.*;
 
 import java.util.*;
 
@@ -14,6 +11,12 @@ import java.util.*;
  *
  * Algorithms
  * Article CFG==CFG
+ *
+ * Generate words CFG, Regex
+ * Regex to CFG
+ * Find counter-example
+ * Enumerator fixed length words
+ * CFG termination checks
  * */
 
 /*
@@ -28,7 +31,7 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        Menu.equalCfgCfgArticle("Resources/g0a.txt", "Resources/g0b.txt");
+        Menu.generateWordsRegex("Resources/x1_regex.txt", 500);
     }
 
 }
