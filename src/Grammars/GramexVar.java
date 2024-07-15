@@ -52,7 +52,7 @@ public class GramexVar implements GramexNonEmpty {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GramexVar that = (GramexVar) o;
-        return Objects.equals(v, that.v);
+        return v.equals(that.v);
     }
 
     @Override

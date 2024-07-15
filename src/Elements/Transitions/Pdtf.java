@@ -77,7 +77,7 @@ public class Pdtf {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             PdtfInput pdtfInput = (PdtfInput) o;
-            return character == pdtfInput.character && pop == pdtfInput.pop && Objects.equals(origin, pdtfInput.origin);
+            return character == pdtfInput.character && pop == pdtfInput.pop && origin.equals(pdtfInput.origin);
         }
 
         @Override
@@ -100,7 +100,7 @@ public class Pdtf {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             PdtfOutput that = (PdtfOutput) o;
-            return push == that.push && Objects.equals(destiny, that.destiny);
+            return push == that.push && destiny.equals(that.destiny);
         }
 
         @Override

@@ -6,6 +6,7 @@ import Factory.Reader;
 import GrammarComparisonArticle.WordsGenerator;
 import Grammars.CfgNonEmpty;
 import RegularExpressions.RegularExpression;
+import Utils.Pair;
 
 import java.util.List;
 
@@ -38,6 +39,20 @@ public class Menu {
             else{
                 System.out.println(Printer.nonequal(fa,fb) + " :: " + Algorithms.findCounterExampleCfgs(a,b));
             }
+        }
+        catch (Exception ex){
+            System.out.println(ex.toString());
+        }
+    }
+
+    public static void checkAmbiguity(String f){
+        try{
+            Pair<Boolean,String> p = Reader.readGrammarFile(f).checkAmbiguity();
+            if(p.getA()){
+                if(p.getB().equals("")) System.out.println(Printer.ambiguous(f) + " :: empty word");
+                else System.out.println(Printer.ambiguous(f) + " :: " + p.getB());
+            }
+            else System.out.println(Printer.unambiguous(f));
         }
         catch (Exception ex){
             System.out.println(ex.toString());

@@ -69,7 +69,7 @@ public class RegexConcat implements RegularExpression {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RegexConcat that = (RegexConcat) o;
-        return Objects.equals(a, that.a) && Objects.equals(b, that.b);
+        return a.equals(that.a) && b.equals(that.b);
     }
 
     @Override

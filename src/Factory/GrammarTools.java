@@ -430,6 +430,36 @@ public class GrammarTools {
         return makeWord(shortest);
     }
 
+    public static String shortestWordOfGramex(Cfg cfg, Gramex g) {
+        if(!containsVar(g)) return makeWord(g);
+        Map<Gvar, Set<Gramex>> mapper = getMapperRules(cfg);
+
+        Gramex shortest = null;
+        Set<Gramex> pre = new HashSet<>();
+        Set<Gramex> post = new HashSet<>();
+        pre.add(g);
+        while(!pre.isEmpty()){
+            for(Gramex r : pre){
+                Gvar var = getLeftMostVar(r.toGramexNonEmpty());
+                for(Gramex subs : mapper.get(var)) post.add(substituteLeftMost(r, var, subs));
+            }
+            pre.clear();
+            for(Gramex r : post){
+                if(!containsVar(r)){
+                    if(shortest == null) shortest = r;
+                    else if(shortest.length() > r.length()) shortest = r;
+                }
+                else{
+                    if(shortest == null) pre.add(r);
+                    else if(r.length() < shortest.length()) pre.add(r);
+                }
+            }
+            post.clear();
+        }
+
+        return makeWord(shortest);
+    }
+
     public static boolean acceptsAllWords(CfgNonEmpty cfg, GramexNonEmpty rule, List<String> words) {
         CfgNonEmptyConstructor aux = cfg.getConstructor();
         Gvar newStart = aux.generate(aux.start);

@@ -1,0 +1,6 @@
+terminals: x,y,a
+variables: Z0, X0, Y0
+start: Z0
+Z0 -> X0 Y0
+X0 -> x a | x
+Y0 -> a y | y

@@ -59,7 +59,7 @@ public class RegexStar implements RegularExpression {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RegexStar regexStar = (RegexStar) o;
-        return Objects.equals(x, regexStar.x);
+        return x.equals(regexStar.x);
     }
 
     @Override

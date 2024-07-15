@@ -22,7 +22,7 @@ public class EnumeratorNode implements Enumerator {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EnumeratorNode that = (EnumeratorNode) o;
-        return Objects.equals(r, that.r) && Objects.equals(e, that.e);
+        return r.equals(that.r) && e.equals(that.e);
     }
 
     @Override

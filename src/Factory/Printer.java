@@ -42,6 +42,14 @@ public class Printer {
         return "Incorrect format for the regular expression in file " + filename;
     }
 
+    public static String ambiguous(String filename) {
+        return "The grammar in file " + filename + " is ambiguous";
+    }
+
+    public static String unambiguous(String filename){
+        return "The grammar in file " + filename + " is probably unambiguous";
+    }
+
     //Automatons and grammars
 
     public static String stringOfDfa(Dfa dfa){

@@ -66,7 +66,7 @@ public class Comparison {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Comparison that = (Comparison) o;
-        return opEq == that.opEq && Objects.equals(left, that.left) && Objects.equals(right, that.right);
+        return opEq == that.opEq && left.equals(that.left) && right.equals(that.right);
     }
 
     @Override

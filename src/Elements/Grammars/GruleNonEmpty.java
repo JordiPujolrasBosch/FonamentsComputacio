@@ -36,7 +36,7 @@ public class GruleNonEmpty {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GruleNonEmpty that = (GruleNonEmpty) o;
-        return Objects.equals(left, that.left) && Objects.equals(right, that.right);
+        return left.equals(that.left) && right.equals(that.right);
     }
 
     @Override

@@ -34,7 +34,7 @@ public class Rule {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Rule rule = (Rule) o;
-        return character == rule.character && Objects.equals(origin, rule.origin) && Objects.equals(destiny, rule.destiny);
+        return character == rule.character && origin.equals(rule.origin) && destiny.equals(rule.destiny);
     }
 
     @Override

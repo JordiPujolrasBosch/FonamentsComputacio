@@ -2,12 +2,8 @@ package Factory;
 
 import Elements.Alphabet;
 import Factory.Builders.RegexOperator;
-import Grammars.GramexChar;
-import Grammars.GramexConcat;
-import Grammars.GramexNonEmpty;
 import RegularExpressions.RegexChar;
 import RegularExpressions.RegexConcat;
-import RegularExpressions.RegexUnion;
 import RegularExpressions.RegularExpression;
 
 import java.util.*;

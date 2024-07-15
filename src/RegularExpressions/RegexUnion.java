@@ -66,7 +66,7 @@ public class RegexUnion implements RegularExpression {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RegexUnion that = (RegexUnion) o;
-        return (Objects.equals(a, that.a) && Objects.equals(b, that.b)) || (Objects.equals(a, that.b) && Objects.equals(b, that.a));
+        return (a.equals(that.a) && b.equals(that.b)) || (a.equals(that.b) && b.equals(that.a));
     }
 
     @Override

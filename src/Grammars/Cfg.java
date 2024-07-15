@@ -3,10 +3,10 @@ package Grammars;
 import Elements.Alphabet;
 import Automatons.Pda;
 import Elements.Grammars.*;
-import Exceptions.GrammarReaderException;
 import Factory.Algorithms;
 import Factory.Constructors.CfgConstructor;
 import Factory.Printer;
+import Utils.Pair;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -58,25 +58,10 @@ public class Cfg {
         return Algorithms.simplifyGrammar(this);
     }
 
-    /*
-    // LL -> LL + Greibach ?
-
-    public boolean isLL(){
-        return false;
+    public Pair<Boolean, String> checkAmbiguity(){
+        return Algorithms.checkAmbiguity(this);
     }
 
-    public boolean isLLOne(){
-        return false;
-    }
-
-    public boolean isLLTwo(){
-        return false;
-    }
-
-    public boolean compare(Cfg x){
-        return Beta.compare(this, x);
-    }
-    */
     @Override
     public String toString() {
         return Printer.stringOfGrammar(this);

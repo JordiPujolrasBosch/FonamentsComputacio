@@ -11,6 +11,7 @@ import GrammarComparisonArticle.WordsGenerator;
 import Grammars.*;
 import RegularExpressions.*;
 import Utils.IntegerInf;
+import Utils.Pair;
 
 import java.util.*;
 
@@ -1655,6 +1656,374 @@ public class Algorithms {
                     ccx.rules.add(new GruleNonEmpty(incorrectRule.getLeft(), substituted));
                 }
                 ccx.rules.remove(incorrectRule);
+            }
+        }
+    }
+
+    // AMBIGUITY
+
+    public static Pair<Boolean, String> checkAmbiguity(Cfg x){
+        CheckAmbiguityPrivate.ExitAmbiguity exit = new CheckAmbiguityPrivate.ExitAmbiguity();
+        CheckAmbiguityPrivate.simplifyBasic(x, exit);
+        if(exit.finished) return exit.ret;
+        CheckAmbiguityPrivate.removeEmptyRules(exit.cfg, exit);
+        if(exit.finished) return exit.ret;
+        CheckAmbiguityPrivate.removeUnitRules(exit.cfg, exit);
+        if(exit.finished) return exit.ret;
+
+        CfgConstructor ccx = exit.cfg.getConstructor();
+        SimplifyGrammarPrivate.removeNonReachableVarsAndTerminals(ccx);
+        exit.cne = SimplifyGrammarPrivate.cfgToCfgNonEmpty(ccx).getCfgNonEmpty();
+
+        exit.cne = exit.cne.toChomsky();
+        Map<Integer, Gvar> mapper = new HashMap<>();
+        CheckAmbiguityPrivate.buildLength(exit.cne, exit, 10, mapper);
+
+        CfgNonEmpty g = exit.cne;
+        int i = 1;
+        while(!exit.finished && i<=300){
+            CheckAmbiguityPrivate.buildStart(g, mapper, i, exit);
+            WordsGenerator wg = new WordsGenerator(exit.cne);
+            Iterator<String> it = wg.generateWordsStart(1000).iterator();
+            Set<String> set = new HashSet<>();
+
+            while(it.hasNext() && !exit.finished){
+                String s = it.next();
+                if(!set.contains(s)) set.add(s);
+                else{
+                    exit.finished = true;
+                    exit.ret = new Pair<>(true, s);
+                }
+            }
+
+            i++;
+        }
+
+        if(!exit.finished) return new Pair<>(false, "");
+        return exit.ret;
+    }
+
+    private static class CheckAmbiguityPrivate{
+        static void simplifyBasic(Cfg x, ExitAmbiguity exit){
+            CfgConstructor ccx = x.getConstructor();
+            SimplifyGrammarPrivate.addNewStart(ccx);
+            SimplifyGrammarPrivate.removeNonDerivableVars(ccx);
+            if(!SimplifyGrammarPrivate.startIsDerivable(ccx)){
+                exit.finished = true;
+                exit.ret = new Pair<>(false, "");
+            }
+            else{
+                SimplifyGrammarPrivate.removeNonReachableVarsAndTerminals(ccx);
+                exit.cfg = ccx.getCfg();
+            }
+        }
+
+        static void removeEmptyRules(Cfg x, ExitAmbiguity exit){
+            CfgConstructor ccx = x.getConstructor();
+            Set<Grule> original = new HashSet<>(ccx.rules);
+            Set<Grule> added = new HashSet<>();
+
+
+            Set<Gvar> anulable = new HashSet<>();
+            Set<Gvar> onlyAnulable = new HashSet<>();
+            SimplifyGrammarPrivate.findAnulableVars(ccx, anulable, onlyAnulable);
+            /*if(onlyAnulable.contains(ccx.start)){
+                Map<Gvar, Set<Gramex>> mapper = GrammarTools.getMapperRules(ccx.getCfg());
+                Iterator<Set<Gramex>> it = mapper.values().iterator();
+                boolean found = false;
+                while(it.hasNext() && !found) found = it.next().size() > 1;
+
+                exit.finished = true;
+                if(found) exit.ret = new Pair<>(true, "");
+                else exit.ret = new Pair<>(false, "");
+            }
+            else*/ if(!anulable.isEmpty()) {
+                Set<Grule> checked = new HashSet<>();
+                Set<Grule> toCheck = new HashSet<>(ccx.rules);
+
+                if(!anulable.contains(ccx.start)) ccx.terminals.removeEmptyChar();
+                else{
+                    Grule emptyStart = new Grule(ccx.start, GramexEmpty.getInstance());
+                    checked.add(emptyStart);
+                    if(!original.contains(emptyStart)) added.add(emptyStart);
+                    int count = countAnulStart(ccx, anulable);
+                    if(count > 1){
+                        exit.finished = true;
+                        exit.ret = new Pair<>(true, "");
+                    }
+                }
+
+                while (!toCheck.isEmpty()) {
+                    Grule act = toCheck.iterator().next();
+                    toCheck.remove(act);
+
+                    if (act.getRight().type() == TypesGramex.CHAR) checked.add(act);
+                    else if (act.getRight().type() == TypesGramex.VAR) {
+                        Gvar v = act.getRight().toGramexVar().getV();
+                        if (!onlyAnulable.contains(v)) checked.add(act);
+                        if(anulable.contains(v)){
+                            Grule newg = new Grule(act.getLeft(), GramexEmpty.getInstance());
+                            if(original.contains(newg)){
+                                exit.finished = true;
+                                exit.ret = new Pair<>(true, findWordDerived(x, newg));
+                            }
+                            else{
+                                if(!added.contains(newg)) added.add(newg);
+                                else{
+                                    exit.finished = true;
+                                    exit.ret = new Pair<>(true, findWordDerived(x, newg));
+                                }
+                            }
+                        }
+                    } else if (act.getRight().type() == TypesGramex.CONCAT) {
+                        List<Gramex> lc = removeAnulableInConcat(act.getRight().toGramexConcat(), anulable, onlyAnulable);
+                        for (Gramex g : lc){
+                            Grule newg = new Grule(act.getLeft(), g);
+                            checked.add(newg);
+                            if(original.contains(newg)){
+                                exit.finished = true;
+                                exit.ret = new Pair<>(true, findWordDerived(x, newg));
+                            }
+                            else{
+                                if(!added.contains(newg)) added.add(newg);
+                                else{
+                                    exit.finished = true;
+                                    exit.ret = new Pair<>(true, findWordDerived(x, newg));
+                                }
+                            }
+                        }
+                    }
+                }
+
+                ccx.rules = checked;
+                ccx.variables.removeAll(onlyAnulable);
+            }
+
+
+            exit.cfg = ccx.getCfg();
+        }
+
+        static int countAnulStart(CfgConstructor ccx, Set<Gvar> anulable){
+            Set<Grule> set = GrammarTools.getRulesVar(ccx.getCfg(), ccx.start);
+            int count = 0;
+            for(Grule g : set){
+                switch (g.getRight().type()){
+                    case VAR -> {
+                        if(anulable.contains(g.getRight().toGramexVar().getV())) count++;
+                    }
+                    case EMPTY -> count++;
+                    case CONCAT -> {
+                        Iterator<GramexNonEmpty> it = g.getRight().toGramexConcat().toList().iterator();
+                        boolean foundNotAnul = false;
+                        while(it.hasNext() && !foundNotAnul){
+                            GramexNonEmpty gne = it.next();
+                            boolean isChar = gne.type() == TypesGramex.CHAR;
+                            boolean isVar = gne.type() == TypesGramex.VAR && !anulable.contains(gne.toGramexVar().getV());
+                            foundNotAnul =  isChar || isVar;
+                        }
+                        if(!foundNotAnul) count++;
+                    }
+                }
+            }
+            return count;
+        }
+
+        static List<Gramex> removeAnulableInConcat(GramexConcat gc, Set<Gvar> anulable, Set<Gvar> onlyAnulable){
+            List<Gramex> resA = new ArrayList<>();
+            List<Gramex> resB = new ArrayList<>();
+
+            switch (gc.getA().type()){
+                case CHAR -> resA.add(gc.getA());
+                case CONCAT -> resA.addAll(removeAnulableInConcat(gc.getA().toGramexConcat(), anulable, onlyAnulable));
+                case VAR -> {
+                    if(anulable.contains(gc.getA().toGramexVar().getV())){
+                        resA.add(GramexEmpty.getInstance());
+                        resA.add(gc.getA());
+                    }
+                    else{
+                        resA.add(gc.getA());
+                    }
+                }
+            }
+
+            switch (gc.getB().type()){
+                case CHAR -> resB.add(gc.getB());
+                case CONCAT -> resB.addAll(removeAnulableInConcat(gc.getB().toGramexConcat(), anulable, onlyAnulable));
+                case VAR -> {
+                    if(anulable.contains(gc.getB().toGramexVar().getV())){
+                        resB.add(GramexEmpty.getInstance());
+                        resB.add(gc.getB());
+                    }
+                    else{
+                        resB.add(gc.getB());
+                    }
+                }
+            }
+
+            List<Gramex> res = new ArrayList<>();
+            if(resA.isEmpty()) res.addAll(resB);
+            else if(resB.isEmpty()) res.addAll(resA);
+            else{
+                for(Gramex a : resA){
+                    for(Gramex b : resB){
+                        if(b.type() == TypesGramex.EMPTY) res.add(a);
+                        else if(a.type() == TypesGramex.EMPTY) res.add(b);
+                        else res.add(new GramexConcat(a.toGramexNonEmpty(), b.toGramexNonEmpty()));
+                    }
+                }
+            }
+
+            return res;
+        }
+
+        static void buildLength(CfgNonEmpty g, ExitAmbiguity exit, int max, Map<Integer,Gvar> mapper){
+            CfgNonEmptyConstructor ccx = g.getConstructor();
+
+            Map<Gvar, Map<Integer, Gvar>> originalToNew = new HashMap<>();
+            Map<Gvar, Pair<Gvar, Integer>> newToOriginal = new HashMap<>();
+
+            for(Gvar v : new HashSet<>(ccx.variables)){
+                for(int i=1; i<=max; i++){
+                    Gvar newVar = ccx.generate(v);
+                    if(v.equals(ccx.start)) mapper.put(i,newVar);
+                    if(!originalToNew.containsKey(v)) originalToNew.put(v, new HashMap<>());
+                    originalToNew.get(v).put(i,newVar);
+                    newToOriginal.put(newVar, new Pair<>(v,i));
+                }
+            }
+
+            CfgNonEmptyConstructor res = new CfgNonEmptyConstructor();
+            res.start = originalToNew.get(ccx.start).get(max);
+            res.terminals = ccx.terminals;
+            res.acceptsEmptyWord = ccx.acceptsEmptyWord;
+            res.variables.addAll(newToOriginal.keySet());
+
+            for(GruleNonEmpty r : ccx.rules){
+                if(r.getRight().type() == TypesGramex.CHAR){
+                    res.rules.add(new GruleNonEmpty(originalToNew.get(r.getLeft()).get(1), r.getRight()));
+                }
+                else{
+                    Gvar left = r.getLeft();
+                    Gvar a = r.getRight().toGramexConcat().getA().toGramexVar().getV();
+                    Gvar b = r.getRight().toGramexConcat().getB().toGramexVar().getV();
+                    for(int i=2; i<=max; i++){
+                        Gvar nl = originalToNew.get(left).get(i);
+                        for(int j=1; j<i; j++){
+                            Gvar na = originalToNew.get(a).get(j);
+                            Gvar nb = originalToNew.get(b).get(i-j);
+                            res.rules.add(new GruleNonEmpty(nl, new GramexConcat(new GramexVar(na), new GramexVar(nb))));
+                        }
+                    }
+                }
+            }
+
+            exit.cne = res.getCfgNonEmpty();
+        }
+
+        static void buildStart(CfgNonEmpty g, Map<Integer,Gvar> mapper, int length, ExitAmbiguity exit){
+            CfgNonEmptyConstructor ccg = g.getConstructor();
+            ccg.start = mapper.get(length);
+            CfgConstructor aux = ccg.getCfgNonEmpty().toCfg().getConstructor();
+            SimplifyGrammarPrivate.removeNonDerivableVars(aux);
+            SimplifyGrammarPrivate.removeNonReachableVarsAndTerminals(aux);
+            exit.cne = SimplifyGrammarPrivate.cfgToCfgNonEmpty(aux).getCfgNonEmpty();
+        }
+
+        static void removeUnitRules(Cfg x, ExitAmbiguity exit) {
+            CfgConstructor ccx = x.getConstructor();
+            Set<Grule> unitRules = new HashSet<>();
+            for(Grule r : ccx.rules){
+                if(r.getRight().type() == TypesGramex.VAR) unitRules.add(r);
+            }
+
+            Set<Grule> removed = new HashSet<>();
+            while(!unitRules.isEmpty()){
+                Grule rule = unitRules.iterator().next();
+                Gvar v = rule.getRight().toGramexVar().getV();
+
+                if (!rule.getLeft().equals(v)) {
+                    Set<Grule> toAdd = new HashSet<>();
+                    for (Grule r : GrammarTools.getRulesVar(ccx.getCfg(), v)) {
+                        Grule aux = new Grule(rule.getLeft(), r.getRight());
+                        if(ccx.rules.contains(aux) || removed.contains(aux)){
+                            exit.finished = true;
+                            exit.ret = new Pair<>(true, findWordDerived(x, rule));
+                        }
+                        if (aux.getRight().type() != TypesGramex.VAR){
+                            toAdd.add(aux);
+                        }
+                        else if (!removed.contains(aux)) {
+                            toAdd.add(aux);
+                            unitRules.add(aux);
+                        }
+                    }
+
+                    ccx.rules.addAll(toAdd);
+                }
+                else{
+                    exit.finished = true;
+                    exit.ret = new Pair<>(true, findWordDerived(x, rule));
+                }
+
+                ccx.rules.remove(rule);
+                removed.add(rule);
+                unitRules.remove(rule);
+            }
+            exit.cfg = ccx.getCfg();
+        }
+
+        static String findWordDerived(Cfg x, Grule v){
+            GramexVar start = new GramexVar(x.getStart());
+            Set<Gramex> pre = new HashSet<>();
+            Set<Gramex> post = new HashSet<>();
+            pre.add(start);
+
+            boolean foundVar = false;
+            Gramex g = null;
+            Iterator<Gramex> it = pre.iterator();
+            while(it.hasNext() && !foundVar){
+                Gramex a = it.next();
+                foundVar = GrammarTools.containsVar(a,v.getLeft());
+                if(foundVar) g = a;
+            }
+
+            while(!foundVar && !pre.isEmpty()){
+                it = pre.iterator();
+                while(it.hasNext()){
+                    Gramex act = it.next();
+                    if(GrammarTools.containsVar(act)){
+                        Gvar left = GrammarTools.getLeftMostVar(act.toGramexNonEmpty());
+                        Set<Gramex> subs = GrammarTools.getRulesRightVar(x,left);
+                        for(Gramex s : subs) post.add(GrammarTools.substituteLeftMost(act, left, s));
+                    }
+                }
+
+                pre = post;
+                post = new HashSet<>();
+
+                it = pre.iterator();
+                while(it.hasNext() && !foundVar){
+                    Gramex a = it.next();
+                    foundVar = GrammarTools.containsVar(a,v.getLeft());
+                    if(foundVar) g = a;
+                }
+            }
+
+            g = GrammarTools.substituteLeftMost(g, v.getLeft(), v.getRight());
+
+            return GrammarTools.shortestWordOfGramex(x,g);
+        }
+
+        static class ExitAmbiguity{
+            public boolean finished;
+            public Pair<Boolean,String> ret;
+            public Cfg cfg;
+            public CfgNonEmpty cne;
+            public ExitAmbiguity(){
+                finished = false;
+                ret = null;
+                cfg = null;
+                cne = null;
             }
         }
     }

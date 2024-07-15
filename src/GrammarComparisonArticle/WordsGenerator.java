@@ -34,7 +34,7 @@ public class WordsGenerator {
         if(ht.isInfinity()){
             Random rand = new Random();
             for(int i=1; i<=n; i++){
-                list.add(enumFunction(rule, rand.nextInt(100000)).getWord());
+                list.add(enumFunction(rule, rand.nextInt(5*n)).getWord());
             }
         }
         else if(n >= ht.getValue()) {
@@ -101,7 +101,7 @@ public class WordsGenerator {
         else{
             GramexNonEmpty ra = r.toGramexConcat().getA();
             GramexNonEmpty rb = r.toGramexConcat().getB();
-            Pair<Integer, Integer> pi = pi(n, ht(ra), ht(rb));
+            Pair<Integer, Integer> pi = pi(n, ht(ra).add(new IntegerInf(-1)), ht(rb));
             return new EnumeratorPair(enumFunction(ra, pi.getA()), enumFunction(rb, pi.getB()));
         }
     }
@@ -298,7 +298,6 @@ public class WordsGenerator {
         int x = (int) dx;
         int y = (int) dy;
 
-        if(xb.getValue() > 0) x--;
         return new Pair<>(x,y);
     }
 

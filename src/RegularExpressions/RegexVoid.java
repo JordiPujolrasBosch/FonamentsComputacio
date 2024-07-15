@@ -6,8 +6,6 @@ import Factory.TokenFactory;
 import Grammars.Cfg;
 import Utils.IntegerInf;
 
-import java.util.Objects;
-
 public class RegexVoid implements RegularExpression {
     private RegexVoid(){}
 

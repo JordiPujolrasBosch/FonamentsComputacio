@@ -20,7 +20,7 @@ public class EnumeratorLeaf implements Enumerator {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EnumeratorLeaf that = (EnumeratorLeaf) o;
-        return Objects.equals(r, that.r);
+        return r.equals(that.r);
     }
 
     @Override

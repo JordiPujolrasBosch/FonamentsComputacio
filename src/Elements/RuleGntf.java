@@ -36,7 +36,7 @@ public class RuleGntf {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RuleGntf ruleGntf = (RuleGntf) o;
-        return Objects.equals(origin, ruleGntf.origin) && Objects.equals(destiny, ruleGntf.destiny) && Objects.equals(regex, ruleGntf.regex);
+        return origin.equals(ruleGntf.origin) && destiny.equals(ruleGntf.destiny) && regex.equals(ruleGntf.regex);
     }
 
     @Override

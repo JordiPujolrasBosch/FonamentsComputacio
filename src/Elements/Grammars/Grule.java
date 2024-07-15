@@ -36,7 +36,7 @@ public class Grule {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Grule grule = (Grule) o;
-        return Objects.equals(left, grule.left) && Objects.equals(right, grule.right);
+        return left.equals(grule.left) && right.equals(grule.right);
     }
 
     @Override
