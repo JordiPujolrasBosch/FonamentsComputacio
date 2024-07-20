@@ -37,13 +37,10 @@ public class GrammarComparator {
             else if(canApplyDist(act))                                       toProve.addAll(verifyDist(act));
             else if(canApplyBranch(act, data))                               toProve.addAll(verifyBranch(act, context, data));
             else if(canApplyInclusion(act))                                  toProve.addAll(verifyInclusion(act));
-            else {
-                stop = true;
-                toProve.add(act);
-            }
+            else                                                             stop = true;
 
             data.counter++;
-            if(toProve.isEmpty()){
+            if(toProve.isEmpty() && !stop){
                 stop = true;
                 equal = true;
             }

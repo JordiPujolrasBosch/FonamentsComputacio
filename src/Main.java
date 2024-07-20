@@ -27,7 +27,8 @@
 
 public class Main {
     public static void main(String[] args) {
-        Menu.equalCfgCfgArticle("Resources/g0a.txt","Resources/g0b.txt");
+        Menu.findCounterExampleCfgs("Resources/gc1.txt", "Resources/gc2.txt");
+        Menu.checkAmbiguity("Resources/gc2.txt");
     }
 
 }

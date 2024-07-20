@@ -66,6 +66,27 @@ public class WordsGenerator {
         return list;
     }
 
+    public List<String> generateAllWordsStart() {
+        GramexVar start = new GramexVar(cfg.getStart());
+        List<String> list = new ArrayList<>();
+        if(cfg.acceptsEmpty()) list.add("");
+
+        IntegerInf ht = ht(start);
+        if(ht.isInfinity()){
+            Random rand = new Random();
+            for(int i=1; i<=300; i++){
+                list.add(enumFunction(start, rand.nextInt(1000)).getWord());
+            }
+        }
+        else{
+            for(int i=0; i<ht.getValue(); i++){
+                list.add(enumFunction(start, i).getWord());
+            }
+        }
+
+        return list;
+    }
+
     //Private functions
 
     private void build(){
