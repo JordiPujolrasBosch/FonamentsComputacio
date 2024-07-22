@@ -35,8 +35,8 @@ public class Grule {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Grule grule = (Grule) o;
-        return left.equals(grule.left) && right.equals(grule.right);
+        Grule that = (Grule) o;
+        return left.equals(that.left) && right.equals(that.right);
     }
 
     @Override

@@ -19,34 +19,42 @@ public class Printer {
     //Output messages
 
     public static String automatonCheck(String filename) {
+        if(filename == null) return "Incorrect format for the automaton";
         return "Incorrect format for the automaton in file " + filename;
     }
 
     public static String automatonNondeterministic(String filename) {
+        if(filename == null) return "The automaton is nondeterministic";
         return "The automaton in file " + filename + " is nondeterministic";
     }
 
     public static String equal(String fa, String fb) {
+        if(fa == null || fb == null) return "EQUAL";
         return "EQUAL " + fa + " " + fb;
     }
 
     public static String nonequal(String fa, String fb) {
+        if(fa == null || fb == null) return "NOT EQUAL";
         return "NOT EQUAL " + fa + " " + fb;
     }
 
     public static String grammarCheck(String filename) {
+        if(filename == null) return "Incorrect format for the grammar";
         return "Incorrect format for the grammar in file " + filename;
     }
 
     public static String regexCheck(String filename){
+        if(filename == null) return "Incorrect format for the regular expression";
         return "Incorrect format for the regular expression in file " + filename;
     }
 
     public static String ambiguous(String filename) {
+        if(filename == null) return "The grammar is ambiguous";
         return "The grammar in file " + filename + " is ambiguous";
     }
 
     public static String unambiguous(String filename){
+        if(filename == null) return "The grammar is probably unambiguous";
         return "The grammar in file " + filename + " is probably unambiguous";
     }
 

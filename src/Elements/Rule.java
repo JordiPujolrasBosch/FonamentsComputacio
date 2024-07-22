@@ -33,8 +33,8 @@ public class Rule {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Rule rule = (Rule) o;
-        return character == rule.character && origin.equals(rule.origin) && destiny.equals(rule.destiny);
+        Rule that = (Rule) o;
+        return character == that.character && origin.equals(that.origin) && destiny.equals(that.destiny);
     }
 
     @Override

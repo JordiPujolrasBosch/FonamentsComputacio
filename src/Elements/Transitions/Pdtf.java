@@ -76,8 +76,8 @@ public class Pdtf {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            PdtfInput pdtfInput = (PdtfInput) o;
-            return character == pdtfInput.character && pop == pdtfInput.pop && origin.equals(pdtfInput.origin);
+            PdtfInput that = (PdtfInput) o;
+            return character == that.character && pop == that.pop && origin.equals(that.origin);
         }
 
         @Override

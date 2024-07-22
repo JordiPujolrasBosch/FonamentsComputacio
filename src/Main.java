@@ -27,8 +27,8 @@
 
 public class Main {
     public static void main(String[] args) {
-        Menu.findCounterExampleCfgs("Resources/gc1.txt", "Resources/gc2.txt");
-        Menu.checkAmbiguity("Resources/gc2.txt");
+       // Functionalities.Menu.findCounterExampleCfgs("Resources/gc1.txt", "Resources/gc2.txt");
+       // Functionalities.Menu.checkAmbiguity("Resources/gc2.txt");
     }
 
 }

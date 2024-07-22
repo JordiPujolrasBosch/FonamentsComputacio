@@ -5,6 +5,7 @@ import Grammars.*;
 import Elements.Grammars.Grule;
 import Elements.Grammars.Gvar;
 import Factory.TokenFactory;
+import Utils.Utility;
 
 import java.util.*;
 
@@ -106,9 +107,13 @@ public class GrammarData {
         Iterator<String> it = variables.iterator();
         while(it.hasNext() && ok){
             String s = it.next();
-            char last = s.charAt(s.length()-1);
+            char last = ' ';
+            if(!s.isEmpty()) last = s.charAt(s.length()-1);
 
-            if(!s.contains("-")){
+            if(s.isEmpty()) {
+                ok = false;
+            }
+            else if(!s.contains("-")){
                 ok = isVariable(s);
                 if(ok) setvar.add(toVariable(s));
             }
@@ -242,7 +247,7 @@ public class GrammarData {
     //Private
 
     private boolean isVariable(String s) {
-        return s.length() > 1 && s.charAt(0) >= 'A' && s.charAt(0) <= 'Z' && isNumber(s.substring(1));
+        return s.length() > 1 && s.charAt(0) >= 'A' && s.charAt(0) <= 'Z' && Utility.isNumber(s.substring(1));
     }
 
     private Gvar toVariable(String s) {
@@ -268,7 +273,7 @@ public class GrammarData {
         boolean c = s.charAt(0) >= 'A' && s.charAt(0) <= 'Z';
         String[] pair = s.substring(1).split("-");
         if(pair.length != 2) return false;
-        return c && isNumber(pair[0]) && isNumber(pair[1]) && Integer.parseInt(pair[0]) < Integer.parseInt(pair[1]);
+        return c && Utility.isNumber(pair[0]) && Utility.isNumber(pair[1]) && Integer.parseInt(pair[0]) < Integer.parseInt(pair[1]);
     }
 
     private Set<Gvar> toVariablesTwo(String s) {
@@ -277,16 +282,6 @@ public class GrammarData {
         Set<Gvar> set = new HashSet<>();
         for(int i = Integer.parseInt(pair[0]); i <= Integer.parseInt(pair[1]); i++) set.add(new Gvar(c, i));
         return set;
-    }
-
-    private boolean isNumber(String s){
-        boolean isnumber = true;
-        int i = 0;
-        while(isnumber && i < s.length()){
-            isnumber = s.charAt(i) >= '0' && s.charAt(i) <= '9';
-            i++;
-        }
-        return isnumber;
     }
 
 }

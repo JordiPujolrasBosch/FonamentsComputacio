@@ -33,8 +33,8 @@ public class RuleData {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RuleData ruleData = (RuleData) o;
-        return origin == ruleData.origin && destiny == ruleData.destiny && transition == ruleData.transition;
+        RuleData that = (RuleData) o;
+        return origin == that.origin && destiny == that.destiny && transition == that.transition;
     }
 
     @Override

@@ -82,8 +82,8 @@ public class Alphabet {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Alphabet alphabet = (Alphabet) o;
-        return hasEmptyChar == alphabet.hasEmptyChar && set.equals(alphabet.set);
+        Alphabet that = (Alphabet) o;
+        return hasEmptyChar == that.hasEmptyChar && set.equals(that.set);
     }
 
     @Override

@@ -47,8 +47,8 @@ public class PdtfTuple {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PdtfTuple tuple = (PdtfTuple) o;
-        return character == tuple.character && pop == tuple.pop && push == tuple.push && origin.equals(tuple.origin) && destiny.equals(tuple.destiny);
+        PdtfTuple that = (PdtfTuple) o;
+        return character == that.character && pop == that.pop && push == that.push && origin.equals(that.origin) && destiny.equals(that.destiny);
     }
 
     @Override

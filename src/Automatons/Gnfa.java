@@ -3,7 +3,6 @@ package Automatons;
 import Elements.Alphabet;
 import Elements.Transitions.Gntf;
 import Elements.State;
-
 import Factory.Algorithms;
 import Factory.Constructors.GnfaConstructor;
 import RegularExpressions.RegularExpression;

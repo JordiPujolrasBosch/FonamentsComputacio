@@ -6,6 +6,7 @@ import Automatons.Nfa;
 import Exceptions.AutomatonReaderException;
 import Factory.Algorithms;
 import Factory.TokenFactory;
+import Utils.Utility;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -14,51 +15,64 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class AutomatonData {
-    private int numberStates;
-    private boolean numberStatesRead;
+    private boolean numberStatesRead;                //read
+    private String numberStatesString;               //string
+    private int numberStates;                        //out
 
-    private int startStateNumber;
-    private boolean startStateNumberRead;
+    private boolean startStateNumberRead;            //read
+    private String startStateString;                 //string
+    private int startStateNumber;                    //out
 
-    private List<Integer> finalStatesNumbers;
-    private boolean finalStatesNumbersRead;
+    private boolean finalStatesNumbersRead;          //read
+    private List<String> finalStatesString;          //string
+    private List<Integer> finalStatesNumbers;        //out
 
-    private List<String> alphabetElements;
-    private boolean alphabetElementsRead;
+    private boolean alphabetElementsRead;            //read
+    private List<String> alphabetElements;           //string
+    private Alphabet alphabet;                       //out
 
-    private final List<RuleData> transition;
-    private final Alphabet alphabet;
+    private final List<RuleString> transitionString; //string
+    private List<RuleData> transition;               //out
+
     private final String filename;
 
     //Constructor
+
+    public AutomatonData(){
+        numberStatesRead = false;
+        startStateNumberRead = false;
+        finalStatesNumbersRead = false;
+        alphabetElementsRead = false;
+        transitionString = new ArrayList<>();
+
+        filename = null;
+    }
 
     public AutomatonData(String file){
         numberStatesRead = false;
         startStateNumberRead = false;
         finalStatesNumbersRead = false;
         alphabetElementsRead = false;
+        transitionString = new ArrayList<>();
 
-        transition = new ArrayList<>();
-        alphabet = new Alphabet();
         filename = file;
     }
 
     //Read
 
-    public void setStates(int s) {
-        numberStates = s;
+    public void setStates(String s) {
+        numberStatesString = s;
         numberStatesRead = true;
     }
 
-    public void setStart(int s) {
-        startStateNumber = s;
+    public void setStart(String s) {
+        startStateString = s;
         startStateNumberRead = true;
     }
 
-    public void setFinal(String[] finals) throws NumberFormatException {
+    public void setFinal(String[] finals) {
         finalStatesNumbersRead = true;
-        finalStatesNumbers = new ArrayList<>();
-        for(String s : finals) finalStatesNumbers.add(Integer.parseInt(s));
+        finalStatesString = Arrays.asList(finals);
     }
 
     public void setAlphabet(String[] tokens) {
@@ -66,10 +80,8 @@ public class AutomatonData {
         alphabetElements = Arrays.asList(tokens);
     }
 
-    public void addRule(int o, String s, int d) throws Exception {
-        if(s.length() == 1) transition.add(new RuleData(o,d,s.charAt(0)));
-        else if(TokenFactory.isBChar(s)) transition.add(new RuleData(o,d, TokenFactory.getBChar(s)));
-        else throw new Exception();
+    public void addRule(String o, String c, String d) {
+        transitionString.add(new RuleString(o,d,c));
     }
 
     //Getters
@@ -107,8 +119,8 @@ public class AutomatonData {
 
     public boolean check(){
         boolean ok = hasBasic();
-        ok = ok && numberStates > 0;
-        ok = ok && validState(startStateNumber);
+        ok = ok && checkNumberStates();
+        ok = ok && checkStartState();
         ok = ok && checkFinalStates();
         ok = ok && checkAlphabet();
         ok = ok && checkRules();
@@ -149,20 +161,42 @@ public class AutomatonData {
 
     //Private
 
+    private boolean checkNumberStates(){
+        if(!Utility.isNumber(numberStatesString)) return false;
+        numberStates = Integer.parseInt(numberStatesString);
+        return numberStates > 0;
+    }
+
+    private boolean checkStartState(){
+        if(!Utility.isNumber(startStateString)) return false;
+        startStateNumber = Integer.parseInt(startStateString);
+        return validState(startStateNumber);
+    }
+
     private boolean validState(int x){
         return x >= 0 && x < numberStates;
     }
 
     private boolean checkFinalStates(){
-        if(finalStatesNumbers.size() == 1 && finalStatesNumbers.get(0) < 0) return true;
+        if(finalStatesString.isEmpty()) return false;
+        finalStatesNumbers = new ArrayList<>();
+        if(finalStatesString.size() == 1 && Utility.isNegativeNumber(finalStatesString.get(0))){
+            finalStatesNumbers.add(Integer.parseInt(finalStatesString.get(0)));
+            return true;
+        }
 
         boolean ok = true;
-        Iterator<Integer> it = finalStatesNumbers.iterator();
-        while (it.hasNext() && ok) ok = validState(it.next());
+        Iterator<String> it = finalStatesString.iterator();
+        while(it.hasNext() && ok){
+            String s = it.next();
+            ok = Utility.isNumber(s) && validState(Integer.parseInt(s));
+            if(ok) finalStatesNumbers.add(Integer.parseInt(s));
+        }
         return ok;
     }
 
     private boolean checkAlphabet(){
+        alphabet = new Alphabet();
         boolean ok = true;
         Iterator<String> it = alphabetElements.iterator();
         while (it.hasNext() && ok){
@@ -176,13 +210,32 @@ public class AutomatonData {
     }
 
     private boolean checkRules(){
+        transition = new ArrayList<>();
         boolean ok = true;
-        Iterator<RuleData> it = transition.iterator();
-        while (it.hasNext() && ok){
-            RuleData r = it.next();
-            ok = validState(r.getOrigin()) && validState(r.getDestiny()) && alphabet.contains(r.getCharacter());
+        Iterator<RuleString> it = transitionString.iterator();
+        while(it.hasNext() && ok){
+            RuleString r = it.next();
+            ok = Utility.isNumber(r.origin) && validState(Integer.parseInt(r.origin));
+            ok = ok && Utility.isNumber(r.destiny) && validState(Integer.parseInt(r.destiny));
+            char c = 'A';
+            if(r.transition.length() == 1) c = r.transition.charAt(0);
+            else if(TokenFactory.isBChar(r.transition)) c = TokenFactory.getBChar(r.transition);
+            else ok = false;
+            ok = ok && alphabet.contains(c);
+            if(ok) transition.add(new RuleData(Integer.parseInt(r.origin), Integer.parseInt(r.destiny), c));
         }
         return ok;
+    }
+
+    private static class RuleString{
+        public String origin;
+        public String destiny;
+        public String transition;
+        public RuleString(String origin, String destiny, String transition){
+            this.origin = origin;
+            this.destiny = destiny;
+            this.transition = transition;
+        }
     }
 
 }
