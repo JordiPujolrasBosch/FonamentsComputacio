@@ -38,6 +38,18 @@ public class Printer {
         return "NOT EQUAL " + fa + " " + fb;
     }
 
+    public static String nonequalCounterexmaple(String fa, String fb, String counter){
+        String out = "NOT EQUAL";
+        if(fa != null && fb != null) out = out + " " + fa + " " + fb;
+        if(counter.isEmpty()) out = out + " :: empty word";
+        else out = out + " :: " + counter;
+        return out;
+    }
+
+    public static String counterexampleNotFound(){
+        return "Counter-example not found";
+    }
+
     public static String grammarCheck(String filename) {
         if(filename == null) return "Incorrect format for the grammar";
         return "Incorrect format for the grammar in file " + filename;
@@ -56,6 +68,14 @@ public class Printer {
     public static String unambiguous(String filename){
         if(filename == null) return "The grammar is probably unambiguous";
         return "The grammar in file " + filename + " is probably unambiguous";
+    }
+
+    public static String acceptsAllWords(){
+        return "The language accepts all the words";
+    }
+
+    public static String notAcceptAllWords(int n, int max){
+        return "The language doesn't accept all words: " + n + "/" + max;
     }
 
     //Automatons and grammars

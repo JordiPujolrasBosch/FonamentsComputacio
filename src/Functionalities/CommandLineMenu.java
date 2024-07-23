@@ -3,7 +3,6 @@ package Functionalities;
 import Automatons.Dfa;
 import Automatons.Nfa;
 import Factory.Reader;
-import Functionalities.Menu;
 import Grammars.Cfg;
 import RegularExpressions.RegularExpression;
 
@@ -12,7 +11,7 @@ import java.util.List;
 
 public class CommandLineMenu {
 
-    //ARTICLE
+    //CONTEXT FREE LANGUAGES TESTS
 
     public static void equalCfgCfgArticle(String fa, String fb){
         try{
@@ -20,20 +19,31 @@ public class CommandLineMenu {
             File fileb = new File(fb);
             Cfg a = Reader.readGrammarFile(filea);
             Cfg b = Reader.readGrammarFile(fileb);
-            System.out.println(Menu.equalCfgCfgArticle(a,b,filea.getName(), fileb.getName()));
+            System.out.println(Menu.equalCfgCfg(a, b, filea.getName(), fileb.getName()));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
         }
     }
 
-    public static void findCounterExampleCfgs(String fa, String fb){
+    public static void findCounterExampleCfg(String fa, String fb){
         try{
             File filea = new File(fa);
             File fileb = new File(fb);
             Cfg a = Reader.readGrammarFile(filea);
             Cfg b = Reader.readGrammarFile(fileb);
-            System.out.println(Menu.findCounterExampleCfgs(a,b,filea.getName(), fileb.getName()));
+            System.out.println(Menu.findCounterExampleCfg(a, b, filea.getName(), fileb.getName()));
+        }
+        catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public static void findManyCounterExamplesCfg(String fa, String fb){
+        try{
+            Cfg a = Reader.readGrammarFile(new File(fa));
+            Cfg b = Reader.readGrammarFile(new File(fb));
+            System.out.println(Menu.findManyCounterExamplesCfg(a, b));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
@@ -51,7 +61,7 @@ public class CommandLineMenu {
         }
     }
 
-    //COMPARE
+    //REGULAR LANGUAGES COMPARISONS
 
     public static void equalDfaDfa(String fa, String fb) {
         try{
@@ -59,7 +69,7 @@ public class CommandLineMenu {
             File fileb = new File(fb);
             Dfa a = Reader.readAutomatonFile(filea).toDfa();
             Dfa b = Reader.readAutomatonFile(fileb).toDfa();
-            System.out.println(Menu.equalDfaDfa(a,b,filea.getName(), fileb.getName()));
+            System.out.println(Menu.equalDfaDfa(a, b, filea.getName(), fileb.getName()));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
@@ -72,7 +82,7 @@ public class CommandLineMenu {
             File fileb = new File(fb);
             Dfa a = Reader.readAutomatonFile(filea).toDfa();
             Nfa b = Reader.readAutomatonFile(fileb).toNfa();
-            System.out.println(Menu.equalDfaNfa(a,b,filea.getName(), fileb.getName()));
+            System.out.println(Menu.equalDfaNfa(a, b, filea.getName(), fileb.getName()));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
@@ -85,7 +95,20 @@ public class CommandLineMenu {
             File fileb = new File(fb);
             Dfa a = Reader.readAutomatonFile(filea).toDfa();
             RegularExpression b = Reader.readRegularExpressionFile(fileb);
-            System.out.println(Menu.equalDfaRegex(a,b,filea.getName(), fileb.getName()));
+            System.out.println(Menu.equalDfaRegex(a, b, filea.getName(), fileb.getName()));
+        }
+        catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public static void equalNfaDfa(String fa, String fb){
+        try{
+            File filea = new File(fa);
+            File fileb = new File(fb);
+            Nfa a = Reader.readAutomatonFile(filea).toNfa();
+            Dfa b = Reader.readAutomatonFile(fileb).toDfa();
+            System.out.println(Menu.equalNfaDfa(a, b, filea.getName(), fileb.getName()));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
@@ -98,7 +121,7 @@ public class CommandLineMenu {
             File fileb = new File(fb);
             Nfa a = Reader.readAutomatonFile(filea).toNfa();
             Nfa b = Reader.readAutomatonFile(fileb).toNfa();
-            System.out.println(Menu.equalNfaNfa(a,b,filea.getName(), fileb.getName()));
+            System.out.println(Menu.equalNfaNfa(a, b, filea.getName(), fileb.getName()));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
@@ -111,7 +134,33 @@ public class CommandLineMenu {
             File fileb = new File(fb);
             Nfa a = Reader.readAutomatonFile(filea).toNfa();
             RegularExpression b = Reader.readRegularExpressionFile(fileb);
-            System.out.println(Menu.equalNfaRegex(a,b,filea.getName(),fileb.getName()));
+            System.out.println(Menu.equalNfaRegex(a, b, filea.getName(), fileb.getName()));
+        }
+        catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public static void equalRegexDfa(String fa, String fb){
+        try{
+            File filea = new File(fa);
+            File fileb = new File(fb);
+            RegularExpression a = Reader.readRegularExpressionFile(filea);
+            Dfa b = Reader.readAutomatonFile(fileb).toDfa();
+            System.out.println(Menu.equalRegexDfa(a, b, filea.getName(), fileb.getName()));
+        }
+        catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public static void equalRegexNfa(String fa, String fb){
+        try{
+            File filea = new File(fa);
+            File fileb = new File(fb);
+            RegularExpression a = Reader.readRegularExpressionFile(filea);
+            Nfa b = Reader.readAutomatonFile(fileb).toNfa();
+            System.out.println(Menu.equalRegexNfa(a, b, filea.getName(), fileb.getName()));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
@@ -124,43 +173,14 @@ public class CommandLineMenu {
             File fileb = new File(fb);
             RegularExpression a = Reader.readRegularExpressionFile(filea);
             RegularExpression b = Reader.readRegularExpressionFile(fileb);
-            System.out.println(Menu.equalRegexRegex(a,b,filea.getName(),fileb.getName()));
+            System.out.println(Menu.equalRegexRegex(a, b, filea.getName(), fileb.getName()));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
         }
     }
 
-    //DFA transformations
-
-    public static void minimizeDfa(String f){
-        try{
-            System.out.println(Menu.minimizeDfa(Reader.readAutomatonFile(new File(f)).toDfa()));
-        }
-        catch (Exception ex){
-            System.out.println(ex.getMessage());
-        }
-    }
-
-    public static void reverseDfa(String f){
-        try{
-            System.out.println(Menu.reverseDfa(Reader.readAutomatonFile(new File(f)).toDfa()));
-        }
-        catch (Exception ex){
-            System.out.println(ex.getMessage());
-        }
-    }
-
-    public static void complementDfa(String f){
-        try{
-            System.out.println(Menu.complementDfa(Reader.readAutomatonFile(new File(f)).toDfa()));
-        }
-        catch (Exception ex){
-            System.out.println(ex.getMessage());
-        }
-    }
-
-    //TRANSFORM
+    //REGULAR LANGUAGES TRANSFORMATIONS
 
     public static void transformDfaNfa(String f){
         try{
@@ -189,9 +209,27 @@ public class CommandLineMenu {
         }
     }
 
+    public static void transformNfaDfaMinim(String f){
+        try{
+            System.out.println(Menu.transformNfaDfaMinim(Reader.readAutomatonFile(new File(f)).toNfa()));
+        }
+        catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+
     public static void transformNfaRegex(String f){
         try{
             System.out.println(Menu.transformNfaRegex(Reader.readAutomatonFile(new File(f)).toNfa()));
+        }
+        catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public static void transformRegexDfa(String f){
+        try{
+            System.out.println(Menu.transformRegexDfa(Reader.readRegularExpressionFile(new File(f))));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
@@ -207,9 +245,9 @@ public class CommandLineMenu {
         }
     }
 
-    public static void transformRegexDfaNotMinim(String f){
+    public static void transformRegexNfa(String f){
         try{
-            System.out.println(Menu.transformRegexDfaNotMinim(Reader.readRegularExpressionFile(new File(f))));
+            System.out.println(Menu.transformRegexNfa(Reader.readRegularExpressionFile(new File(f))));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
@@ -219,15 +257,6 @@ public class CommandLineMenu {
     public static void transformRegexNfaMinim(String f){
         try{
             System.out.println(Menu.transformRegexNfaMinim(Reader.readRegularExpressionFile(new File(f))));
-        }
-        catch (Exception ex){
-            System.out.println(ex.getMessage());
-        }
-    }
-
-    public static void transformRegexNfaNotMinim(String f){
-        try{
-            System.out.println(Menu.transformRegexNfaNotMinim(Reader.readRegularExpressionFile(new File(f))));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
@@ -274,11 +303,55 @@ public class CommandLineMenu {
         }
     }
 
+    public static void checkWordsDfaYes(String f, String fw){
+        try{
+            Dfa dfa = Reader.readAutomatonFile(new File(f)).toDfa();
+            List<String> list = Reader.readWordsFile(new File(fw));
+            System.out.println(Menu.checkWordsDfaYes(dfa, list));
+        }
+        catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public static void checkWordsDfaNo(String f, String fw){
+        try{
+            Dfa dfa = Reader.readAutomatonFile(new File(f)).toDfa();
+            List<String> list = Reader.readWordsFile(new File(fw));
+            System.out.println(Menu.checkWordsDfaNo(dfa, list));
+        }
+        catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+
     public static void checkWordsNfa(String f, String fw){
         try{
             Nfa nfa = Reader.readAutomatonFile(new File(f)).toNfa();
             List<String> list = Reader.readWordsFile(new File(fw));
             System.out.println(Menu.checkWordsNfa(nfa, list));
+        }
+        catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public static void checkWordsNfaYes(String f, String fw){
+        try{
+            Nfa nfa = Reader.readAutomatonFile(new File(f)).toNfa();
+            List<String> list = Reader.readWordsFile(new File(fw));
+            System.out.println(Menu.checkWordsNfaYes(nfa, list));
+        }
+        catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public static void checkWordsNfaNo(String f, String fw){
+        try{
+            Nfa nfa = Reader.readAutomatonFile(new File(f)).toNfa();
+            List<String> list = Reader.readWordsFile(new File(fw));
+            System.out.println(Menu.checkWordsNfaNo(nfa, list));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
@@ -296,11 +369,55 @@ public class CommandLineMenu {
         }
     }
 
+    public static void checkWordsRegexYes(String f, String fw){
+        try{
+            RegularExpression regex = Reader.readRegularExpressionFile(new File(f));
+            List<String> list = Reader.readWordsFile(new File(fw));
+            System.out.println(Menu.checkWordsRegexYes(regex, list));
+        }
+        catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public static void checkWordsRegexNo(String f, String fw){
+        try{
+            RegularExpression regex = Reader.readRegularExpressionFile(new File(f));
+            List<String> list = Reader.readWordsFile(new File(fw));
+            System.out.println(Menu.checkWordsRegexNo(regex, list));
+        }
+        catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+
     public static void checkWordsCfg(String f, String fw){
         try{
             Cfg g = Reader.readGrammarFile(new File(f));
             List<String> list = Reader.readWordsFile(new File(fw));
             System.out.println(Menu.checkWordsCfg(g, list));
+        }
+        catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public static void checkWordsCfgYes(String f, String fw){
+        try{
+            Cfg g = Reader.readGrammarFile(new File(f));
+            List<String> list = Reader.readWordsFile(new File(fw));
+            System.out.println(Menu.checkWordsCfgYes(g, list));
+        }
+        catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public static void checkWordsCfgNo(String f, String fw){
+        try{
+            Cfg g = Reader.readGrammarFile(new File(f));
+            List<String> list = Reader.readWordsFile(new File(fw));
+            System.out.println(Menu.checkWordsCfgNo(g, list));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
@@ -381,29 +498,58 @@ public class CommandLineMenu {
         }
     }
 
-    //CFG transformations
+    //DFA TRANSFORMATIONS
 
-    public static void simplifyGrammar(String f){
+    public static void minimizeDfa(String f){
         try{
-            System.out.println(Menu.simplifyGrammar(Reader.readGrammarFile(new File(f))));
+            System.out.println(Menu.minimizeDfa(Reader.readAutomatonFile(new File(f)).toDfa()));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
         }
     }
 
-    public static void transformChomsky(String f){
+    public static void reverseDfa(String f){
         try{
-            System.out.println(Menu.transformChomsky(Reader.readGrammarFile(new File(f))));
+            System.out.println(Menu.reverseDfa(Reader.readAutomatonFile(new File(f)).toDfa()));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
         }
     }
 
-    public static void transformGriebach(String f){
+    public static void complementDfa(String f){
         try{
-            System.out.println(Menu.transformGriebach(Reader.readGrammarFile(new File(f))));
+            System.out.println(Menu.complementDfa(Reader.readAutomatonFile(new File(f)).toDfa()));
+        }
+        catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    //CFG TRANSFORMATIONS
+
+    public static void simplifyCfg(String f){
+        try{
+            System.out.println(Menu.simplifyCfg(Reader.readGrammarFile(new File(f))));
+        }
+        catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public static void chomskyCfg(String f){
+        try{
+            System.out.println(Menu.chomskyCfg(Reader.readGrammarFile(new File(f))));
+        }
+        catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public static void griebachCfg(String f){
+        try{
+            System.out.println(Menu.griebachCfg(Reader.readGrammarFile(new File(f))));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());

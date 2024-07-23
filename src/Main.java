@@ -1,34 +1,9 @@
-
-
-/*
- * TODO
- * Test all
- *
- * Enumerator fixed length words
- * Ambiguity
- * GUI
- *
- * */
-
-/*
- * DONE
- * Automatons
- * Elements
- * Exceptions
- * Grammars
- * RegularExpressions
- * Utils
- * Algorithms
- *
- * Article CFG==CFG
- * CFG termination checks
- * Find counter-example
- * */
+import Functionalities.RunCommandLine;
 
 public class Main {
     public static void main(String[] args) {
-       // Functionalities.Menu.findCounterExampleCfgs("Resources/gc1.txt", "Resources/gc2.txt");
-       // Functionalities.Menu.checkAmbiguity("Resources/gc2.txt");
+       if(args.length == 0) AppFx.main(args);
+       else if(args.length == 1 && args[0].equals("--gui")) AppFx.main(args);
+       else RunCommandLine.run(args);
     }
-
 }

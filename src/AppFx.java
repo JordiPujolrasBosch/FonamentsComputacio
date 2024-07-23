@@ -1,5 +1,5 @@
-import JavafxClasses.Layouts;
-import JavafxClasses.UtilFx;
+import JavafxClasses.LayoutMenu;
+import Utils.Utility;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Screen;
@@ -14,13 +14,15 @@ public class AppFx extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         stage.setTitle("RL&CFLTools");
-        UtilFx.setStage(stage);
+        Utility.setStage(stage);
 
         double width = Screen.getPrimary().getBounds().getWidth()*0.6;
         double height = Screen.getPrimary().getBounds().getHeight()*0.6;
-        //Scene scene = new Scene(Layouts.dfaToNfaAct(), width, height);
-        //stage.setScene(scene);
+        Scene scene = new Scene(LayoutMenu.build(), width, height);
+        stage.setScene(scene);
         stage.setMaximized(true);
+        stage.setMinHeight(550);
+        stage.setMinWidth(900);
 
         stage.show();
     }

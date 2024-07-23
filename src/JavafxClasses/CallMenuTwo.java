@@ -1,5 +1,5 @@
 package JavafxClasses;
 
-public interface CallTwo {
+public interface CallMenuTwo {
     String call(String a, String b);
 }

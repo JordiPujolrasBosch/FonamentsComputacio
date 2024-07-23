@@ -16,27 +16,29 @@ import java.util.List;
 
 public class Menu {
 
-    //CFG MAIN
+    //CONTEXT FREE LANGUAGES TESTS
 
-    public static String equalCfgCfgArticle(Cfg ga, Cfg gb, String fa, String fb){
+    public static String equalCfgCfg(Cfg ga, Cfg gb, String fa, String fb){
         CfgNonEmpty a = ga.simplify().toGriebach();
         CfgNonEmpty b = gb.simplify().toGriebach();
         if(a.compare(b)) return Printer.equal(fa,fb);
         return Printer.nonequal(fa,fb);
     }
 
-    public static String findCounterExampleCfgs(Cfg ga, Cfg gb, String fa, String fb){
+    public static String findCounterExampleCfg(Cfg ga, Cfg gb, String fa, String fb){
         CfgNonEmpty a = ga.simplify().toGriebach();
         CfgNonEmpty b = gb.simplify().toGriebach();
-        if(a.acceptsEmpty() != b.acceptsEmpty()){
-            return Printer.nonequal(fa,fb) + " :: empty word";
-        }
-        else if(a.compare(b)){
-            return Printer.equal(fa, fb);
-        }
-        else{
-            return Printer.nonequal(fa,fb) + " :: " + Algorithms.findCounterExampleCfgs(a,b);
-        }
+        if(a.acceptsEmpty() != b.acceptsEmpty()) return Printer.nonequalCounterexmaple(fa, fb, "");
+        else if(a.compare(b)) return Printer.equal(fa, fb);
+        else return Printer.nonequalCounterexmaple(fa,fb, Algorithms.findCounterExampleCfg(a,b));
+    }
+
+    public static String findManyCounterExamplesCfg(Cfg ga, Cfg gb){
+        CfgNonEmpty a = ga.simplify().toGriebach();
+        CfgNonEmpty b = gb.simplify().toGriebach();
+        List<String> list = new ArrayList<>();
+        if(a.compare(b)) return "";
+        return Printer.stringOfWords(Algorithms.findManyCounterExamplesCfg(a,b));
     }
 
     public static String checkAmbiguity(Cfg g, String f){
@@ -48,7 +50,7 @@ public class Menu {
         return Printer.unambiguous(f);
     }
 
-    //COMPARE
+    //REGULAR LANGUAGES COMPARISONS
 
     public static String equalDfaDfa(Dfa a, Dfa b, String fa, String fb) {
         if(a.minimize().compare(b.minimize())) return Printer.equal(fa, fb);
@@ -65,6 +67,11 @@ public class Menu {
         return Printer.nonequal(fa,fb);
     }
 
+    public static String equalNfaDfa(Nfa a, Dfa b, String fa, String fb){
+        if(a.toDfa().minimize().compare(b.minimize())) return Printer.equal(fa,fb);
+        return Printer.nonequal(fa,fb);
+    }
+
     public static String equalNfaNfa(Nfa a, Nfa b, String fa, String fb){
         if(a.toDfa().minimize().compare(b.toDfa().minimize())) return Printer.equal(fa,fb);
         return Printer.nonequal(fa,fb);
@@ -75,30 +82,22 @@ public class Menu {
         return Printer.nonequal(fa,fb);
     }
 
+    public static String equalRegexDfa(RegularExpression a, Dfa b, String fa, String fb){
+        if(a.toNfa().toDfa().minimize().compare(b.minimize())) return Printer.equal(fa,fb);
+        return Printer.nonequal(fa,fb);
+    }
+
+    public static String equalRegexNfa(RegularExpression a, Nfa b, String fa, String fb){
+        if(a.toNfa().toDfa().minimize().compare(b.toDfa().minimize())) return Printer.equal(fa,fb);
+        return Printer.nonequal(fa,fb);
+    }
+
     public static String equalRegexRegex(RegularExpression a, RegularExpression b, String fa, String fb){
         if(a.toNfa().toDfa().minimize().compare(b.toNfa().toDfa().minimize())) return Printer.equal(fa,fb);
         return Printer.nonequal(fa,fb);
     }
 
-    //DFA transformations
-
-    public static String minimizeDfa(Dfa a){
-        return a.minimize().toString();
-    }
-
-    public static String minimize2Dfa(Dfa a){
-        return Algorithms.minimize2(a).toString();
-    }
-
-    public static String reverseDfa(Dfa a){
-        return Algorithms.reverse(a).toString();
-    }
-
-    public static String complementDfa(Dfa a){
-        return Algorithms.complement(a).toString();
-    }
-
-    //TRANSFORM
+    //REGULAR LANGUAGES TRANSFORMATIONS
 
     public static String transformDfaNfa(Dfa a){
         return a.toNfa().toString();
@@ -112,28 +111,32 @@ public class Menu {
         return a.toDfa().toString();
     }
 
+    public static String transformNfaDfaMinim(Nfa a){
+        return a.toDfa().minimize().toString();
+    }
+
     public static String transformNfaRegex(Nfa a){
         return a.toGnfa().toRegex().simplify().toString();
+    }
+
+    public static String transformRegexDfa(RegularExpression a){
+        return a.toNfa().toDfa().toString();
     }
 
     public static String transformRegexDfaMinim(RegularExpression a){
         return a.toNfa().toDfa().minimize().toString();
     }
 
-    public static String transformRegexDfaNotMinim(RegularExpression a){
-        return a.toNfa().toDfa().toString();
+    public static String transformRegexNfa(RegularExpression a){
+        return a.toNfa().toString();
     }
 
     public static String transformRegexNfaMinim(RegularExpression a){
         return a.toNfa().toDfa().minimize().toNfa().toString();
     }
 
-    public static String transformRegexNfaNotMinim(RegularExpression a){
-        return a.toNfa().toString();
-    }
-
     public static String transformDfaCfg(Dfa a){
-        return a.toNfa().toGnfa().toRegex().toCfg().simplify().toString();
+        return a.minimize().toNfa().toGnfa().toRegex().toCfg().simplify().toString();
     }
 
     public static String transformNfaCfg(Nfa a){
@@ -149,6 +152,23 @@ public class Menu {
     public static String checkWordsDfa(Dfa a, List<String> words){
         List<String> out = new ArrayList<>();
         for(String word : words){
+            if(a.checkWord(word)) out.add(word);
+        }
+        if(out.size() == words.size()) return Printer.acceptsAllWords();
+        return Printer.notAcceptAllWords(out.size(), words.size());
+    }
+
+    public static String checkWordsDfaYes(Dfa a, List<String> words){
+        List<String> out = new ArrayList<>();
+        for(String word : words){
+            if(a.checkWord(word)) out.add(word);
+        }
+        return Printer.stringOfWords(out);
+    }
+
+    public static String checkWordsDfaNo(Dfa a, List<String> words){
+        List<String> out = new ArrayList<>();
+        for(String word : words){
             if(!a.checkWord(word)) out.add(word);
         }
         return Printer.stringOfWords(out);
@@ -158,11 +178,46 @@ public class Menu {
         return checkWordsDfa(a.toDfa(), words);
     }
 
+    public static String checkWordsNfaYes(Nfa a, List<String> words){
+        return checkWordsDfaYes(a.toDfa(), words);
+    }
+
+    public static String checkWordsNfaNo(Nfa a, List<String> words){
+        return checkWordsDfaNo(a.toDfa(), words);
+    }
+
     public static String checkWordsRegex(RegularExpression a, List<String> words){
         return checkWordsDfa(a.toNfa().toDfa(), words);
     }
 
+    public static String checkWordsRegexYes(RegularExpression a, List<String> words){
+        return checkWordsDfaYes(a.toNfa().toDfa(), words);
+    }
+
+    public static String checkWordsRegexNo(RegularExpression a, List<String> words){
+        return checkWordsDfaNo(a.toNfa().toDfa(), words);
+    }
+
     public static String checkWordsCfg(Cfg g, List<String> words){
+        Pda parser = g.toPda();
+        List<String> out = new ArrayList<>();
+        for(String word : words){
+            if(parser.checkWord(word)) out.add(word);
+        }
+        if(out.size() == words.size()) return Printer.acceptsAllWords();
+        return Printer.notAcceptAllWords(out.size(), words.size());
+    }
+
+    public static String checkWordsCfgYes(Cfg g, List<String> words){
+        Pda parser = g.toPda();
+        List<String> out = new ArrayList<>();
+        for(String word : words){
+            if(parser.checkWord(word)) out.add(word);
+        }
+        return Printer.stringOfWords(out);
+    }
+
+    public static String checkWordsCfgNo(Cfg g, List<String> words){
         Pda parser = g.toPda();
         List<String> out = new ArrayList<>();
         for(String word : words){
@@ -190,17 +245,35 @@ public class Menu {
         return Printer.stringOfWords(wg.generateWordsStart(n));
     }
 
-    //CFG transformations
+    //DFA TRANSFORMATIONS
 
-    public static String simplifyGrammar(Cfg g){
+    public static String minimizeDfa(Dfa a){
+        return a.minimize().toString();
+    }
+
+    public static String minimize2Dfa(Dfa a){
+        return Algorithms.minimize2(a).toString();
+    }
+
+    public static String reverseDfa(Dfa a){
+        return Algorithms.reverse(a).toString();
+    }
+
+    public static String complementDfa(Dfa a){
+        return Algorithms.complement(a).toString();
+    }
+
+    //CFG TRANSFORMATIONS
+
+    public static String simplifyCfg(Cfg g){
         return g.simplify().toString();
     }
 
-    public static String transformChomsky(Cfg g){
+    public static String chomskyCfg(Cfg g){
         return g.simplify().toChomsky().toString();
     }
 
-    public static String transformGriebach(Cfg g){
+    public static String griebachCfg(Cfg g){
         return g.simplify().toGriebach().toString();
     }
 }

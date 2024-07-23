@@ -1,5 +1,5 @@
 package JavafxClasses;
 
-public interface CallOne {
+public interface CallMenuOne {
     String call(String data);
 }

@@ -900,7 +900,7 @@ public class Algorithms {
     public static List<String> generateWords(RegularExpression regex, int n){
         RegularExpression simplified = regex.simplify();
         IntegerInf bagSize = simplified.wordsCount();
-        if(n <= 0 || bagSize.isZero()) return new ArrayList<>();
+        if(n <= 0 || bagSize.isZero() || n > 2000) return new ArrayList<>();
 
         Set<String> set = new HashSet<>();
 
@@ -2078,7 +2078,7 @@ public class Algorithms {
         }
     }
 
-    public static String findCounterExampleCfgs(CfgNonEmpty a, CfgNonEmpty b) {
+    public static String findCounterExampleCfg(CfgNonEmpty a, CfgNonEmpty b) {
         Pda parsera = a.toCfg().toPda();
         Pda parserb = b.toCfg().toPda();
 
@@ -2107,7 +2107,38 @@ public class Algorithms {
         }
 
         if(found) return act;
-        return "Counter-example not found";
+        return Printer.counterexampleNotFound();
+    }
+
+    public static List<String> findManyCounterExamplesCfg(CfgNonEmpty a, CfgNonEmpty b){
+        Pda parsera = a.toCfg().toPda();
+        Pda parserb = b.toCfg().toPda();
+
+        WordsGenerator wga = new WordsGenerator(a);
+        WordsGenerator wgb = new WordsGenerator(b);
+
+        Set<String> set = new HashSet<>();
+        int counter = 0;
+        Iterator<String> it;
+        String act;
+
+        while(set.size() < 100 && counter < 100000){
+            it = wga.generateWordsStart(100).iterator();
+            while(it.hasNext() && set.size() < 100){
+                act = it.next();
+                if(!parserb.checkWord(act)) set.add(act);
+                counter++;
+            }
+
+            it = wgb.generateWordsStart(100).iterator();
+            while(it.hasNext() && set.size() < 100){
+                act = it.next();
+                if(!parsera.checkWord(act)) set.add(act);
+                counter++;
+            }
+        }
+
+        return set.stream().toList();
     }
 
 }
