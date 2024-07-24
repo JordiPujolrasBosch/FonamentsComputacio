@@ -76,8 +76,8 @@ public class CfgNonEmpty {
         return Algorithms.chomsky(this);
     }
 
-    public CfgNonEmpty toGriebach(){
-        return Algorithms.griebach(this);
+    public CfgNonEmpty toGreibach(){
+        return Algorithms.greibach(this);
     }
 
     //String

@@ -2,9 +2,11 @@ package Functionalities;
 
 import Automatons.Dfa;
 import Automatons.Nfa;
+import Factory.Printer;
 import Factory.Reader;
 import Grammars.Cfg;
 import RegularExpressions.RegularExpression;
+import Utils.Utility;
 
 import java.io.File;
 import java.util.List;
@@ -435,9 +437,11 @@ public class CommandLineMenu {
         }
     }
 
-    public static void generateWordsDfa(String f, int n){
+    public static void generateWordsDfa(String f, String n){
         try{
-            System.out.println(Menu.generateWordsDfa(Reader.readAutomatonFile(new File(f)).toDfa(),n));
+            if(!Utility.isNumber(n)) throw new Exception(Printer.sizeOutOfRange());
+            if(Integer.parseInt(n) < 0 || Integer.parseInt(n) > 500) throw new Exception(Printer.sizeOutOfRange());
+            System.out.println(Menu.generateWordsDfa(Reader.readAutomatonFile(new File(f)).toDfa(),Integer.parseInt(n)));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
@@ -453,9 +457,11 @@ public class CommandLineMenu {
         }
     }
 
-    public static void generateWordsNfa(String f, int n){
+    public static void generateWordsNfa(String f, String n){
         try{
-            System.out.println(Menu.generateWordsNfa(Reader.readAutomatonFile(new File(f)).toNfa(),n));
+            if(!Utility.isNumber(n)) throw new Exception(Printer.sizeOutOfRange());
+            if(Integer.parseInt(n) < 0 || Integer.parseInt(n) > 500) throw new Exception(Printer.sizeOutOfRange());
+            System.out.println(Menu.generateWordsNfa(Reader.readAutomatonFile(new File(f)).toNfa(),Integer.parseInt(n)));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
@@ -471,9 +477,11 @@ public class CommandLineMenu {
         }
     }
 
-    public static void generateWordsRegex(String f, int n){
+    public static void generateWordsRegex(String f, String n){
         try{
-            System.out.println(Menu.generateWordsRegex(Reader.readRegularExpressionFile(new File(f)),n));
+            if(!Utility.isNumber(n)) throw new Exception(Printer.sizeOutOfRange());
+            if(Integer.parseInt(n) < 0 || Integer.parseInt(n) > 500) throw new Exception(Printer.sizeOutOfRange());
+            System.out.println(Menu.generateWordsRegex(Reader.readRegularExpressionFile(new File(f)),Integer.parseInt(n)));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
@@ -489,9 +497,11 @@ public class CommandLineMenu {
         }
     }
 
-    public static void generateWordsCfg(String f, int n){
+    public static void generateWordsCfg(String f, String n){
         try{
-            System.out.println(Menu.generateWordsCfg(Reader.readGrammarFile(new File(f)),n));
+            if(!Utility.isNumber(n)) throw new Exception(Printer.sizeOutOfRange());
+            if(Integer.parseInt(n) < 0 || Integer.parseInt(n) > 500) throw new Exception(Printer.sizeOutOfRange());
+            System.out.println(Menu.generateWordsCfg(Reader.readGrammarFile(new File(f)),Integer.parseInt(n)));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
@@ -547,9 +557,9 @@ public class CommandLineMenu {
         }
     }
 
-    public static void griebachCfg(String f){
+    public static void greibachCfg(String f){
         try{
-            System.out.println(Menu.griebachCfg(Reader.readGrammarFile(new File(f))));
+            System.out.println(Menu.greibachCfg(Reader.readGrammarFile(new File(f))));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());

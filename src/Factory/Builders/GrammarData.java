@@ -71,7 +71,7 @@ public class GrammarData {
     }
 
     public boolean check() {
-        boolean ok = hasBasic() && !rulesString.isEmpty();
+        boolean ok = hasBasic();
 
         ok = ok && checkTerminals();
         ok = ok && checkVariables();

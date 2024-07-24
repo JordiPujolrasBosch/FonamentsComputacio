@@ -1,5 +1,6 @@
 package JavafxClasses;
 
+import Factory.Printer;
 import Utils.Utility;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -64,10 +65,14 @@ public class Layout2Words {
         Button apply = new Button(Utility.apply);
         Properties.button(apply);
         apply.setOnAction(event -> {
-            if(!Utility.isNumber(inputNumber.getText())) textAreaRight.setText("Enter a number");
+            if(!Utility.isNumber(inputNumber.getText())) textAreaRight.setText(Printer.sizeOutOfRange());
             else{
-                Utility.setInt(Integer.parseInt(inputNumber.getText()));
-                textAreaRight.setText(call.call(textAreaLeft.getText()));
+                int n = Integer.parseInt(inputNumber.getText());
+                if(n < 0 || n > 500) textAreaRight.setText(Printer.sizeOutOfRange());
+                else{
+                    Utility.setInt(n);
+                    textAreaRight.setText(call.call(textAreaLeft.getText()));
+                }
             }
         });
 

@@ -78,6 +78,14 @@ public class Printer {
         return "The language doesn't accept all words: " + n + "/" + max;
     }
 
+    public static String sizeOutOfRange(){
+        return "Size out of range: from 0 to 500";
+    }
+
+    public static String incorrectArguments(){
+        return "Incorrect arguments (try \"--help\")";
+    }
+
     //Automatons and grammars
 
     public static String stringOfDfa(Dfa dfa){

@@ -900,7 +900,7 @@ public class Algorithms {
     public static List<String> generateWords(RegularExpression regex, int n){
         RegularExpression simplified = regex.simplify();
         IntegerInf bagSize = simplified.wordsCount();
-        if(n <= 0 || bagSize.isZero() || n > 2000) return new ArrayList<>();
+        if(n <= 0 || bagSize.isZero() || n > 500) return new ArrayList<>();
 
         Set<String> set = new HashSet<>();
 
@@ -1511,17 +1511,17 @@ public class Algorithms {
         }
     }
 
-    public static CfgNonEmpty griebach(CfgNonEmpty x) {
+    public static CfgNonEmpty greibach(CfgNonEmpty x) {
         CfgNonEmptyConstructor ccx = x.getConstructor();
 
-        List<Gvar> order = GriebachPrivate.findOrder(ccx);
-        GriebachPrivate.verifyOrder(ccx,order);
-        GriebachPrivate.applyGriebachSubstitution(ccx, order);
+        List<Gvar> order = GreibachPrivate.findOrder(ccx);
+        GreibachPrivate.verifyOrder(ccx,order);
+        GreibachPrivate.applyGreibachSubstitution(ccx, order);
 
         return ccx.getCfgNonEmpty();
     }
 
-    private static class GriebachPrivate {
+    private static class GreibachPrivate {
         static List<Gvar> findOrder(CfgNonEmptyConstructor ccx){
             List<Gvar> order = new ArrayList<>();
 
@@ -1567,7 +1567,7 @@ public class Algorithms {
             }
         }
 
-        static void applyGriebachSubstitution(CfgNonEmptyConstructor ccx, List<Gvar> order){
+        static void applyGreibachSubstitution(CfgNonEmptyConstructor ccx, List<Gvar> order){
             for(int i = order.size()-2; i>=0; i--){
                 Set<GruleNonEmpty> rules = GrammarTools.getRulesVar(ccx.getCfgNonEmpty(), order.get(i));
                 for(GruleNonEmpty r : rules){

@@ -52,7 +52,7 @@ public class WordsGenerator {
     }
 
     public List<String> generateWordsStart(int n) {
-        if(n <= 0 || n > 2000) return new ArrayList<>();
+        if(n <= 0 || n > 1000) return new ArrayList<>();
 
         List<String> list = new ArrayList<>();
         GramexNonEmpty start = new GramexVar(cfg.getStart());

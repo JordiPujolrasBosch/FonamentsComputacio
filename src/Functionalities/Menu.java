@@ -19,23 +19,23 @@ public class Menu {
     //CONTEXT FREE LANGUAGES TESTS
 
     public static String equalCfgCfg(Cfg ga, Cfg gb, String fa, String fb){
-        CfgNonEmpty a = ga.simplify().toGriebach();
-        CfgNonEmpty b = gb.simplify().toGriebach();
+        CfgNonEmpty a = ga.simplify().toGreibach();
+        CfgNonEmpty b = gb.simplify().toGreibach();
         if(a.compare(b)) return Printer.equal(fa,fb);
         return Printer.nonequal(fa,fb);
     }
 
     public static String findCounterExampleCfg(Cfg ga, Cfg gb, String fa, String fb){
-        CfgNonEmpty a = ga.simplify().toGriebach();
-        CfgNonEmpty b = gb.simplify().toGriebach();
+        CfgNonEmpty a = ga.simplify().toGreibach();
+        CfgNonEmpty b = gb.simplify().toGreibach();
         if(a.acceptsEmpty() != b.acceptsEmpty()) return Printer.nonequalCounterexmaple(fa, fb, "");
         else if(a.compare(b)) return Printer.equal(fa, fb);
         else return Printer.nonequalCounterexmaple(fa,fb, Algorithms.findCounterExampleCfg(a,b));
     }
 
     public static String findManyCounterExamplesCfg(Cfg ga, Cfg gb){
-        CfgNonEmpty a = ga.simplify().toGriebach();
-        CfgNonEmpty b = gb.simplify().toGriebach();
+        CfgNonEmpty a = ga.simplify().toGreibach();
+        CfgNonEmpty b = gb.simplify().toGreibach();
         List<String> list = new ArrayList<>();
         if(a.compare(b)) return "";
         return Printer.stringOfWords(Algorithms.findManyCounterExamplesCfg(a,b));
@@ -273,7 +273,7 @@ public class Menu {
         return g.simplify().toChomsky().toString();
     }
 
-    public static String griebachCfg(Cfg g){
-        return g.simplify().toGriebach().toString();
+    public static String greibachCfg(Cfg g){
+        return g.simplify().toGreibach().toString();
     }
 }

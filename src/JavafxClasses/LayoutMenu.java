@@ -33,11 +33,7 @@ public class LayoutMenu {
 
         for(ItemMenu i : menu){
             Node node;
-            if(!i.space){
-                Text t = new Text(i.text);
-                //t.setFont();
-                node = t;
-            }
+            if(!i.space) node = new Text(i.text);
             else if(!i.active){
                 Hyperlink t = new Hyperlink(i.text);
                 t.setStyle("-fx-text-fill: black; -fx-underline: false;");
@@ -45,10 +41,7 @@ public class LayoutMenu {
             }
             else{
                 Hyperlink h = new Hyperlink(i.text);
-                //h.setFont();
-                h.setOnAction(actionEvent -> {
-                    move(i);
-                });
+                h.setOnAction(actionEvent -> move(i));
                 node = h;
             }
             if(i.space) VBox.setMargin(node, new Insets(0,0,0,10));
@@ -84,7 +77,8 @@ public class LayoutMenu {
 
     private static CallPane infoPane(){
         return () -> {
-            return new VBox();
+            LayoutStart start = new LayoutStart();
+            return start.build();
         };
     }
 

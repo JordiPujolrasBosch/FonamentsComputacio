@@ -52,7 +52,7 @@ alphabet: [alphabet-tokens]
 **Conditions:**
 * Each token in the list must be a character or an `[a-token]`.
 
-**Examples:** `$/, 0, 1`, `$0, $c, $/, +, -`, `$a, $A, $s, .`, `$w` ...
+**Examples:** `$/, 0, 1`, `$0, $c, $/, +, -`, `$a, $A, $s`, `$w` ...
 
 #### 5) [transitions]
 
@@ -261,6 +261,31 @@ start: [start-variable]
 
 **Examples:** `A0 -> A1 A2`, `B0 -> A1 c B3 | / | a b`, 
 `A1 -> a | b | c | d d`,`D11 -> / | A1 A2 A3 | B0 $s`, `N0 -> $0` ...
+
+### Examples
+
+```
+terminals: a,b
+variables: A0,B0,C0
+start: A0
+A0 -> B0 | C0
+B0 -> a B0 | /
+C0 -> b C0 | /
+```
+
+```
+terminals: H,e,l,o,!,$s
+variables: A0
+start: A0
+A0 -> H e l l o !
+A0 -> H e l l o ! $s A0
+```
+
+```
+terminals: $w
+variables: S0
+start: S0
+```
 
 ## Tokens
 
