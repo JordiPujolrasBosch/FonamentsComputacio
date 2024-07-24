@@ -590,7 +590,7 @@ public class RunCommandLine {
     }
 
     private static String helpMessage(){
-        return "Try \"--gui\" and visit the guide.";
+        return "Check this webpage: https://github.com/JordiPujolrasBosch/FonamentsComputacio/blob/master/Manual.md";
     }
 
     private final static String cfg = "cfg";
