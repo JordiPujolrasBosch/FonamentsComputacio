@@ -70,9 +70,9 @@ public class LayoutMenu {
 
     private static List<ItemMenu> buildMenu(){
         List<ItemMenu> list = new ArrayList<>();
-        list.add(new ItemMenu("Information", null, false, false));
+        list.add(new ItemMenu("Starting", null, false, false));
         list.add(new ItemMenu("Welcome to the app", startPane(), true, false));
-        list.add(new ItemMenu("Manuals", infoPane(), true, true));
+        list.add(new ItemMenu("Information", infoPane(), true, true));
         for(Pair<String,List<GuiMenu.GuiMenuIn>> pair : GuiMenu.getList()){
             list.add(new ItemMenu(pair.getA(), null, false, false));
             for(GuiMenu.GuiMenuIn g : pair.getB()){
@@ -104,25 +104,19 @@ public class LayoutMenu {
             layout.setAlignment(Pos.TOP_LEFT);
             layout.setPadding(new Insets(20,20,20,20));
 
-            Label titleManual1 = new Label("Command line manual");
+            Label titleManual1 = new Label("Manual");
             infoTitleProperties(titleManual1);
 
-            TextField manual1 = new TextField("https://github.com/JordiPujolrasBosch/FonamentsComputacio/blob/master/CommandLineManual.md");
+            TextField manual1 = new TextField("https://github.com/JordiPujolrasBosch/FonamentsComputacio/blob/master/Manual.md");
             infoManualProperties(manual1);
 
-            Label titleManual2 = new Label("Format of dfa, nfa, regex and cfg");
-            infoTitleProperties(titleManual2);
-
-            TextField manual2 = new TextField("https://github.com/JordiPujolrasBosch/FonamentsComputacio/blob/master/ReaderManual.md");
-            infoManualProperties(manual2);
-
-            Label title3 = new Label("Author");
-            infoTitleProperties(title3);
+            Label title2 = new Label("Author");
+            infoTitleProperties(title2);
 
             Label author = new Label("Made by: Jordi Pujolras Bosch");
             author.setPadding(new Insets(0,0,0,10));
 
-            layout.getChildren().addAll(titleManual1, manual1, titleManual2, manual2, title3, author);
+            layout.getChildren().addAll(titleManual1, manual1, title2, author);
             return layout;
         };
     }
