@@ -88,7 +88,6 @@ public class GuiMenu {
         aux.add(buildGreibachCfg());
         list.add(new Pair<>("Cfg transformations", aux));
 
-
         return list;
     }
 
@@ -651,8 +650,8 @@ public class GuiMenu {
             try{
                 Cfg aa = Reader.readGrammarString(a);
                 List<String> bb = Reader.readWordsString(b);
-                if(Utility.getInt() == 0) Menu.checkWordsCfg(aa,bb);
-                else if(Utility.getInt() == 1) Menu.checkWordsCfgYes(aa,bb);
+                if(Utility.getInt() == 0) return Menu.checkWordsCfg(aa,bb);
+                else if(Utility.getInt() == 1) return Menu.checkWordsCfgYes(aa,bb);
                 return Menu.checkWordsCfgNo(aa,bb);
             }
             catch (Exception ex){

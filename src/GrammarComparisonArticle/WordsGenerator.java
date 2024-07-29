@@ -93,18 +93,9 @@ public class WordsGenerator {
         innerHt = new InnerHt();
         htMapper = new HashMap<>();
 
-        for(char t : cfg.getTerminals().getSet()){
-            GramexChar g = new GramexChar(t);
-            htMapper.put(g, ht(g));
-        }
-        for(Gvar v : cfg.getVariables()){
-            GramexVar g = new GramexVar(v);
-            htMapper.put(g, ht(g));
-        }
-        for(GruleNonEmpty r : cfg.getRules()){
-            GramexNonEmpty g = r.getRight();
-            if(!htMapper.containsKey(g)) htMapper.put(g, ht(g));
-        }
+        for(char t : cfg.getTerminals().getSet()) ht(new GramexChar(t));
+        for(Gvar v : cfg.getVariables()) ht(new GramexVar(v));
+        for(GruleNonEmpty r : cfg.getRules()) ht(r.getRight());
 
         innerChoose = new InnerChoose();
         innerChoose.build(this);
@@ -112,7 +103,7 @@ public class WordsGenerator {
 
     private Enumerator enumFunction(GramexNonEmpty r, int n) {
         if(r.type() == TypesGramex.CHAR){
-            if(n != 0) return null;
+            //if(n != 0) return null;
             return new EnumeratorLeaf(r.toGramexChar());
         }
         else if(r.type() == TypesGramex.VAR){

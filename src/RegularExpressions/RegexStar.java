@@ -58,8 +58,8 @@ public class RegexStar implements RegularExpression {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RegexStar regexStar = (RegexStar) o;
-        return x.equals(regexStar.x);
+        RegexStar that = (RegexStar) o;
+        return x.equals(that.x);
     }
 
     @Override

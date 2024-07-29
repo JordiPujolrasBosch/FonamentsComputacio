@@ -38,14 +38,14 @@ public class Menu {
         CfgNonEmpty b = gb.simplify().toGreibach();
         List<String> list = new ArrayList<>();
         if(a.compare(b)) return "";
-        return Printer.stringOfWords(Algorithms.findManyCounterExamplesCfg(a,b));
+        return Printer.stringOfWords(Algorithms.findManyCounterExamplesCfg2(a,b));
     }
 
     public static String checkAmbiguity(Cfg g, String f){
         Pair<Boolean,String> p = g.checkAmbiguity();
         if(p.getA()){
             if(p.getB().equals("")) return Printer.ambiguous(f) + " :: empty word";
-            return Printer.unambiguous(f) + " :: " + p.getB();
+            return Printer.ambiguous(f) + " :: " + p.getB();
         }
         return Printer.unambiguous(f);
     }

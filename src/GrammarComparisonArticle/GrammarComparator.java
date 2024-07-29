@@ -4,7 +4,11 @@ import Elements.Grammars.Gvar;
 import Factory.GrammarTools;
 import Grammars.*;
 
-import java.util.*;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class GrammarComparator {
     public static boolean compare(CfgNonEmpty a, CfgNonEmpty b) {
@@ -212,7 +216,7 @@ public class GrammarComparator {
         for(char c : cfgl.getTerminals().getSet()){
             Set<Gramex> dl = derivativeOfSet(Character.toString(c), comp.getLeft(), cfgl);
             Set<Gramex> dr = derivativeOfSet(Character.toString(c), comp.getRight(), cfgr);
-            if(!dl.isEmpty() || !dr.isEmpty()) set.add(new Comparison(dl, dr, comp.isEquivalence()));
+            if(!dl.isEmpty() && !dr.isEmpty()) set.add(new Comparison(dl, dr, comp.isEquivalence()));
         }
 
         data.branch.result = set;
@@ -227,7 +231,10 @@ public class GrammarComparator {
     //Rule testcases
 
     private static boolean canApplyTestcases(Comparison comp){
-        return comp.getLeft().size() == 1 && comp.getRight().size() > 1 && comp.isInclusion();
+        return comp.getLeft().size() == 1
+                && comp.getRight().size() > 1
+                && comp.isInclusion()
+                && comp.getLeft().iterator().next().type() != TypesGramex.EMPTY;
     }
 
     private static boolean checkTestcasesData(Comparison comp, GrammarComparatorDataAux data){
@@ -261,9 +268,11 @@ public class GrammarComparator {
 
     private static boolean canApplySplit(Comparison comp){
         boolean ok = comp.getLeft().size() == 1;
-        Gramex left = comp.getLeft().iterator().next();
-        ok = ok && left.length() > 1;
-        ok = ok && GrammarTools.startsWithVar(left);
+        if(ok){
+            Gramex left = comp.getLeft().iterator().next();
+            ok = ok && left.length() > 1;
+            ok = ok && GrammarTools.startsWithVar(left);
+        }
         return ok;
     }
 

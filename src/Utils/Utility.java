@@ -16,7 +16,7 @@ public class Utility {
     //String is number
 
     public static boolean isNumber(String x){
-        if(x.isEmpty()) return false;
+        if(x == null || x.isEmpty()) return false;
         int i=0;
         boolean isNumber = true;
         while(i<x.length() && isNumber){
@@ -28,7 +28,7 @@ public class Utility {
     }
 
     public static boolean isNegativeNumber(String x){
-        if(x.length() < 2) return false;
+        if(x == null || x.length() < 2) return false;
         return x.charAt(0) == '-' && isNumber(x.substring(1));
     }
 

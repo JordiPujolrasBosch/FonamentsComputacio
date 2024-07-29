@@ -99,7 +99,9 @@ public class Reader {
     }
 
     public static List<String> readWordsString(String s) {
-        return Arrays.stream(s.split("\n")).toList();
+        List<String> out = new ArrayList<>(List.of(s.split("\n")));
+        if(s.endsWith("\n")) out.add("");
+        return out;
     }
 
     public static Cfg readGrammarFile(File f) throws FileNotFoundException, GrammarReaderException {

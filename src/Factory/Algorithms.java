@@ -165,6 +165,7 @@ public class Algorithms {
                 }
             }
 
+            partition.remove(new HashSet<State>());
             return partition;
         }
 
@@ -826,7 +827,6 @@ public class Algorithms {
 
         for(RegularExpression x : mapper.keySet()){
             Gvar v = mapper.get(x);
-            cc.variables.add(v);
 
             switch (x.type()){
                 case CHAR -> {
@@ -849,6 +849,7 @@ public class Algorithms {
                     GramexVar in = new GramexVar(mapper.get(s.getX()));
                     cc.rules.add(new Grule(v, GramexEmpty.getInstance()));
                     cc.rules.add(new Grule(v, new GramexConcat(in, new GramexVar(v))));
+                    cc.terminals.addEmptyChar();
                 }
                 case UNION -> {
                     RegexUnion u = (RegexUnion) x;
@@ -1369,7 +1370,7 @@ public class Algorithms {
                     while(itc.hasNext() && !foundNotAnulable){
                         GramexNonEmpty gne = itc.next();
                         if(gne.type() == TypesGramex.CHAR) foundNotAnulable = true;
-                        else if(!anulable.contains(gne.toGramexVar().getV())) foundNotAnulable = true;
+                        else if(!isOnlyAnulable(ccx,gne.toGramexVar().getV(),anulable)) foundNotAnulable = true;
                     }
                 }
             }
@@ -1671,7 +1672,7 @@ public class Algorithms {
         exit.cne = exit.cne.toChomsky();
 
         int l = 1;
-        while(l <= 200 && !exit.finished){
+        while(l <= 30 && !exit.finished){
             CheckAmbiguityPrivate.checkAmbiguityLength(exit.cne, exit, l);
             l++;
         }
@@ -2079,31 +2080,36 @@ public class Algorithms {
     }
 
     public static String findCounterExampleCfg(CfgNonEmpty a, CfgNonEmpty b) {
-        Pda parsera = a.toCfg().toPda();
-        Pda parserb = b.toCfg().toPda();
-
-        WordsGenerator wga = new WordsGenerator(a);
-        WordsGenerator wgb = new WordsGenerator(b);
+        Pda parserA = a.toCfg().toPda();
+        Pda parserB = b.toCfg().toPda();
+        CfgNonEmpty chomskyA = a.toChomsky();
+        CfgNonEmpty chomskyB = b.toChomsky();
 
         boolean found = false;
-        int counter = 0;
-        Iterator<String> it;
+        int length = 1;
         String act = "";
 
-        while(!found && counter < 100000){
-            it = wga.generateWordsStart(100).iterator();
-            while(it.hasNext() && !found){
+        while (!found && length <= 30){
+            WordsGenerator wg;
+            Iterator<String> it;
+
+            wg = new WordsGenerator(CheckAmbiguityPrivate.buildLength(chomskyA, length));
+            it = wg.generateAllWordsStart().iterator();
+            while (it.hasNext() && !found){
                 act = it.next();
-                found = !parserb.checkWord(act);
-                counter++;
+                found = !parserB.checkWord(act);
             }
 
-            it = wgb.generateWordsStart(100).iterator();
-            while(it.hasNext() && !found){
-                act = it.next();
-                found = !parsera.checkWord(act);
-                counter++;
+            if(!found){
+                wg = new WordsGenerator(CheckAmbiguityPrivate.buildLength(chomskyB, length));
+                it = wg.generateAllWordsStart().iterator();
+                while(it.hasNext() && !found){
+                    act = it.next();
+                    found = !parserA.checkWord(act);
+                }
             }
+
+            length++;
         }
 
         if(found) return act;
@@ -2111,34 +2117,118 @@ public class Algorithms {
     }
 
     public static List<String> findManyCounterExamplesCfg(CfgNonEmpty a, CfgNonEmpty b){
-        Pda parsera = a.toCfg().toPda();
-        Pda parserb = b.toCfg().toPda();
-
-        WordsGenerator wga = new WordsGenerator(a);
-        WordsGenerator wgb = new WordsGenerator(b);
+        Pda parserA = a.toCfg().toPda();
+        Pda parserB = b.toCfg().toPda();
+        CfgNonEmpty chomskyA = a.toChomsky();
+        CfgNonEmpty chomskyB = b.toChomsky();
 
         Set<String> set = new HashSet<>();
-        int counter = 0;
+        int length = 1;
+
+        if(a.acceptsEmpty() != b.acceptsEmpty()) set.add("");
+
+        while(set.size() <= 100 && length <= 30){
+            WordsGenerator wg;
+            Iterator<String> it;
+            String act;
+
+            wg = new WordsGenerator(CheckAmbiguityPrivate.buildLength(chomskyA, length));
+            it = wg.generateAllWordsStart().iterator();
+            while (it.hasNext() && set.size() <= 100){
+                act = it.next();
+                if(!parserB.checkWord(act)) set.add(act);
+            }
+
+            if(set.size() <= 100){
+                wg = new WordsGenerator(CheckAmbiguityPrivate.buildLength(chomskyB, length));
+                it = wg.generateAllWordsStart().iterator();
+                while(it.hasNext() && set.size() <= 100){
+                    act = it.next();
+                    if(!parserA.checkWord(act)) set.add(act);
+                }
+            }
+
+            length++;
+        }
+
+        return set.stream().toList();
+    }
+
+    public static List<String> findManyCounterExamplesCfg2(CfgNonEmpty a, CfgNonEmpty b){
+        Pda parserA = a.toCfg().toPda();
+        Pda parserB = b.toCfg().toPda();
+        CfgNonEmpty lengthA = buildCfgLengthTo(a.toChomsky(),30);
+        CfgNonEmpty lengthB = buildCfgLengthTo(b.toChomsky(),30);
+
+        Set<String> set = new HashSet<>();
+        if(a.acceptsEmpty() != b.acceptsEmpty()) set.add("");
+
+        WordsGenerator wg;
         Iterator<String> it;
         String act;
 
-        while(set.size() < 100 && counter < 100000){
-            it = wga.generateWordsStart(100).iterator();
-            while(it.hasNext() && set.size() < 100){
-                act = it.next();
-                if(!parserb.checkWord(act)) set.add(act);
-                counter++;
-            }
+        wg = new WordsGenerator(lengthA);
+        it = wg.generateAllWordsStart().iterator();
+        while (it.hasNext() && set.size() <= 100){
+            act = it.next();
+            if(!parserB.checkWord(act)) set.add(act);
+        }
 
-            it = wgb.generateWordsStart(100).iterator();
-            while(it.hasNext() && set.size() < 100){
+        if(set.size() <= 100){
+            wg = new WordsGenerator(lengthB);
+            it = wg.generateAllWordsStart().iterator();
+            while(it.hasNext() && set.size() <= 100){
                 act = it.next();
-                if(!parsera.checkWord(act)) set.add(act);
-                counter++;
+                if(!parserA.checkWord(act)) set.add(act);
             }
         }
 
         return set.stream().toList();
+    }
+
+    private static CfgNonEmpty buildCfgLengthTo(CfgNonEmpty x, int length){
+        CfgNonEmptyConstructor ccx = x.getConstructor();
+        Map<Gvar, Map<Integer, Gvar>> originalToNew = new HashMap<>();
+        Map<Gvar, Pair<Gvar, Integer>> newToOriginal = new HashMap<>();
+
+        for(Gvar v : new HashSet<>(ccx.variables)){
+            for(int i=1; i<=length; i++){
+                Gvar newVar = ccx.generate(v);
+                if(!originalToNew.containsKey(v)) originalToNew.put(v, new HashMap<>());
+                originalToNew.get(v).put(i,newVar);
+                newToOriginal.put(newVar, new Pair<>(v,i));
+            }
+        }
+
+        CfgNonEmptyConstructor res = new CfgNonEmptyConstructor();
+        res.terminals = ccx.terminals;
+        res.acceptsEmptyWord = ccx.acceptsEmptyWord;
+        res.variables.addAll(newToOriginal.keySet());
+
+        for(GruleNonEmpty r : ccx.rules){
+            if(r.getRight().type() == TypesGramex.CHAR){
+                res.rules.add(new GruleNonEmpty(originalToNew.get(r.getLeft()).get(1), r.getRight()));
+            }
+            else{
+                Gvar left = r.getLeft();
+                Gvar a = r.getRight().toGramexConcat().getA().toGramexVar().getV();
+                Gvar b = r.getRight().toGramexConcat().getB().toGramexVar().getV();
+                for(int i=2; i<=length; i++){
+                    Gvar nl = originalToNew.get(left).get(i);
+                    for(int j=1; j<i; j++){
+                        Gvar na = originalToNew.get(a).get(j);
+                        Gvar nb = originalToNew.get(b).get(i-j);
+                        res.rules.add(new GruleNonEmpty(nl, new GramexConcat(new GramexVar(na), new GramexVar(nb))));
+                    }
+                }
+            }
+        }
+
+        Gvar newStart = res.generate(ccx.start);
+        for(int i=1; i<=length; i++) res.rules.add(new GruleNonEmpty(newStart, new GramexVar(originalToNew.get(ccx.start).get(i))));
+        res.start = newStart;
+
+        return res.getCfgNonEmpty().toCfg().simplify();
     }
 
 }

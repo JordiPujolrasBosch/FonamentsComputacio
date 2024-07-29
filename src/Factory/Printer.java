@@ -12,7 +12,11 @@ import Factory.Constructors.DfaConstructor;
 import Factory.Constructors.NfaConstructor;
 import Grammars.Cfg;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
 
 public class Printer {
 
@@ -112,6 +116,7 @@ public class Printer {
     //Words file output
 
     public static String stringOfWords(List<String> list){
+        if(list.isEmpty()) return "";
         String s = "";
         for(int i = 0; i<list.size()-1; i++) s = s + list.get(i) + "\n";
         s = s + list.get(list.size()-1);

@@ -53,8 +53,8 @@ public class RegexChar implements RegularExpression {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RegexChar regexChar = (RegexChar) o;
-        return c == regexChar.c;
+        RegexChar that = (RegexChar) o;
+        return c == that.c;
     }
 
     @Override

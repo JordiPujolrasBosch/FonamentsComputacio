@@ -41,7 +41,7 @@ public class RegexUnion implements RegularExpression {
 
         if(a.type() == TypesRegex.VOID) return b;
         if(b.type() == TypesRegex.VOID) return a;
-        if(a.type() == b.type() && a.type() == TypesRegex.EMPTY) return a;
+        if(a.equals(b)) return a;
 
         return this;
     }

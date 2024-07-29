@@ -4,9 +4,13 @@ import Elements.Alphabet;
 import Factory.Builders.RegexOperator;
 import RegularExpressions.RegexChar;
 import RegularExpressions.RegexConcat;
+import RegularExpressions.RegexUnion;
 import RegularExpressions.RegularExpression;
 
-import java.util.*;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
 
 public class TokenFactory {
     public static char getSpecialChar(){return '$';}
@@ -224,9 +228,9 @@ public class TokenFactory {
         RegularExpression upper = new RegexChar('A');
         RegularExpression numbers = new RegexChar('0');
 
-        for(char c = 'b'; c <= 'z'; c++) lower = new RegexConcat(lower, new RegexChar(c));
-        for(char c = 'B'; c <= 'Z'; c++) upper = new RegexConcat(upper, new RegexChar(c));
-        for(char c = '1'; c <= '9'; c++) numbers = new RegexConcat(numbers, new RegexChar(c));
+        for(char c = 'b'; c <= 'z'; c++) lower = new RegexUnion(lower, new RegexChar(c));
+        for(char c = 'B'; c <= 'Z'; c++) upper = new RegexUnion(upper, new RegexChar(c));
+        for(char c = '1'; c <= '9'; c++) numbers = new RegexUnion(numbers, new RegexChar(c));
 
         mapper.put("$a", lower);
         mapper.put("$A", upper);

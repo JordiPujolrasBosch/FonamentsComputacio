@@ -73,4 +73,13 @@ public class Comparison {
     public int hashCode() {
         return Objects.hash(left, right, opEq);
     }
+
+    @Override
+    public String toString() {
+        return "Comparison{" +
+                "left=" + left +
+                ", right=" + right +
+                ", opEq=" + opEq +
+                '}';
+    }
 }
