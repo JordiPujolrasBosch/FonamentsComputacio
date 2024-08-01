@@ -270,8 +270,7 @@ public class GrammarComparator {
         boolean ok = comp.getLeft().size() == 1;
         if(ok){
             Gramex left = comp.getLeft().iterator().next();
-            ok = ok && left.length() > 1;
-            ok = ok && GrammarTools.startsWithVar(left);
+            ok = left.length() > 1 && GrammarTools.startsWithVar(left);
         }
         return ok;
     }

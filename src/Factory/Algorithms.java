@@ -130,9 +130,9 @@ public class Algorithms {
             partition.add(dc.finalStates);
 
             boolean consolidated = false;
-            Iterator<Set<State>> ita, itb = null;
-            Iterator<Character> itc = null;
-            Set<State> sa, sb, right, left = null;
+            Iterator<Set<State>> ita, itb;
+            Iterator<Character> itc;
+            Set<State> sa, sb, right, left;
             char c;
 
             while(!consolidated){
@@ -193,7 +193,7 @@ public class Algorithms {
             res.start = mapper.get(findWhichSetContains(partition, dc.start));
 
             for(Set<State> ss : partition){
-                if(!conjunctionIsEmpty(ss,dc.finalStates)){
+                if(!Utility.conjunctionIsEmpty(ss,dc.finalStates)){
                     res.finalStates.add(mapper.get(ss));
                 }
             }
@@ -211,15 +211,6 @@ public class Algorithms {
             }
 
             return res;
-        }
-
-        static boolean conjunctionIsEmpty(Set<State> a, Set<State> b) {
-            boolean found = false;
-            Iterator<State> it = b.iterator();
-            while(it.hasNext() && !found){
-                found = a.contains(it.next());
-            }
-            return !found;
         }
     }
 
@@ -373,7 +364,7 @@ public class Algorithms {
             res.start = mapper.get(findWhichSetContains(partition, dc.start));
 
             for(Set<State> ss : partition){
-                if(!conjunctionIsEmpty(ss,dc.finalStates)){
+                if(!Utility.conjunctionIsEmpty(ss,dc.finalStates)){
                     res.finalStates.add(mapper.get(ss));
                 }
             }
@@ -391,15 +382,6 @@ public class Algorithms {
             }
 
             return res;
-        }
-
-        static boolean conjunctionIsEmpty(Set<State> a, Set<State> b) {
-            boolean found = false;
-            Iterator<State> it = b.iterator();
-            while(it.hasNext() && !found){
-                found = a.contains(it.next());
-            }
-            return !found;
         }
 
         static Set<State> findWhichSetContains(Set<Set<State>> x, State s){
@@ -436,7 +418,7 @@ public class Algorithms {
             dc.start = mapper.get(nc.transition.stateExtended(nc.start));
 
             for(Set<State> ss : dsss){
-                if(!conjunctionIsEmpty(ss, nc.finalStates)) dc.finalStates.add(mapper.get(ss));
+                if(!Utility.conjunctionIsEmpty(ss, nc.finalStates)) dc.finalStates.add(mapper.get(ss));
             }
 
             for(Set<State> ss : dsss){
@@ -484,15 +466,6 @@ public class Algorithms {
             }
 
             return after;
-        }
-
-        static boolean conjunctionIsEmpty(Set<State> a, Set<State> b) {
-            boolean found = false;
-            Iterator<State> it = b.iterator();
-            while(it.hasNext() && !found){
-                found = a.contains(it.next());
-            }
-            return !found;
         }
     }
 
@@ -921,9 +894,8 @@ public class Algorithms {
 
             switch (regex.type()){
                 case UNION -> {
-                    Random rand = new Random();
                     RegexUnion u = (RegexUnion) regex;
-                    out = rand.nextBoolean() ? generateOneWord(u.getA(), starSize) : generateOneWord(u.getB(), starSize);
+                    out = generateOneWordUnion(u, starSize);
                 }
                 case STAR -> {
                     Random rand = new Random();
@@ -941,6 +913,26 @@ public class Algorithms {
             }
 
             return out;
+        }
+
+        static String generateOneWordUnion(RegexUnion u, int starSize){
+            List<RegularExpression> list = new ArrayList<>();
+            List<RegexUnion> unions = new ArrayList<>();
+            unions.add(u);
+
+            while(!unions.isEmpty()){
+                RegexUnion last = unions.get(unions.size()-1);
+                unions.remove(unions.size()-1);
+
+                if(last.getA().type() == TypesRegex.UNION) unions.add((RegexUnion) last.getA());
+                else list.add(last.getA());
+
+                if(last.getB().type() == TypesRegex.UNION) unions.add((RegexUnion) last.getB());
+                else list.add(last.getB());
+            }
+
+            Random rand = new Random();
+            return generateOneWord(list.get(rand.nextInt(list.size())),starSize);
         }
 
         static int starCounter(RegularExpression regex){
@@ -1015,7 +1007,7 @@ public class Algorithms {
                     pc.transition.add(loop, e, pc.getMapper(r.getLeft()), loop, e);
                 }
                 else if(r.getRight().length() == 1){
-                    int k = 0;
+                    int k;
                     if(r.getRight().type() == TypesGramex.VAR) k = pc.getMapper(r.getRight().toGramexVar().getV());
                     else k = pc.getMapper(r.getRight().toGramexChar().getC());
                     pc.transition.add(loop, e, pc.getMapper(r.getLeft()), loop, k);
@@ -1023,7 +1015,7 @@ public class Algorithms {
                 else{
                     List<Integer> list = makeList(r.getRight(), pc);
 
-                    State pre = null;
+                    State pre;
                     State post = null;
                     for(int i = list.size()-1; i >= 0; i--){
                         if(i == list.size()-1){
@@ -1334,7 +1326,8 @@ public class Algorithms {
             }
 
             for(Gvar v : anulable){
-                if(isOnlyAnulable(ccx, v, anulable)) onlyAnulable.add(v);
+                Set<Gvar> aux = new HashSet<>();
+                if(isOnlyAnulable(ccx, v, aux)) onlyAnulable.add(v);
             }
         }
 
@@ -1358,19 +1351,28 @@ public class Algorithms {
             return found;
         }
 
-        static boolean isOnlyAnulable(CfgConstructor ccx, Gvar v, Set<Gvar> anulable){
+        static boolean isOnlyAnulable(CfgConstructor ccx, Gvar v, Set<Gvar> aux){
             boolean foundNotAnulable = false;
+            aux.add(v);
             Iterator<Grule> it = GrammarTools.getRulesVar(ccx.getCfg(), v).iterator();
             while(it.hasNext() && !foundNotAnulable){
                 Grule r = it.next();
                 if(r.getRight().type() == TypesGramex.CHAR) foundNotAnulable = true;
-                else if(r.getRight().type() == TypesGramex.VAR) foundNotAnulable = !isOnlyAnulable(ccx, r.getRight().toGramexVar().getV(), anulable);
+                else if(r.getRight().type() == TypesGramex.VAR) {
+                    if(!aux.contains(r.getRight().toGramexVar().getV())){
+                        foundNotAnulable = !isOnlyAnulable(ccx,r.getRight().toGramexVar().getV(), aux);
+                    }
+                }
                 else if(r.getRight().type() == TypesGramex.CONCAT){
                     Iterator<GramexNonEmpty> itc = r.getRight().toGramexConcat().toList().iterator();
                     while(itc.hasNext() && !foundNotAnulable){
                         GramexNonEmpty gne = itc.next();
                         if(gne.type() == TypesGramex.CHAR) foundNotAnulable = true;
-                        else if(!isOnlyAnulable(ccx,gne.toGramexVar().getV(),anulable)) foundNotAnulable = true;
+                        else{
+                            if(!aux.contains(gne.toGramexVar().getV())){
+                                foundNotAnulable = !isOnlyAnulable(ccx,gne.toGramexVar().getV(),aux);
+                            }
+                        }
                     }
                 }
             }
@@ -1464,7 +1466,7 @@ public class Algorithms {
                     toRemove.add(r);
                     GramexNonEmpty aux = r.getRight();
                     while(GrammarTools.containsChar(aux)){
-                        GramexChar gc = GrammarTools.getLeftMostChar(aux);
+                        GramexChar gc = new GramexChar(GrammarTools.getLeftMostChar(aux));
                         if(!mapper.containsKey(gc.getC())) mapper.put(gc.getC(), ccx.generate(new Gvar('Z',0)));
                         aux = GrammarTools.substituteAllChars(aux, gc.getC(), mapper.get(gc.getC())).toGramexNonEmpty();
                     }
@@ -1552,18 +1554,17 @@ public class Algorithms {
         }
 
         static void verifyOrder(CfgNonEmptyConstructor ccx, List<Gvar> order){
-            int i=order.size()-1;
-            while(i>=0){
-                if(haveLeftRecursivity(GrammarTools.getRulesVar(ccx.getCfgNonEmpty(), order.get(i)))) {
+            int i=0;
+            while(i<order.size()-1){
+                if(haveLeftRecursivity(GrammarTools.getRulesVar(ccx.getCfgNonEmpty(), order.get(i)))){
                     Gvar aux = removeLeftRecursivity(ccx, order.get(i));
-                    order.add(i+1, aux);
-                    i++;
+                    order.add(0, aux);
                 }
                 else if(!orderOfRulesIsCorrect(order, GrammarTools.getRulesVar(ccx.getCfgNonEmpty(), order.get(i)))){
                     applySubstitutionIncorrectRule(ccx, order.get(i), order);
                 }
-                else{
-                    i--;
+                else {
+                    i++;
                 }
             }
         }
@@ -1669,12 +1670,27 @@ public class Algorithms {
         if(exit.finished) return exit.ret;
         CheckAmbiguityPrivate.removeUnitRules(exit.cfg, exit);
         if(exit.finished) return exit.ret;
-        exit.cne = exit.cne.toChomsky();
 
         int l = 1;
-        while(l <= 30 && !exit.finished){
-            CheckAmbiguityPrivate.checkAmbiguityLength(exit.cne, exit, l);
-            l++;
+        CfgNonEmpty ch = exit.cne.toChomsky();
+        Set<String> set = new HashSet<>();
+        WordsGenerator wg;
+        Iterator<String> it;
+        while(l <= 21 && !exit.finished){
+            wg = new WordsGenerator(buildCfgLengthFromTo(ch, l, l+9));
+            it = wg.generateAllWordsStart().iterator();
+            set.clear();
+
+            while(it.hasNext() && !exit.finished){
+                String s = it.next();
+                if(!set.contains(s)) set.add(s);
+                else{
+                    exit.finished = true;
+                    exit.ret = new Pair<>(true, s);
+                }
+            }
+
+            l = l + 10;
         }
 
         if(!exit.finished) return new Pair<>(false, "");
@@ -1715,68 +1731,7 @@ public class Algorithms {
             }
         }
 
-        static void checkAmbiguityLength(CfgNonEmpty x, ExitAmbiguity exit, int l){
-            CfgNonEmpty aux = buildLength(x,l);
-            WordsGenerator wg = new WordsGenerator(aux);
-            Iterator<String> it = wg.generateAllWordsStart().iterator();
-            Set<String> set = new HashSet<>();
-
-            while(it.hasNext() && !exit.finished){
-                String s = it.next();
-                if(!set.contains(s)) set.add(s);
-                else{
-                    exit.finished = true;
-                    exit.ret = new Pair<>(true, s);
-                }
-            }
-        }
-
         //Inner
-
-        static CfgNonEmpty buildLength(CfgNonEmpty x, int length){
-            CfgNonEmptyConstructor ccx = x.getConstructor();
-            Map<Gvar, Map<Integer, Gvar>> originalToNew = new HashMap<>();
-            Map<Gvar, Pair<Gvar, Integer>> newToOriginal = new HashMap<>();
-
-            for(Gvar v : new HashSet<>(ccx.variables)){
-                for(int i=1; i<=length; i++){
-                    Gvar newVar = ccx.generate(v);
-                    if(!originalToNew.containsKey(v)) originalToNew.put(v, new HashMap<>());
-                    originalToNew.get(v).put(i,newVar);
-                    newToOriginal.put(newVar, new Pair<>(v,i));
-                }
-            }
-
-            CfgNonEmptyConstructor res = new CfgNonEmptyConstructor();
-            res.start = originalToNew.get(ccx.start).get(length);
-            res.terminals = ccx.terminals;
-            res.acceptsEmptyWord = ccx.acceptsEmptyWord && length==0;
-            res.variables.addAll(newToOriginal.keySet());
-
-            for(GruleNonEmpty r : ccx.rules){
-                if(r.getRight().type() == TypesGramex.CHAR){
-                    res.rules.add(new GruleNonEmpty(originalToNew.get(r.getLeft()).get(1), r.getRight()));
-                }
-                else{
-                    Gvar left = r.getLeft();
-                    Gvar a = r.getRight().toGramexConcat().getA().toGramexVar().getV();
-                    Gvar b = r.getRight().toGramexConcat().getB().toGramexVar().getV();
-                    for(int i=2; i<=length; i++){
-                        Gvar nl = originalToNew.get(left).get(i);
-                        for(int j=1; j<i; j++){
-                            Gvar na = originalToNew.get(a).get(j);
-                            Gvar nb = originalToNew.get(b).get(i-j);
-                            res.rules.add(new GruleNonEmpty(nl, new GramexConcat(new GramexVar(na), new GramexVar(nb))));
-                        }
-                    }
-                }
-            }
-
-            CfgConstructor aux = res.getCfgNonEmpty().toCfg().getConstructor();
-            SimplifyGrammarPrivate.removeNonDerivableVars(aux);
-            SimplifyGrammarPrivate.removeNonReachableVarsAndTerminals(aux);
-            return SimplifyGrammarPrivate.cfgToCfgNonEmpty(aux).getCfgNonEmpty();
-        }
 
         static String findWordDerived(Cfg x, Grule v){
             GramexVar start = new GramexVar(x.getStart());
@@ -1797,11 +1752,7 @@ public class Algorithms {
                 it = pre.iterator();
                 while(it.hasNext()){
                     Gramex act = it.next();
-                    if(GrammarTools.containsVar(act)){
-                        Gvar left = GrammarTools.getLeftMostVar(act.toGramexNonEmpty());
-                        Set<Gramex> subs = GrammarTools.getRulesRightVar(x,left);
-                        for(Gramex s : subs) post.add(GrammarTools.substituteLeftMost(act, left, s));
-                    }
+                    if(GrammarTools.containsVar(act)) post.addAll(GrammarTools.step(x,act));
                 }
 
                 pre = post;
@@ -2079,6 +2030,8 @@ public class Algorithms {
         }
     }
 
+    //COUNTER EXAMPLE
+
     public static String findCounterExampleCfg(CfgNonEmpty a, CfgNonEmpty b) {
         Pda parserA = a.toCfg().toPda();
         Pda parserB = b.toCfg().toPda();
@@ -2088,12 +2041,11 @@ public class Algorithms {
         boolean found = false;
         int length = 1;
         String act = "";
+        WordsGenerator wg;
+        Iterator<String> it;
 
-        while (!found && length <= 30){
-            WordsGenerator wg;
-            Iterator<String> it;
-
-            wg = new WordsGenerator(CheckAmbiguityPrivate.buildLength(chomskyA, length));
+        while (!found && length <= 21){
+            wg = new WordsGenerator(buildCfgLengthFromTo(chomskyA, length, length+9));
             it = wg.generateAllWordsStart().iterator();
             while (it.hasNext() && !found){
                 act = it.next();
@@ -2101,7 +2053,7 @@ public class Algorithms {
             }
 
             if(!found){
-                wg = new WordsGenerator(CheckAmbiguityPrivate.buildLength(chomskyB, length));
+                wg = new WordsGenerator(buildCfgLengthFromTo(chomskyB, length, length+9));
                 it = wg.generateAllWordsStart().iterator();
                 while(it.hasNext() && !found){
                     act = it.next();
@@ -2109,7 +2061,7 @@ public class Algorithms {
                 }
             }
 
-            length++;
+            length = length+10;
         }
 
         if(found) return act;
@@ -2125,14 +2077,14 @@ public class Algorithms {
         Set<String> set = new HashSet<>();
         int length = 1;
 
+        WordsGenerator wg;
+        Iterator<String> it;
+        String act;
+
         if(a.acceptsEmpty() != b.acceptsEmpty()) set.add("");
 
-        while(set.size() <= 100 && length <= 30){
-            WordsGenerator wg;
-            Iterator<String> it;
-            String act;
-
-            wg = new WordsGenerator(CheckAmbiguityPrivate.buildLength(chomskyA, length));
+        while(set.size() <= 100 && length <= 21){
+            wg = new WordsGenerator(buildCfgLengthFromTo(chomskyA, length, length+9));
             it = wg.generateAllWordsStart().iterator();
             while (it.hasNext() && set.size() <= 100){
                 act = it.next();
@@ -2140,7 +2092,7 @@ public class Algorithms {
             }
 
             if(set.size() <= 100){
-                wg = new WordsGenerator(CheckAmbiguityPrivate.buildLength(chomskyB, length));
+                wg = new WordsGenerator(buildCfgLengthFromTo(chomskyB, length, length+9));
                 it = wg.generateAllWordsStart().iterator();
                 while(it.hasNext() && set.size() <= 100){
                     act = it.next();
@@ -2148,51 +2100,22 @@ public class Algorithms {
                 }
             }
 
-            length++;
+            length = length+10;
         }
 
         return set.stream().toList();
     }
 
-    public static List<String> findManyCounterExamplesCfg2(CfgNonEmpty a, CfgNonEmpty b){
-        Pda parserA = a.toCfg().toPda();
-        Pda parserB = b.toCfg().toPda();
-        CfgNonEmpty lengthA = buildCfgLengthTo(a.toChomsky(),30);
-        CfgNonEmpty lengthB = buildCfgLengthTo(b.toChomsky(),30);
+    //BUILD CFG WORDS OF LENGTH
 
-        Set<String> set = new HashSet<>();
-        if(a.acceptsEmpty() != b.acceptsEmpty()) set.add("");
-
-        WordsGenerator wg;
-        Iterator<String> it;
-        String act;
-
-        wg = new WordsGenerator(lengthA);
-        it = wg.generateAllWordsStart().iterator();
-        while (it.hasNext() && set.size() <= 100){
-            act = it.next();
-            if(!parserB.checkWord(act)) set.add(act);
-        }
-
-        if(set.size() <= 100){
-            wg = new WordsGenerator(lengthB);
-            it = wg.generateAllWordsStart().iterator();
-            while(it.hasNext() && set.size() <= 100){
-                act = it.next();
-                if(!parserA.checkWord(act)) set.add(act);
-            }
-        }
-
-        return set.stream().toList();
-    }
-
-    private static CfgNonEmpty buildCfgLengthTo(CfgNonEmpty x, int length){
+    private static CfgNonEmpty buildCfgLengthFromTo(CfgNonEmpty x, int lengthStart, int lengthFinish){
+        if(lengthStart < 0 || lengthFinish < 0 || lengthStart >= lengthFinish) return new CfgNonEmpty();
         CfgNonEmptyConstructor ccx = x.getConstructor();
         Map<Gvar, Map<Integer, Gvar>> originalToNew = new HashMap<>();
         Map<Gvar, Pair<Gvar, Integer>> newToOriginal = new HashMap<>();
 
         for(Gvar v : new HashSet<>(ccx.variables)){
-            for(int i=1; i<=length; i++){
+            for(int i=1; i<=lengthFinish; i++){
                 Gvar newVar = ccx.generate(v);
                 if(!originalToNew.containsKey(v)) originalToNew.put(v, new HashMap<>());
                 originalToNew.get(v).put(i,newVar);
@@ -2202,7 +2125,7 @@ public class Algorithms {
 
         CfgNonEmptyConstructor res = new CfgNonEmptyConstructor();
         res.terminals = ccx.terminals;
-        res.acceptsEmptyWord = ccx.acceptsEmptyWord;
+        res.acceptsEmptyWord = ccx.acceptsEmptyWord && lengthStart == 0;
         res.variables.addAll(newToOriginal.keySet());
 
         for(GruleNonEmpty r : ccx.rules){
@@ -2213,7 +2136,7 @@ public class Algorithms {
                 Gvar left = r.getLeft();
                 Gvar a = r.getRight().toGramexConcat().getA().toGramexVar().getV();
                 Gvar b = r.getRight().toGramexConcat().getB().toGramexVar().getV();
-                for(int i=2; i<=length; i++){
+                for(int i=2; i<=lengthFinish; i++){
                     Gvar nl = originalToNew.get(left).get(i);
                     for(int j=1; j<i; j++){
                         Gvar na = originalToNew.get(a).get(j);
@@ -2225,7 +2148,7 @@ public class Algorithms {
         }
 
         Gvar newStart = res.generate(ccx.start);
-        for(int i=1; i<=length; i++) res.rules.add(new GruleNonEmpty(newStart, new GramexVar(originalToNew.get(ccx.start).get(i))));
+        for(int i=lengthStart; i<=lengthFinish; i++) res.rules.add(new GruleNonEmpty(newStart, new GramexVar(originalToNew.get(ccx.start).get(i))));
         res.start = newStart;
 
         return res.getCfgNonEmpty().toCfg().simplify();

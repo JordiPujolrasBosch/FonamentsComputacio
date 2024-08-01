@@ -7,10 +7,10 @@ import Elements.Grammars.Grule;
 import Elements.Grammars.Gvar;
 import Elements.Rule;
 import Elements.State;
-import Factory.Constructors.CfgConstructor;
 import Factory.Constructors.DfaConstructor;
 import Factory.Constructors.NfaConstructor;
 import Grammars.Cfg;
+import Grammars.Gramex;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -86,6 +86,10 @@ public class Printer {
         return "Size out of range: from 0 to 500";
     }
 
+    public static String lengthOutOfRange() {
+        return "Length out of range: from 0 to 50";
+    }
+
     public static String incorrectArguments(){
         return "Incorrect arguments (try \"--help\")";
     }
@@ -103,13 +107,18 @@ public class Printer {
     }
 
     public static String stringOfGrammar(Cfg cfg){
-        CfgConstructor cc = cfg.getConstructor();
-
         String res = "";
-        res = res + alphabetPrinter(cc.terminals, "terminals") + "\n";
-        res = res + variablesCfgPrinter(cc.variables) + "\n";
-        res = res + "start: " + cc.start + "\n";
-        for(Grule rule : cc.rules) res = res + rule + "\n";
+        res = res + alphabetPrinter(cfg.getTerminals(), "terminals") + "\n";
+        res = res + variablesCfgPrinter(cfg.getVariables()) + "\n";
+        res = res + "start: " + cfg.getStart() + "\n";
+
+        Map<Gvar,Set<Gramex>> mapper = GrammarTools.getMapperRules(cfg);
+        for(Gvar v : mapper.keySet()){
+            for(Gramex g : mapper.get(v)){
+                Grule r = new Grule(v,g);
+                res = res + r + "\n";
+            }
+        }
         return res;
     }
 

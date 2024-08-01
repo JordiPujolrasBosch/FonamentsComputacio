@@ -1,5 +1,6 @@
 package JavafxClasses;
 
+import Factory.Printer;
 import Utils.Utility;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -11,7 +12,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-public class Layout1x1 {
+public class Layout1x1Len {
     private final String title;
     private final String description;
     private final String up;
@@ -21,7 +22,7 @@ public class Layout1x1 {
     private TextArea textAreaUp;
     private TextField textFieldUnder;
 
-    public Layout1x1(String title, String description, String up, String under, CallMenuOne call){
+    public Layout1x1Len(String title, String description, String up, String under, CallMenuOne call){
         this.title = title;
         this.description = description;
         this.up = up;
@@ -57,15 +58,31 @@ public class Layout1x1 {
         HBox layout = new HBox();
         Properties.buttonBox(layout);
 
+        Text len = new Text("Max length:");
+
+        TextField inputNumber = new TextField("10");
+        inputNumber.setEditable(true);
+        inputNumber.setPrefWidth(80);
+
         Button load = new Button(Utility.loadFile);
         Properties.button(load);
         load.setOnAction(actionEvent -> Utility.loadFile(textAreaUp));
 
         Button apply = new Button(Utility.apply);
         Properties.button(apply);
-        apply.setOnAction(event -> textFieldUnder.setText(call.call(textAreaUp.getText())));
+        apply.setOnAction(event -> {
+            if(!Utility.isNumber(inputNumber.getText())) textFieldUnder.setText(Printer.lengthOutOfRange());
+            else{
+                int n = Integer.parseInt(inputNumber.getText());
+                if(n < 0 || n > 50) textFieldUnder.setText(Printer.lengthOutOfRange());
+                else{
+                    Utility.setInt(n);
+                    textFieldUnder.setText(call.call(textAreaUp.getText()));
+                }
+            }
+        });
 
-        layout.getChildren().addAll(load, apply);
+        layout.getChildren().addAll(len, inputNumber, load, apply);
         return layout;
     }
 

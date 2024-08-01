@@ -222,9 +222,11 @@ public class WordsGenerator {
         private void orderLists(){
             for(Gvar v : a.cfg.getVariables()){
                 List<GramexNonEmpty> list = orderedRights.get(v);
-                for(int i = 0; i<list.size()-1; i++){
-                    for(int j = i+1; j<list.size(); j++){
-                        if(a.ht(list.get(i)).isGreaterThan(a.ht(list.get(j)))){
+                for(int i = 0; i<list.size(); i++){
+                    for(int j = 0; j<list.size(); j++){
+                        IntegerInf na = a.ht(list.get(i));
+                        IntegerInf nb = a.ht(list.get(j));
+                        if(i<j && na.isGreaterThan(nb)){
                             GramexNonEmpty aux = list.get(i);
                             list.set(i, list.get(j));
                             list.set(j, aux);
@@ -266,7 +268,7 @@ public class WordsGenerator {
             boolean found = false;
             int k = 0;
             int j = 0;
-            while(j < orderedRights.get(v).size()){
+            while(j < orderedRights.get(v).size() && !found){
                 IntegerInf ik1 = is.get(v).get(j);
                 IntegerInf ik2 = is.get(v).get(j+1);
                 IntegerInf a = new IntegerInf(mid);

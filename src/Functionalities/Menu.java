@@ -38,7 +38,7 @@ public class Menu {
         CfgNonEmpty b = gb.simplify().toGreibach();
         List<String> list = new ArrayList<>();
         if(a.compare(b)) return "";
-        return Printer.stringOfWords(Algorithms.findManyCounterExamplesCfg2(a,b));
+        return Printer.stringOfWords(Algorithms.findManyCounterExamplesCfg(a,b));
     }
 
     public static String checkAmbiguity(Cfg g, String f){

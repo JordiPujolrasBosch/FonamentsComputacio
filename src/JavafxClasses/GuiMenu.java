@@ -92,7 +92,7 @@ public class GuiMenu {
     }
 
     private enum LayoutTypes{
-        L1X1, L2, L2W, L2X1, L3, L3W
+        L1X1L, L2, L2W, L2X1, L3, L3W
     }
 
     static class GuiMenuIn {
@@ -130,8 +130,8 @@ public class GuiMenu {
         public CallPane getCallPane() {
             CallPane cp = null;
             switch (type){
-                case L1X1 -> cp = () -> {
-                    Layout1x1 l = new Layout1x1(title, description, a, b, callMenuOne);
+                case L1X1L -> cp = () -> {
+                    Layout1x1Len l = new Layout1x1Len(title, description, a, b, callMenuOne);
                     return l.build();
                 };
                 case L2 -> cp = () -> {
@@ -229,7 +229,7 @@ public class GuiMenu {
             }
         };
 
-        return new GuiMenuIn(title, description, call, Utility.cfg, Utility.result, LayoutTypes.L1X1);
+        return new GuiMenuIn(title, description, call, Utility.cfg, Utility.result, LayoutTypes.L1X1L);
     }
 
     //REGULAR LANGUAGES COMPARISONS

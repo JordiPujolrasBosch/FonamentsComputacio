@@ -1,5 +1,6 @@
 package Utils;
 
+import Elements.State;
 import Factory.Printer;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
@@ -10,8 +11,21 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.Iterator;
 
 public class Utility {
+
+    //Conjunction of set
+
+    public static boolean conjunctionIsEmpty(Set<State> a, Set<State> b) {
+        boolean found = false;
+        Iterator<State> it = b.iterator();
+        while(it.hasNext() && !found){
+            found = a.contains(it.next());
+        }
+        return !found;
+    }
 
     //String is number
 
