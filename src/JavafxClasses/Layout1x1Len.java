@@ -12,7 +12,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-public class Layout1x1Len {
+public class Layout1x1Len implements Layout{
     private final String title;
     private final String description;
     private final String up;

@@ -58,8 +58,8 @@ public class Cfg {
         return Algorithms.simplifyGrammar(this);
     }
 
-    public Pair<Boolean, String> checkAmbiguity(){
-        return Algorithms.checkAmbiguity(this);
+    public Pair<Boolean, String> checkAmbiguity(int l){
+        return Algorithms.checkAmbiguity(this, l);
     }
 
     @Override

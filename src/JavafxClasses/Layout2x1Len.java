@@ -1,29 +1,34 @@
 package JavafxClasses;
 
+import Factory.Printer;
 import Utils.Utility;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-public class Layout2 implements Layout{
+public class Layout2x1Len implements Layout{
     private final String title;
     private final String description;
     private final String left;
     private final String right;
-    private final CallMenuOne call;
+    private final String under;
+    private final CallMenuTwo call;
 
     private TextArea textAreaLeft;
     private TextArea textAreaRight;
+    private TextField textFieldUnder;
 
-    public Layout2(String title, String description, String left, String right, CallMenuOne call){
+    public Layout2x1Len(String title, String description, String left, String right, String under, CallMenuTwo call){
         this.title = title;
         this.description = description;
         this.left = left;
+        this.under = under;
         this.right = right;
         this.call = call;
     }
@@ -42,7 +47,13 @@ public class Layout2 implements Layout{
 
         Pane d = buildGrid();
 
-        layout.getChildren().addAll(a,b,c,d);
+        Label e = new Label(under);
+        Properties.textAreaCompanion(e);
+
+        textFieldUnder = new TextField();
+        Properties.textFieldResult(textFieldUnder);
+
+        layout.getChildren().addAll(a,b,c,d,e,textFieldUnder);
         return layout;
     }
 
@@ -50,15 +61,35 @@ public class Layout2 implements Layout{
         HBox layout = new HBox();
         Properties.buttonBox(layout);
 
-        Button load = new Button(Utility.loadFile);
-        Properties.button(load);
-        load.setOnAction(event -> Utility.loadFile(textAreaLeft));
+        Text len = new Text("Max length:");
+
+        TextField inputNumber = new TextField("10");
+        inputNumber.setEditable(true);
+        inputNumber.setPrefWidth(80);
+
+        Button loadA = new Button(Utility.loadFileA);
+        Properties.button(loadA);
+        loadA.setOnAction(event -> Utility.loadFile(textAreaLeft));
+
+        Button loadB = new Button(Utility.loadFileB);
+        Properties.button(loadB);
+        loadB.setOnAction(actionEvent -> Utility.loadFile(textAreaRight));
 
         Button apply = new Button(Utility.apply);
         Properties.button(apply);
-        apply.setOnAction(event -> textAreaRight.setText(call.call(textAreaLeft.getText())));
+        apply.setOnAction(event -> {
+            if(!Utility.isNumber(inputNumber.getText())) textFieldUnder.setText(Printer.lengthOutOfRange());
+            else{
+                int n = Integer.parseInt(inputNumber.getText());
+                if(n < 0 || n > 50) textFieldUnder.setText(Printer.lengthOutOfRange());
+                else{
+                    Utility.setInt(n);
+                    textFieldUnder.setText(call.call(textAreaLeft.getText(), textAreaRight.getText()));
+                }
+            }
+        });
 
-        layout.getChildren().addAll(load, apply);
+        layout.getChildren().addAll(len, inputNumber, loadA, loadB, apply);
         return layout;
     }
 
@@ -76,7 +107,7 @@ public class Layout2 implements Layout{
         Properties.textAreaEdit(textAreaLeft);
 
         textAreaRight = new TextArea();
-        Properties.textAreaResult(textAreaRight);
+        Properties.textAreaEdit(textAreaRight);
 
         GridPane.setConstraints(textLeft,0,0);
         GridPane.setConstraints(textRight,1,0);

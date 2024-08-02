@@ -3,7 +3,6 @@ package Functionalities;
 import Automatons.Dfa;
 import Automatons.Nfa;
 import Automatons.Pda;
-import Factory.Algorithms;
 import Factory.Printer;
 import GrammarComparisonArticle.WordsGenerator;
 import Grammars.Cfg;
@@ -25,24 +24,24 @@ public class Menu {
         return Printer.nonequal(fa,fb);
     }
 
-    public static String findCounterExampleCfg(Cfg ga, Cfg gb, String fa, String fb){
+    public static String findCounterExampleCfg(Cfg ga, Cfg gb, String fa, String fb, int l){
         CfgNonEmpty a = ga.simplify().toGreibach();
         CfgNonEmpty b = gb.simplify().toGreibach();
         if(a.acceptsEmpty() != b.acceptsEmpty()) return Printer.nonequalCounterexmaple(fa, fb, "");
         else if(a.compare(b)) return Printer.equal(fa, fb);
-        else return Printer.nonequalCounterexmaple(fa,fb, Algorithms.findCounterExampleCfg(a,b));
+        else return Printer.nonequalCounterexmaple(fa,fb, a.findCounterExample(b,l));
     }
 
-    public static String findManyCounterExamplesCfg(Cfg ga, Cfg gb){
+    /*public static String findManyCounterExamplesCfg(Cfg ga, Cfg gb){
         CfgNonEmpty a = ga.simplify().toGreibach();
         CfgNonEmpty b = gb.simplify().toGreibach();
         List<String> list = new ArrayList<>();
         if(a.compare(b)) return "";
         return Printer.stringOfWords(Algorithms.findManyCounterExamplesCfg(a,b));
-    }
+    }*/
 
-    public static String checkAmbiguity(Cfg g, String f){
-        Pair<Boolean,String> p = g.checkAmbiguity();
+    public static String checkAmbiguity(Cfg g, String f, int l){
+        Pair<Boolean,String> p = g.checkAmbiguity(l);
         if(p.getA()){
             if(p.getB().equals("")) return Printer.ambiguous(f) + " :: empty word";
             return Printer.ambiguous(f) + " :: " + p.getB();
@@ -237,7 +236,7 @@ public class Menu {
     }
 
     public static String generateWordsRegex(RegularExpression regex, int n){
-        return Printer.stringOfWords(Algorithms.generateWords(regex,n));
+        return Printer.stringOfWords(regex.generateWords(n));
     }
 
     public static String generateWordsCfg(Cfg g, int n){
@@ -251,16 +250,16 @@ public class Menu {
         return a.minimize().toString();
     }
 
-    public static String minimize2Dfa(Dfa a){
+    /*public static String minimize2Dfa(Dfa a){
         return Algorithms.minimize2(a).toString();
-    }
+    }*/
 
     public static String reverseDfa(Dfa a){
-        return Algorithms.reverse(a).toString();
+        return a.reverse().toString();
     }
 
     public static String complementDfa(Dfa a){
-        return Algorithms.complement(a).toString();
+        return a.complement().toString();
     }
 
     //CFG TRANSFORMATIONS

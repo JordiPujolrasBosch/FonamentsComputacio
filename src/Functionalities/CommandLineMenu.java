@@ -34,18 +34,33 @@ public class CommandLineMenu {
             File fileb = new File(fb);
             Cfg a = Reader.readGrammarFile(filea);
             Cfg b = Reader.readGrammarFile(fileb);
-            System.out.println(Menu.findCounterExampleCfg(a, b, filea.getName(), fileb.getName()));
+            System.out.println(Menu.findCounterExampleCfg(a, b, filea.getName(), fileb.getName(), 10));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
         }
     }
 
-    public static void findManyCounterExamplesCfg(String fa, String fb){
+    /*public static void findManyCounterExamplesCfg(String fa, String fb){
         try{
             Cfg a = Reader.readGrammarFile(new File(fa));
             Cfg b = Reader.readGrammarFile(new File(fb));
             System.out.println(Menu.findManyCounterExamplesCfg(a, b));
+        }
+        catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }*/
+
+    public static void findCounterExampleCfgLength(String fa, String fb, String l){
+        try{
+            if(!Utility.isNumber(l)) throw new Exception(Printer.lengthOutOfRange());
+            if(Integer.parseInt(l) < 0 || Integer.parseInt(l) > 50) throw new Exception(Printer.lengthOutOfRange());
+            File filea = new File(fa);
+            File fileb = new File(fb);
+            Cfg a = Reader.readGrammarFile(filea);
+            Cfg b = Reader.readGrammarFile(fileb);
+            System.out.println(Menu.findCounterExampleCfg(a, b, filea.getName(), fileb.getName(), Integer.parseInt(l)));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());
@@ -56,7 +71,20 @@ public class CommandLineMenu {
         try{
             File file = new File(f);
             Cfg g = Reader.readGrammarFile(file);
-            System.out.println(Menu.checkAmbiguity(g, file.getName()));
+            System.out.println(Menu.checkAmbiguity(g, file.getName(), 10));
+        }
+        catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public static void checkAmbiguityLength(String f, String l){
+        try{
+            if(!Utility.isNumber(l)) throw new Exception(Printer.lengthOutOfRange());
+            if(Integer.parseInt(l) < 0 || Integer.parseInt(l) > 50) throw new Exception(Printer.lengthOutOfRange());
+            File file = new File(f);
+            Cfg g = Reader.readGrammarFile(file);
+            System.out.println(Menu.checkAmbiguity(g, file.getName(), Integer.parseInt(l)));
         }
         catch (Exception ex){
             System.out.println(ex.getMessage());

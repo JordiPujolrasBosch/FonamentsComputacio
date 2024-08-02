@@ -6,6 +6,7 @@ import Factory.TokenFactory;
 import Grammars.Cfg;
 import Utils.IntegerInf;
 
+import java.util.List;
 import java.util.Objects;
 
 public class RegexUnion implements RegularExpression {
@@ -52,6 +53,10 @@ public class RegexUnion implements RegularExpression {
 
     public IntegerInf wordsCount() {
         return a.wordsCount().add(b.wordsCount());
+    }
+
+    public List<String> generateWords(int n){
+        return Algorithms.generateWords(this, n);
     }
 
     //TO STRING AND EQUALS

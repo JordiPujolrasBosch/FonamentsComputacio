@@ -44,6 +44,14 @@ public class Dfa {
         return Algorithms.minimize(this);
     }
 
+    public Dfa complement(){
+        return Algorithms.complement(this);
+    }
+
+    public Nfa reverse(){
+        return Algorithms.reverse(this);
+    }
+
     @Override
     public String toString(){
         return Printer.stringOfDfa(this);

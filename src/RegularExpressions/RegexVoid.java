@@ -6,6 +6,8 @@ import Factory.TokenFactory;
 import Grammars.Cfg;
 import Utils.IntegerInf;
 
+import java.util.List;
+
 public class RegexVoid implements RegularExpression {
     private RegexVoid(){}
 
@@ -35,6 +37,10 @@ public class RegexVoid implements RegularExpression {
 
     public IntegerInf wordsCount() {
         return new IntegerInf(0);
+    }
+
+    public List<String> generateWords(int n){
+        return Algorithms.generateWords(this, n);
     }
 
     //TO STRING AND EQUALS

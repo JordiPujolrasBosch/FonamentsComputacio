@@ -6,6 +6,8 @@ import Factory.TokenFactory;
 import Grammars.Cfg;
 import Utils.IntegerInf;
 
+import java.util.List;
+
 public class RegexEmptyChar implements RegularExpression {
     private RegexEmptyChar(){}
 
@@ -35,6 +37,10 @@ public class RegexEmptyChar implements RegularExpression {
 
     public IntegerInf wordsCount() {
         return new IntegerInf(1);
+    }
+
+    public List<String> generateWords(int n){
+        return Algorithms.generateWords(this, n);
     }
 
     //TO STRING AND EQUALS

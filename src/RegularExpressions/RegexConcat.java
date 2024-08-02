@@ -5,6 +5,7 @@ import Automatons.Nfa;
 import Grammars.Cfg;
 import Utils.IntegerInf;
 
+import java.util.List;
 import java.util.Objects;
 
 public class RegexConcat implements RegularExpression {
@@ -52,6 +53,10 @@ public class RegexConcat implements RegularExpression {
 
     public IntegerInf wordsCount() {
         return a.wordsCount().multiply(b.wordsCount());
+    }
+
+    public List<String> generateWords(int n){
+        return Algorithms.generateWords(this, n);
     }
 
     //TO STRING AND EQUALS

@@ -6,6 +6,7 @@ import Factory.TokenFactory;
 import Grammars.Cfg;
 import Utils.IntegerInf;
 
+import java.util.List;
 import java.util.Objects;
 
 public class RegexStar implements RegularExpression {
@@ -42,6 +43,10 @@ public class RegexStar implements RegularExpression {
 
     public IntegerInf wordsCount() {
         return new IntegerInf(true);
+    }
+
+    public List<String> generateWords(int n){
+        return Algorithms.generateWords(this, n);
     }
 
     //TO STRING AND EQUALS

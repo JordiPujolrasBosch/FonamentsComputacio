@@ -4,11 +4,15 @@ import Factory.Printer;
 
 public class RunCommandLine {
     public static void run(String[] args){
-        if(equalCfgCfg(args))                      CommandLineMenu.equalCfgCfgArticle(args[3], args[4]);
-        else if(findCounterExampleCfg(args))       CommandLineMenu.findCounterExampleCfg(args[1],args[2]);
-        else if(findManyCounterExamplesCfg1(args)) CommandLineMenu.findManyCounterExamplesCfg(args[1],args[2]);
-        else if(findManyCounterExamplesCfg2(args)) CommandLineMenu.findManyCounterExamplesCfg(args[2],args[3]);
-        else if(checkAmbiguity(args))              CommandLineMenu.checkAmbiguity(args[1]);
+        if(equalCfgCfg(args))                        CommandLineMenu.equalCfgCfgArticle(args[3], args[4]);
+        else if(findCounterExampleCfg(args))         CommandLineMenu.findCounterExampleCfg(args[1],args[2]);
+        //else if(findManyCounterExamplesCfg1(args)) CommandLineMenu.findManyCounterExamplesCfg(args[1],args[2]);
+        //else if(findManyCounterExamplesCfg2(args)) CommandLineMenu.findManyCounterExamplesCfg(args[2],args[3]);
+        else if(findCounterExampleCfgLength1(args))  CommandLineMenu.findCounterExampleCfgLength(args[1], args[2], args[4]);
+        else if(findCounterExampleCfgLength2(args))  CommandLineMenu.findCounterExampleCfgLength(args[2], args[3], args[4]);
+        else if(checkAmbiguity(args))                CommandLineMenu.checkAmbiguity(args[1]);
+        else if(checkAmbiguityLength1(args))         CommandLineMenu.checkAmbiguityLength(args[1], args[3]);
+        else if(checkAmbiguityLength2(args))         CommandLineMenu.checkAmbiguityLength(args[2], args[3]);
 
         else if(equalDfaDfa(args))     CommandLineMenu.equalDfaDfa(args[3],args[4]);
         else if(equalDfaNfa(args))     CommandLineMenu.equalDfaNfa(args[3],args[4]);
@@ -93,7 +97,7 @@ public class RunCommandLine {
         return ok;
     }
 
-    private static boolean findManyCounterExamplesCfg1(String[] args){
+    /*private static boolean findManyCounterExamplesCfg1(String[] args){
         boolean ok = args.length == 4;
         ok = ok && args[0].equals(counterexample);
         ok = ok && args[3].equals(many);
@@ -105,11 +109,39 @@ public class RunCommandLine {
         ok = ok && args[0].equals(counterexample);
         ok = ok && args[1].equals(many);
         return ok;
+    }*/
+
+    private static boolean findCounterExampleCfgLength1(String[] args){
+        boolean ok = args.length == 5;
+        ok = ok && args[0].equals(counterexample);
+        ok = ok && args[3].equals(l);
+        return ok;
+    }
+
+    private static boolean findCounterExampleCfgLength2(String[] args){
+        boolean ok = args.length == 5;
+        ok = ok && args[0].equals(counterexample);
+        ok = ok && args[1].equals(l);
+        return ok;
     }
 
     private static boolean checkAmbiguity(String[] args){
         boolean ok = args.length == 2;
         ok = ok && args[0].equals(ambiguity);
+        return ok;
+    }
+
+    private static boolean checkAmbiguityLength1(String[] args){
+        boolean ok = args.length == 4;
+        ok = ok && args[0].equals(ambiguity);
+        ok = ok && args[2].equals(l);
+        return ok;
+    }
+
+    private static boolean checkAmbiguityLength2(String[] args){
+        boolean ok = args.length == 4;
+        ok = ok && args[0].equals(ambiguity);
+        ok = ok && args[1].equals(l);
         return ok;
     }
 
@@ -611,6 +643,7 @@ public class RunCommandLine {
     private final static String minimized = "-minimized";
     private final static String y = "-y";
     private final static String n = "-n";
+    private final static String l = "-l";
 
     private final static String minimize = "minimize";
     private final static String reverse = "reverse";

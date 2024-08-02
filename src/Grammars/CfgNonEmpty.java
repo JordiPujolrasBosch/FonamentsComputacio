@@ -42,6 +42,10 @@ public class CfgNonEmpty {
         return GrammarComparator.compare(this, b);
     }
 
+    public String findCounterExample(CfgNonEmpty b, int l){
+        return Algorithms.findCounterExampleCfg(this, b, l);
+    }
+
     //Getters
 
     public Alphabet getTerminals() {

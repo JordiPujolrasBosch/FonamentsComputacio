@@ -1661,7 +1661,7 @@ public class Algorithms {
 
     // AMBIGUITY
 
-    public static Pair<Boolean, String> checkAmbiguity(Cfg x){
+    public static Pair<Boolean, String> checkAmbiguity(Cfg x, int length){
         CheckAmbiguityPrivate.ExitAmbiguity exit = new CheckAmbiguityPrivate.ExitAmbiguity();
 
         CheckAmbiguityPrivate.simplifyBasic(x, exit);
@@ -1676,8 +1676,8 @@ public class Algorithms {
         Set<String> set = new HashSet<>();
         WordsGenerator wg;
         Iterator<String> it;
-        while(l <= 21 && !exit.finished){
-            wg = new WordsGenerator(buildCfgLengthFromTo(ch, l, l+9));
+        while(l <= length && !exit.finished){
+            wg = new WordsGenerator(buildCfgLengthFromTo(ch, l, Math.min(l+4, length)));
             it = wg.generateAllWordsStart().iterator();
             set.clear();
 
@@ -1690,7 +1690,7 @@ public class Algorithms {
                 }
             }
 
-            l = l + 10;
+            l = l + 5;
         }
 
         if(!exit.finished) return new Pair<>(false, "");
@@ -2032,20 +2032,20 @@ public class Algorithms {
 
     //COUNTER EXAMPLE
 
-    public static String findCounterExampleCfg(CfgNonEmpty a, CfgNonEmpty b) {
+    public static String findCounterExampleCfg(CfgNonEmpty a, CfgNonEmpty b, int length) {
         Pda parserA = a.toCfg().toPda();
         Pda parserB = b.toCfg().toPda();
         CfgNonEmpty chomskyA = a.toChomsky();
         CfgNonEmpty chomskyB = b.toChomsky();
 
         boolean found = false;
-        int length = 1;
+        int l = 1;
         String act = "";
         WordsGenerator wg;
         Iterator<String> it;
 
-        while (!found && length <= 21){
-            wg = new WordsGenerator(buildCfgLengthFromTo(chomskyA, length, length+9));
+        while (!found && l <= length){
+            wg = new WordsGenerator(buildCfgLengthFromTo(chomskyA, l, Math.min(l+4, length)));
             it = wg.generateAllWordsStart().iterator();
             while (it.hasNext() && !found){
                 act = it.next();
@@ -2053,7 +2053,7 @@ public class Algorithms {
             }
 
             if(!found){
-                wg = new WordsGenerator(buildCfgLengthFromTo(chomskyB, length, length+9));
+                wg = new WordsGenerator(buildCfgLengthFromTo(chomskyB, l, Math.min(l+4,length)));
                 it = wg.generateAllWordsStart().iterator();
                 while(it.hasNext() && !found){
                     act = it.next();
@@ -2061,7 +2061,7 @@ public class Algorithms {
                 }
             }
 
-            length = length+10;
+            l = l+5;
         }
 
         if(found) return act;

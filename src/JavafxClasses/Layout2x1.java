@@ -11,7 +11,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 
-public class Layout2x1 {
+public class Layout2x1 implements Layout{
     private final String title;
     private final String description;
     private final String left;
