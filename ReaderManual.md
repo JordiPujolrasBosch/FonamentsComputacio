@@ -1,8 +1,14 @@
 # READER MANUAL
 
-## Automatons
+## Index
 
----
+* [Automatons](#Automatons)
+* [Regular expressions](#Regular expressions)
+* [Context free grammars](#Context free grammars)
+* [List of words](#List of words)
+* [Tokens](#Tokens)
+
+## Automatons
 
 ### Format
 
@@ -144,8 +150,6 @@ alphabet: a, b, $/
 
 ## Regular expressions
 
----
-
 The regular expressions are written with characters and `[r-token]`. 
 The space is skipped. The expression can be written in multiple lines.
 
@@ -165,8 +169,6 @@ America
 ```
 
 ## Context free grammars
-
----
 
 ### Format
 
@@ -287,9 +289,31 @@ variables: S0
 start: S0
 ```
 
-## Tokens
+## List of words
 
----
+Each word of the list is on a different line.
+
+**Examples:**
+
+Words: `Hello`, `my`, `name`, `Hello my name is`.
+
+```
+Hello
+my
+name
+Hello my name is
+```
+
+Words: `abc`, `aabbcc`, empty word, `aaabbbccc`.
+
+```
+abc
+aabbcc
+
+aaabbbccc
+```
+
+## Tokens
 
 ### List of [a-token]
 * `$/`: Represents the empty character.

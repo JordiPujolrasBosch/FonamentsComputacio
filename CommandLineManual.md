@@ -1,5 +1,16 @@
 # COMMAND LINE MANUAL
 
+## Index
+
+* [Help](#Help)
+* [Context free languages tests](#Context free languages tests)
+* [Regular languages comparisons](#Regular languages comparisons)
+* [Regular languages transformations](#Regular languages transformations)
+* [Check words](#Check words)
+* [Generate words](#Generate words)
+* [DFA transformations](#DFA transformations)
+* [CFG transformations](#CFG transformations)
+
 ## Help
 
 * Writes a help message.
@@ -9,6 +20,8 @@ java -jar app.jar --help
 ```
 
 ## Context free languages tests
+
+The value LENGTH must be a number between 0 and 50.
 
 * Check if two context free grammars are equivalent.
 
@@ -177,8 +190,6 @@ java -jar app.jar --transform regex cfg FILE_REGEX
 
 ## Check words
 
-Each word of FILE_WORDS is a line of the file.
-
 * Test if a list of words are accepted by a deterministic finite automaton.
 
 ```
@@ -260,6 +271,8 @@ java -jar app.jar --checkwords -n cfg FILE_CFG FILE_WORDS
 ```
 
 ## Generate words
+
+The value SIZE must be a number between 0 and 500.
 
 * Generate a list of 100 words (max) that are accepted by a deterministic finite automaton.
 
