@@ -1,5 +1,6 @@
 package JavafxClasses;
 
+import Utils.Utility;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -7,9 +8,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -37,8 +42,6 @@ public class Properties {
         hbox.setPadding(new Insets(0,10,10,10));
         hbox.setSpacing(10);
     }
-
-    public static void button(Button button){}
 
     public static void grid(GridPane gridPane){
         gridPane.setVgap(10);
@@ -68,5 +71,38 @@ public class Properties {
 
     public static void textAreaResult(TextArea textArea){
         textArea.setEditable(false);
+    }
+
+    public static void inputNumber(TextField field, int start){
+        field.setText(String.valueOf(start));
+        field.setEditable(true);
+        field.setPrefWidth(80);
+    }
+
+    //Text
+
+    public static void textOfLength(Text l){
+        l.setText("Max length:");
+    }
+
+    public static void textOfLoadFile(Button b){
+        b.setText(Utility.loadFile);
+    }
+
+    public static void textOfLoadFileAB(Button a, Button b){
+        a.setText(Utility.loadFileA);
+        b.setText(Utility.loadFileB);
+    }
+
+    public static void textOfApply(Button b){
+        b.setText(Utility.apply);
+    }
+
+    //Main layout
+
+    public static void verticalMenu(VBox vbox){
+        vbox.setSpacing(3);
+        vbox.setPadding(new Insets(10));
+        vbox.setBackground(new Background(new BackgroundFill(Color.GAINSBORO, CornerRadii.EMPTY, Insets.EMPTY)));
     }
 }

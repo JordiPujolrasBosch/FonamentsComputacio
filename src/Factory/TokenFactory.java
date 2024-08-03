@@ -3,7 +3,6 @@ package Factory;
 import Elements.Alphabet;
 import Factory.Builders.RegexOperator;
 import RegularExpressions.RegexChar;
-import RegularExpressions.RegexConcat;
 import RegularExpressions.RegexUnion;
 import RegularExpressions.RegularExpression;
 

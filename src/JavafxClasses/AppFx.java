@@ -18,7 +18,7 @@ public class AppFx extends Application {
 
         double width = Screen.getPrimary().getBounds().getWidth()*0.6;
         double height = Screen.getPrimary().getBounds().getHeight()*0.6;
-        Scene scene = new Scene(LayoutMenu.build(), width, height);
+        Scene scene = new Scene(MainLayout.build(), width, height);
         stage.setScene(scene);
         stage.setMaximized(true);
         stage.setMinHeight(550);

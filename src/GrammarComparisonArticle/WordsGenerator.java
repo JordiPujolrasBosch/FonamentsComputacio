@@ -4,7 +4,8 @@ import Elements.Grammars.*;
 import Factory.GrammarTools;
 import GrammarComparisonArticle.Enumerators.*;
 import Grammars.*;
-import Utils.*;
+import Utils.Pair;
+import Utils.IntegerInf;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -330,8 +331,8 @@ public class WordsGenerator {
         double zy = zy(yb);
         Pair<Double,Double> tw;
         if(z >= zb) tw = bskip(z,xb,yb);
-        else if(zx <= z && z < zb) tw = xskip(z,xb);
-        else if(zy <= z && z < zb) tw = yskip(z,yb);
+        else if(zx <= z) tw = xskip(z,xb);
+        else if(zy <= z) tw = yskip(z,yb);
         else tw = simple(z);
         double t = tw.getA();
         double w = tw.getB();

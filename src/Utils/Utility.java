@@ -46,16 +46,9 @@ public class Utility {
         return x.charAt(0) == '-' && isNumber(x.substring(1));
     }
 
-    //Integer
-
-    private static int x;
-
-    public static void setInt(int n){
-        x = n;
-    }
-
-    public static int getInt(){
-        return x;
+    public static boolean isNumberInRange(String x, int a, int b){
+        if(!isNumber(x) && !isNegativeNumber(x)) return false;
+        return Integer.parseInt(x) >= a && Integer.parseInt(x) <= b;
     }
 
     //Stage
@@ -95,26 +88,26 @@ public class Utility {
 
     //Mini strings
 
-    public static String dfa    = "DFA";
-    public static String dfaA   = "DFA A";
-    public static String dfaB   = "DFA B";
-    public static String nfa    = "NFA";
-    public static String nfaA   = "NFA A";
-    public static String nfaB   = "NFA B";
-    public static String regex  = "REGEX";
-    public static String regexA = "REGEX A";
-    public static String regexB = "REGEX B";
-    public static String cfg    = "CFG";
-    public static String cfgA   = "CFG A";
-    public static String cfgB   = "CFG B";
-    public static String result = "RESULT";
-    public static String words  = "WORDS";
+    public static final String dfa    = "DFA";
+    public static final String dfaA   = "DFA A";
+    public static final String dfaB   = "DFA B";
+    public static final String nfa    = "NFA";
+    public static final String nfaA   = "NFA A";
+    public static final String nfaB   = "NFA B";
+    public static final String regex  = "REGEX";
+    public static final String regexA = "REGEX A";
+    public static final String regexB = "REGEX B";
+    public static final String cfg    = "CFG";
+    public static final String cfgA   = "CFG A";
+    public static final String cfgB   = "CFG B";
+    public static final String result = "RESULT";
+    public static final String words  = "WORDS";
 
-    public static String loadFile  = "LOAD FILE";
-    public static String loadFileA = "LOAD FILE A";
-    public static String loadFileB = "LOAD FILE B";
-    public static String apply = "APPLY";
-    public static String defaultString = "DEFAULT";
-    public static String retYes = "ACCEPTED WORDS";
-    public static String retNo = "REJECTED WORDS";
+    public static final String loadFile  = "LOAD FILE";
+    public static final String loadFileA = "LOAD FILE A";
+    public static final String loadFileB = "LOAD FILE B";
+    public static final String apply = "APPLY";
+    public static final String defaultString = "DEFAULT";
+    public static final String retYes = "ACCEPTED WORDS";
+    public static final String retNo = "REJECTED WORDS";
 }

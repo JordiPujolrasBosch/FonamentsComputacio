@@ -1,20 +1,15 @@
 package JavafxClasses;
 
-import Utils.Pair;
 import Utils.Utility;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -24,7 +19,7 @@ import javafx.scene.text.TextAlignment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LayoutMenu {
+public class MainLayout {
     private static final List<ItemMenu> menu = buildMenu();
     private static int pos = 1;
 
@@ -36,33 +31,33 @@ public class LayoutMenu {
         return layout;
     }
 
-    private static ScrollPane verticalMenu(){
+    private static Pane verticalMenu(){
         VBox layout = new VBox();
-        layout.setSpacing(3);
-        layout.setPadding(new Insets(10));
-        layout.setBackground(new Background(new BackgroundFill(Color.GAINSBORO, CornerRadii.EMPTY, Insets.EMPTY)));
+        Properties.verticalMenu(layout);
 
         for(ItemMenu i : menu){
             Node node;
-            if(!i.space) node = new Text(i.text);
+            if(!i.space){
+                node = new Text(i.text);
+                VBox.setMargin(node, new Insets(0,0,0,4));
+            }
             else if(!i.active){
                 Hyperlink t = new Hyperlink(i.text);
-                t.setStyle("-fx-text-fill: black; -fx-underline: false;");
+                t.setTextFill(Color.BLACK);
+                t.setUnderline(false);
+                VBox.setMargin(t, new Insets(0,0,0,10));
                 node = t;
             }
             else{
                 Hyperlink h = new Hyperlink(i.text);
                 h.setOnAction(actionEvent -> move(i));
+                VBox.setMargin(h, new Insets(0,0,0,10));
                 node = h;
             }
-            if(i.space) VBox.setMargin(node, new Insets(0,0,0,10));
-            else VBox.setMargin(node, new Insets(0,0,0,4));
             layout.getChildren().add(node);
         }
 
-        ScrollPane scroll = new ScrollPane(layout);
-        scroll.setBackground(new Background(new BackgroundFill(Color.GAINSBORO, CornerRadii.EMPTY, Insets.EMPTY)));
-        return scroll;
+        return layout;
     }
 
     private static void move(ItemMenu item){
@@ -77,14 +72,30 @@ public class LayoutMenu {
         List<ItemMenu> list = new ArrayList<>();
         list.add(new ItemMenu("Starting", null, false, false));
         list.add(new ItemMenu("Welcome to the app", startPane(), true, false));
-        list.add(new ItemMenu("Information", infoPane(), true, true));
-        for(Pair<String,List<GuiMenu.GuiMenuIn>> pair : GuiMenu.getList()){
-            list.add(new ItemMenu(pair.getA(), null, false, false));
-            for(GuiMenu.GuiMenuIn g : pair.getB()){
-                list.add(new ItemMenu(g.getTitle(), g.getCallPane(), true, true));
-            }
-        }
+        list.add(new ItemMenu("Information",        infoPane(), true, true));
+        list.add(new ItemMenu("Application Tools", null, false, false));
+        list.add(new ItemMenu("Compare cfg & cfg",            layoutPane(new LayoutCompareCfg()), true, true));
+        list.add(new ItemMenu("Counterexample cfg & cfg",     layoutPane(new LayoutCounterExample()), true, true));
+        list.add(new ItemMenu("Ambiguity cfg",                layoutPane(new LayoutAmbiguity()), true, true));
+        list.add(new ItemMenu("Regular languages comparison", layoutPane(new LayoutComparison()), true, true));
+        list.add(new ItemMenu("Regular languages conversion", layoutPane(new LayoutConversion()), true, true));
+        list.add(new ItemMenu("Check words",                  layoutPane(new LayoutCheckWords()), true, true));
+        list.add(new ItemMenu("Generate words",               layoutPane(new LayoutGenerateWords()), true, true));
+        list.add(new ItemMenu("Transformations",              layoutPane(new LayoutTransformation()), true, true));
         return list;
+    }
+
+    private static class ItemMenu{
+        public String text;
+        public boolean space;
+        public boolean active;
+        public CallPane action;
+        public ItemMenu(String text, CallPane action, boolean space, boolean active){
+            this.text = text;
+            this.action = action;
+            this.active = active;
+            this.space = space;
+        }
     }
 
     private static CallPane startPane(){
@@ -110,13 +121,18 @@ public class LayoutMenu {
             layout.setPadding(new Insets(20,20,20,20));
 
             Label titleManual1 = new Label("Manual");
-            infoTitleProperties(titleManual1);
+            titleManual1.setFont(Font.font("Source Code Pro", FontWeight.BOLD, 20));
+            titleManual1.setPadding(new Insets(20,0,20,10));
 
             TextField manual1 = new TextField("https://github.com/JordiPujolrasBosch/FonamentsComputacio/blob/master/Manual.md");
-            infoManualProperties(manual1);
+            manual1.setPadding(new Insets(0,0,0,10));
+            manual1.setEditable(false);
+            manual1.setMaxWidth(600);
+            manual1.setPrefHeight(30);
 
             Label title2 = new Label("Author");
-            infoTitleProperties(title2);
+            title2.setFont(Font.font("Source Code Pro", FontWeight.BOLD, 20));
+            title2.setPadding(new Insets(20,0,20,10));
 
             Label author = new Label("Made by: Jordi Pujolras Bosch");
             author.setPadding(new Insets(0,0,0,10));
@@ -126,29 +142,7 @@ public class LayoutMenu {
         };
     }
 
-    private static void infoTitleProperties(Label label){
-        label.setFont(Font.font("Source Code Pro", FontWeight.BOLD, 20));
-        label.setPadding(new Insets(20,0,20,10));
+    private static CallPane layoutPane(Layout l){
+        return l::build;
     }
-
-    private static void infoManualProperties(TextField textField){
-        textField.setPadding(new Insets(0,0,0,10));
-        textField.setEditable(false);
-        textField.setMaxWidth(600);
-        textField.setPrefHeight(30);
-    }
-
-    private static class ItemMenu{
-        public String text;
-        public boolean space;
-        public boolean active;
-        public CallPane action;
-        public ItemMenu(String text, CallPane action, boolean space, boolean active){
-            this.text = text;
-            this.action = action;
-            this.active = active;
-            this.space = space;
-        }
-    }
-
 }
