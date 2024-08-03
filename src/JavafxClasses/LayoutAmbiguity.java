@@ -31,6 +31,7 @@ public class LayoutAmbiguity implements Layout{
     private final TextField textFieldUnder;
 
     private CallMenuOne call;
+    private boolean done;
 
     public LayoutAmbiguity(){
         title = new Label();
@@ -43,12 +44,15 @@ public class LayoutAmbiguity implements Layout{
         textAreaUp = new TextArea();
         under = new Label();
         textFieldUnder = new TextField();
+        done = false;
     }
 
     public Pane build(){
-        buildElements();
-        buildInteractions();
-        buildCall();
+        if(!done){
+            buildElements();
+            buildInteractions();
+            buildCall();
+        }
 
         VBox layout = new VBox();
         Properties.centerVBox(layout);
@@ -64,6 +68,7 @@ public class LayoutAmbiguity implements Layout{
         grid.getChildren().addAll(up, textAreaUp);
 
         layout.getChildren().addAll(title,description,buttonBox,grid,under,textFieldUnder);
+        done = true;
         return layout;
     }
 

@@ -36,6 +36,7 @@ public class LayoutComparison implements Layout{
     private final TextField textFieldUnder;
 
     private CallMenuTwo call;
+    private boolean done;
 
     public LayoutComparison(){
         title = new Label();
@@ -51,12 +52,15 @@ public class LayoutComparison implements Layout{
         textAreaRight = new TextArea();
         under = new Label();
         textFieldUnder = new TextField();
+        done = false;
     }
 
     public Pane build(){
-        buildElements();
-        buildInteractions();
-        loadEqualDfaDfa();
+        if(!done){
+            buildElements();
+            buildInteractions();
+            loadEqualDfaDfa();
+        }
 
         VBox layout = new VBox();
         Properties.centerVBox(layout);
@@ -74,6 +78,7 @@ public class LayoutComparison implements Layout{
         grid.getChildren().addAll(textLeft, textRight, textAreaLeft, textAreaRight);
 
         layout.getChildren().addAll(title,description,buttonBox,grid,under,textFieldUnder);
+        done = true;
         return layout;
     }
 
@@ -152,6 +157,8 @@ public class LayoutComparison implements Layout{
             }
         });
     }
+
+    //Load
 
     private void loadEqualDfaDfa(){
         title.setText("Compare dfa & dfa");

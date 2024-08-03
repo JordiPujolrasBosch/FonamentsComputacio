@@ -35,6 +35,7 @@ public class LayoutGenerateWords implements Layout {
     private final TextArea textAreaRight;
 
     private CallMenuOne call;
+    private boolean done;
 
     public LayoutGenerateWords(){
         title = new Label();
@@ -48,12 +49,15 @@ public class LayoutGenerateWords implements Layout {
         textRight = new Text();
         textAreaLeft = new TextArea();
         textAreaRight = new TextArea();
+        done = false;
     }
 
     public Pane build(){
-        buildElements();
-        buildInteractions();
-        loadGenerateWordsDfa();
+        if(!done){
+            buildElements();
+            buildInteractions();
+            loadGenerateWordsDfa();
+        }
 
         VBox layout = new VBox();
         Properties.centerVBox(layout);
@@ -71,6 +75,7 @@ public class LayoutGenerateWords implements Layout {
         grid.getChildren().addAll(textLeft, textRight, textAreaLeft, textAreaRight);
 
         layout.getChildren().addAll(title,description,buttonBox,grid);
+        done = true;
         return layout;
     }
 
@@ -114,6 +119,8 @@ public class LayoutGenerateWords implements Layout {
             else textAreaRight.setText(call.call(textAreaLeft.getText()));
         });
     }
+
+    //Load
 
     private void loadGenerateWordsDfa(){
         title.setText("Generate words dfa");

@@ -33,6 +33,7 @@ public class LayoutConversion implements Layout{
     private final TextArea textAreaRight;
 
     private CallMenuOne call;
+    private boolean done;
 
     public LayoutConversion(){
         title = new Label();
@@ -46,13 +47,16 @@ public class LayoutConversion implements Layout{
         textRight = new Text();
         textAreaLeft = new TextArea();
         textAreaRight = new TextArea();
+        done = false;
     }
 
     public Pane build(){
-        buildElements();
-        buildInteractions();
-        makeDfa();
-        loadConversionDfaNfa();
+        if(!done){
+            buildElements();
+            buildInteractions();
+            makeDfa();
+            loadConversionDfaNfa();
+        }
 
         VBox layout = new VBox();
         Properties.centerVBox(layout);
@@ -70,6 +74,7 @@ public class LayoutConversion implements Layout{
         grid.getChildren().addAll(textLeft, textRight, textAreaLeft, textAreaRight);
 
         layout.getChildren().addAll(title,description,buttonBox,grid);
+        done = true;
         return layout;
     }
 
@@ -146,6 +151,7 @@ public class LayoutConversion implements Layout{
         });
     }
 
+    //Make
 
     private void makeDfa(){
         optionsOut.getItems().clear();
@@ -216,6 +222,7 @@ public class LayoutConversion implements Layout{
         loadConversionRegexCfg();
     }
 
+    //Load
 
     private void loadConversionDfaNfa(){
         title.setText("Transform dfa to nfa");

@@ -34,6 +34,7 @@ public class LayoutCounterExample implements Layout{
     private final TextField textFieldUnder;
 
     private CallMenuTwo call;
+    private boolean done;
 
     public LayoutCounterExample(){
         title = new Label();
@@ -49,12 +50,15 @@ public class LayoutCounterExample implements Layout{
         textAreaRight = new TextArea();
         under = new Label();
         textFieldUnder = new TextField();
+        done = false;
     }
 
     public Pane build(){
-        buildElements();
-        buildInteractions();
-        buildCall();
+        if(!done){
+            buildElements();
+            buildInteractions();
+            buildCall();
+        }
 
         VBox layout = new VBox();
         Properties.centerVBox(layout);
@@ -72,6 +76,7 @@ public class LayoutCounterExample implements Layout{
         grid.getChildren().addAll(textLeft, textRight, textAreaLeft, textAreaRight);
 
         layout.getChildren().addAll(title,description,buttonBox,grid,under,textFieldUnder);
+        done = true;
         return layout;
     }
 

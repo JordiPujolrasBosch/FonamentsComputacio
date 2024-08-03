@@ -29,6 +29,7 @@ public class LayoutTransformation implements Layout{
     private final TextArea textAreaRight;
 
     private CallMenuOne call;
+    private boolean done;
 
     private final String minimize   = "DFA minimize";
     private final String complement = "DFA complement";
@@ -47,12 +48,15 @@ public class LayoutTransformation implements Layout{
         textRight = new Text();
         textAreaLeft = new TextArea();
         textAreaRight = new TextArea();
+        done = false;
     }
 
     public Pane build(){
-        buildElements();
-        buildInteractions();
-        loadMinimizeDfa();
+        if(!done){
+            buildElements();
+            buildInteractions();
+            loadMinimizeDfa();
+        }
 
         VBox layout = new VBox();
         Properties.centerVBox(layout);
@@ -70,6 +74,7 @@ public class LayoutTransformation implements Layout{
         grid.getChildren().addAll(textLeft, textRight, textAreaLeft, textAreaRight);
 
         layout.getChildren().addAll(title,description,buttonBox,grid);
+        done = true;
         return layout;
     }
 

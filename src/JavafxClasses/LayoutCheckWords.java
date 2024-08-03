@@ -38,6 +38,7 @@ public class LayoutCheckWords implements Layout{
     private final TextArea textAreaUnder;
 
     private CallMenuTwo call;
+    private boolean done;
 
     public LayoutCheckWords(){
         title = new Label();
@@ -53,12 +54,15 @@ public class LayoutCheckWords implements Layout{
         textAreaRight = new TextArea();
         under = new Text();
         textAreaUnder = new TextArea();
+        done = false;
     }
 
     public Pane build(){
-        buildElements();
-        buildInteractions();
-        loadCheckWordsDfa();
+        if(!done){
+            buildElements();
+            buildInteractions();
+            loadCheckWordsDfa();
+        }
 
         VBox layout = new VBox();
         Properties.centerVBox(layout);
@@ -82,6 +86,7 @@ public class LayoutCheckWords implements Layout{
         gridDown.getChildren().addAll(under, textAreaUnder);
 
         layout.getChildren().addAll(title,description,buttonBox,gridUp,gridDown);
+        done = true;
         return layout;
     }
 
@@ -130,6 +135,8 @@ public class LayoutCheckWords implements Layout{
 
         apply.setOnAction(event -> textAreaUnder.setText(call.call(textAreaLeft.getText(), textAreaRight.getText())));
     }
+
+    //Load
 
     private void loadCheckWordsDfa(){
         title.setText("Check words dfa");
