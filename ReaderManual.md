@@ -3,9 +3,9 @@
 ## Index
 
 * [Automatons](#Automatons)
-* [Regular expressions](#Regular expressions)
-* [Context free grammars](#Context free grammars)
-* [List of words](#List of words)
+* [Regular expressions](#Regular-expressions)
+* [Context free grammars](#Context-free-grammars)
+* [List of words](#List-of-words)
 * [Tokens](#Tokens)
 
 ## Automatons

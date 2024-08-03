@@ -3,13 +3,13 @@
 ## Index
 
 * [Help](#Help)
-* [Context free languages tests](#Context free languages tests)
-* [Regular languages comparisons](#Regular languages comparisons)
-* [Regular languages transformations](#Regular languages transformations)
-* [Check words](#Check words)
-* [Generate words](#Generate words)
-* [DFA transformations](#DFA transformations)
-* [CFG transformations](#CFG transformations)
+* [Context free languages tests](#Context-free-languages-tests)
+* [Regular languages comparisons](#Regular-languages-comparisons)
+* [Regular languages transformations](#Regular-languages-transformations)
+* [Check words](#Check-words)
+* [Generate words](#Generate-words)
+* [DFA transformations](#DFA-transformations)
+* [CFG transformations](#CFG-transformations)
 
 ## Help
 
