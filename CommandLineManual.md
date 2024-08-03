@@ -2,7 +2,7 @@
 
 ## Index
 
-* [Help](#Help)
+* [Help and GUI](#Help-and-GUI)
 * [Context free languages tests](#Context-free-languages-tests)
 * [Regular languages comparisons](#Regular-languages-comparisons)
 * [Regular languages transformations](#Regular-languages-transformations)
@@ -11,12 +11,18 @@
 * [DFA transformations](#DFA-transformations)
 * [CFG transformations](#CFG-transformations)
 
-## Help
+## Help and GUI
 
 * Writes a help message.
 
 ```
 java -jar app.jar --help
+```
+
+* Open the Graphic User Interface
+
+```
+java -jar app.jar
 ```
 
 ## Context free languages tests
