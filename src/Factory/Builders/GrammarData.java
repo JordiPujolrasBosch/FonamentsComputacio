@@ -1,6 +1,7 @@
 package Factory.Builders;
 
 import Elements.Alphabet;
+import Factory.Printer;
 import Grammars.*;
 import Elements.Grammars.Grule;
 import Elements.Grammars.Gvar;
@@ -31,6 +32,8 @@ public class GrammarData {
 
     private final List<List<String>> rulesString;
     private final List<Grule> rules;
+
+    private String aux;
 
     public GrammarData(){
         terminalElementsRead = false;
@@ -74,7 +77,9 @@ public class GrammarData {
     //Check
 
     public boolean hasBasic() {
-        return terminalElementsRead && variablesRead && startRead;
+        boolean ok = terminalElementsRead && variablesRead && startRead;
+        if(!ok) Printer.grammarCheckBasic();
+        return ok;
     }
 
     public boolean check() {
@@ -104,7 +109,10 @@ public class GrammarData {
             if(s.length() == 1) alphabet.addChar(s.charAt(0));
             else if(TokenFactory.isAChar(s)) alphabet.addChar(TokenFactory.getAChar(s));
             else if(TokenFactory.isAGroup(s)) alphabet.addAll(TokenFactory.getAGroup(s));
-            else if(!s.equals(TokenFactory.getANothing())) ok = false;
+            else if(!s.equals(TokenFactory.getANothing())) {
+                ok = false;
+                Printer.grammarCheckTerminal(s);
+            }
         }
         return ok;
     }
@@ -135,6 +143,8 @@ public class GrammarData {
             else{
                 ok = false;
             }
+
+            if(!ok) Printer.grammarCheckVariable(s);
         }
         return ok;
     }
@@ -142,6 +152,7 @@ public class GrammarData {
     private boolean checkStart() {
         boolean ok = isVariable(startString) && setvar.contains(toVariable(startString));
         if(ok) start = toVariable(startString);
+        else Printer.grammarCheckStart();
         return ok;
     }
 
@@ -149,18 +160,26 @@ public class GrammarData {
         boolean ok = true;
         Iterator<List<String>> it = rulesString.iterator();
         while(ok && it.hasNext()){
-            ok = checkOneRule(it.next());
+            List<String> x = it.next();
+            aux = stringOfRule(x);
+            ok = checkOneRule(x);
         }
         return ok;
     }
 
     private boolean checkOneRule(List<String> list){
-        if(list.size()<3) return false;
+        if(list.size()<3) {
+            Printer.grammarCheckRule(aux);
+            return false;
+        }
 
         String leftString = list.remove(0);
         String arrow = list.remove(0);
         boolean ok = isVariable(leftString) && setvar.contains(toVariable(leftString)) && arrow.equals(TokenFactory.getGArrow());
-        if(!ok) return false;
+        if(!ok) {
+            Printer.grammarCheckRule(aux);
+            return false;
+        }
 
         if(!correctFormRight(list)) return false;
 
@@ -182,33 +201,45 @@ public class GrammarData {
 
             if(isVariable(act)){
                 ok = setvar.contains(toVariable(act));
+                if(!ok) Printer.grammarCheckVariableNotInSet(act);
             }
             else if(TokenFactory.isGChar(act)){
                 ok = alphabet.contains(TokenFactory.getGChar(act));
+                if(!ok) Printer.grammarCheckTerminalNotInSet(String.valueOf(TokenFactory.getGChar(act)));
             }
             else if(TokenFactory.isGGroup(act)){
                 ok = alphabet.getSet().containsAll(TokenFactory.getGGroup(act));
-                if(ok){
+                if(!ok) Printer.grammarCheckTerminalGroupNotInSet(act);
+                else{
                     if(!isFirst) ok = list.get(i-1).equals(union);
                     if(!isLast)  ok = ok && list.get(i+1).equals(union);
+                    if(!ok) Printer.grammarCheckWrongConcatGroup(aux, act);
                 }
             }
             else if(act.equals(union)){
-                if(isFirst || isLast) ok = false;
-                else ok = !list.get(i-1).equals(union) && !list.get(i+1).equals(union);
+                ok = !isFirst && !isLast;
+                if(!ok) Printer.grammarCheckUnionStartOrEnd(aux);
+                else {
+                    ok = !list.get(i-1).equals(union) && !list.get(i+1).equals(union);
+                    Printer.grammarCheckUnionUnion(aux);
+                }
             }
             else if(act.equals(empty)){
                 ok = alphabet.containsEmptyChar();
-                if(ok){
+                if(!ok) Printer.grammarCheckEmptyCharNotInTerminals();
+                else{
                     if(!isFirst) ok = list.get(i-1).equals(union);
                     if(!isLast)  ok = ok && list.get(i+1).equals(union);
+                    if(!ok) Printer.grammarCheckWrongConcatEmpty(aux);
                 }
             }
             else if(act.length()==1){
                 ok = alphabet.contains(act.charAt(0));
+                if(!ok) Printer.grammarCheckTerminalNotInSet(act);
             }
             else{
                 ok = false;
+                Printer.grammarCheckUnknownToken(aux, act);
             }
 
             i++;
@@ -289,6 +320,14 @@ public class GrammarData {
         Set<Gvar> set = new HashSet<>();
         for(int i = Integer.parseInt(pair[0]); i <= Integer.parseInt(pair[1]); i++) set.add(new Gvar(c, i));
         return set;
+    }
+
+    private String stringOfRule(List<String> list){
+        if(list.isEmpty()) return "";
+        StringBuilder s = new StringBuilder();
+        for(int i=0; i<list.size()-1; i++) s.append(list.get(i)).append(" ");
+        s.append(list.get(list.size() - 1));
+        return s.toString();
     }
 
 }

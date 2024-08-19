@@ -5,6 +5,7 @@ import Automatons.Dfa;
 import Automatons.Nfa;
 import Exceptions.AutomatonReaderException;
 import Factory.Algorithms;
+import Factory.Printer;
 import Factory.TokenFactory;
 import Utils.Utility;
 
@@ -34,8 +35,6 @@ public class AutomatonData {
     private final List<RuleString> transitionString; //string
     private List<RuleData> transition;               //out
 
-    private final String filename;
-
     //Constructor
 
     public AutomatonData(){
@@ -44,18 +43,6 @@ public class AutomatonData {
         finalStatesNumbersRead = false;
         alphabetElementsRead = false;
         transitionString = new ArrayList<>();
-
-        filename = null;
-    }
-
-    public AutomatonData(String file){
-        numberStatesRead = false;
-        startStateNumberRead = false;
-        finalStatesNumbersRead = false;
-        alphabetElementsRead = false;
-        transitionString = new ArrayList<>();
-
-        filename = file;
     }
 
     //Read
@@ -107,14 +94,12 @@ public class AutomatonData {
         return transition;
     }
 
-    public String getFilename() {
-        return filename;
-    }
-
     //Check
 
     public boolean hasBasic() {
-        return numberStatesRead && startStateNumberRead && finalStatesNumbersRead && alphabetElementsRead;
+        boolean ok = numberStatesRead && startStateNumberRead && finalStatesNumbersRead && alphabetElementsRead;
+        if(!ok) Printer.automatonCheckBasic();
+        return ok;
     }
 
     public boolean check(){
@@ -132,9 +117,9 @@ public class AutomatonData {
 
         if(det){
             int i = 0;
-            while (i<numberStates-1 && det){
+            while (i<transition.size()-1 && det){
                 int j = i+1;
-                while (j<numberStates && det){
+                while (j<transition.size() && det){
                     det = !(transition.get(i).getOrigin() == transition.get(j).getOrigin() && transition.get(i).getCharacter() == transition.get(j).getCharacter());
                     j++;
                 }
@@ -162,15 +147,26 @@ public class AutomatonData {
     //Private
 
     private boolean checkNumberStates(){
-        if(!Utility.isNumber(numberStatesString)) return false;
-        numberStates = Integer.parseInt(numberStatesString);
-        return numberStates > 0;
+        boolean ok = Utility.isNumber(numberStatesString);
+        if(!ok) Printer.automatonCheckStates();
+        else{
+            numberStates = Integer.parseInt(numberStatesString);
+            ok = numberStates > 0;
+            if(!ok) Printer.automatonCheckStates();
+        }
+
+        return ok;
     }
 
     private boolean checkStartState(){
-        if(!Utility.isNumber(startStateString)) return false;
-        startStateNumber = Integer.parseInt(startStateString);
-        return validState(startStateNumber);
+        boolean ok = Utility.isNumber(startStateString);
+        if(!ok) Printer.automatonCheckStart();
+        else{
+            startStateNumber = Integer.parseInt(startStateString);
+            ok = validState(startStateNumber);
+            if(!ok) Printer.automatonCheckStart();
+        }
+        return ok;
     }
 
     private boolean validState(int x){
@@ -178,7 +174,10 @@ public class AutomatonData {
     }
 
     private boolean checkFinalStates(){
-        if(finalStatesString.isEmpty()) return false;
+        if(finalStatesString.isEmpty()) {
+            Printer.automatonCheckFinal();
+            return false;
+        }
         finalStatesNumbers = new ArrayList<>();
         if(finalStatesString.size() == 1 && Utility.isNegativeNumber(finalStatesString.get(0))){
             finalStatesNumbers.add(Integer.parseInt(finalStatesString.get(0)));
@@ -191,6 +190,7 @@ public class AutomatonData {
             String s = it.next();
             ok = Utility.isNumber(s) && validState(Integer.parseInt(s));
             if(ok) finalStatesNumbers.add(Integer.parseInt(s));
+            else Printer.automatonCheckFinal();
         }
         return ok;
     }
@@ -204,7 +204,10 @@ public class AutomatonData {
             if(s.length() == 1) alphabet.addChar(s.charAt(0));
             else if(TokenFactory.isAChar(s)) alphabet.addChar(TokenFactory.getAChar(s));
             else if(TokenFactory.isAGroup(s)) alphabet.addAll(TokenFactory.getAGroup(s));
-            else if(!s.equals(TokenFactory.getANothing())) ok = false;
+            else if(!s.equals(TokenFactory.getANothing())) {
+                ok = false;
+                Printer.automatonCheckAlphabet(s);
+            }
         }
         return ok;
     }
@@ -215,13 +218,29 @@ public class AutomatonData {
         Iterator<RuleString> it = transitionString.iterator();
         while(it.hasNext() && ok){
             RuleString r = it.next();
-            ok = Utility.isNumber(r.origin) && validState(Integer.parseInt(r.origin));
-            ok = ok && Utility.isNumber(r.destiny) && validState(Integer.parseInt(r.destiny));
+            String rs = r.origin + " " + r.transition + " " + r.destiny;
             char c = 'A';
-            if(r.transition.length() == 1) c = r.transition.charAt(0);
-            else if(TokenFactory.isBChar(r.transition)) c = TokenFactory.getBChar(r.transition);
-            else ok = false;
-            ok = ok && alphabet.contains(c);
+
+            ok = Utility.isNumber(r.origin) && validState(Integer.parseInt(r.origin));
+            if(!ok) Printer.automatonCheckRuleOrigin(rs);
+            else{
+                ok = Utility.isNumber(r.destiny) && validState(Integer.parseInt(r.destiny));
+                if(!ok) Printer.automatonCheckRuleDestiny(rs);
+                else{
+                    if(r.transition.length() == 1) c = r.transition.charAt(0);
+                    else if(TokenFactory.isBChar(r.transition)) c = TokenFactory.getBChar(r.transition);
+                    else {
+                        ok = false;
+                        Printer.automatonCheckRuleTransitionUnknown(rs);
+                    }
+
+                    if(ok && !alphabet.contains(c)){
+                        ok = false;
+                        Printer.automatonCheckRuleTransitionNotInAlphabet(rs, r.transition);
+                    }
+                }
+            }
+
             if(ok) transition.add(new RuleData(Integer.parseInt(r.origin), Integer.parseInt(r.destiny), c));
         }
         return ok;

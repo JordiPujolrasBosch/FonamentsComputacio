@@ -267,7 +267,7 @@ start: [start-variable]
 ### Examples
 
 ```
-terminals: a,b
+terminals: a,b,$/
 variables: A0,B0,C0
 start: A0
 A0 -> B0 | C0

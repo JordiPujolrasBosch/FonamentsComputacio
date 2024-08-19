@@ -473,10 +473,11 @@ public class Algorithms {
 
     public static Nfa dataToNfa(AutomatonData data) throws AutomatonReaderException {
         if(!data.check()){
-            throw new AutomatonReaderException(Printer.automatonCheck(data.getFilename()));
+            throw new AutomatonReaderException(Printer.exceptionMessage);
         }
         if(!data.getAlphabet().containsEmptyChar()){
-            throw new AutomatonReaderException(Printer.automatonCheck(data.getFilename()));
+            Printer.automatonCheckEmptyChar();
+            throw new AutomatonReaderException(Printer.exceptionMessage);
         }
 
         List<State> array = new ArrayList<>();
@@ -505,10 +506,11 @@ public class Algorithms {
 
     public static Dfa dataToDfa(AutomatonData data) throws AutomatonReaderException {
         if(!data.check()) {
-            throw new AutomatonReaderException(Printer.automatonCheck(data.getFilename()));
+            throw new AutomatonReaderException(Printer.exceptionMessage);
         }
         if(!data.isDeterministic()) {
-            throw new AutomatonReaderException(Printer.automatonNondeterministic(data.getFilename()));
+            Printer.automatonNondeterministic();
+            throw new AutomatonReaderException(Printer.exceptionMessage);
         }
 
         List<State> array = new ArrayList<>();

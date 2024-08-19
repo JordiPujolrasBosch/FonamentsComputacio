@@ -16,7 +16,8 @@ public class Reader {
 
     public static AutomatonData readAutomatonFile(File f) throws FileNotFoundException, AutomatonReaderException {
         Scanner sc = new Scanner(f);
-        AutomatonData data = new AutomatonData(f.getName());
+        AutomatonData data = new AutomatonData();
+        Printer.filename = f.getName();
 
         while (!data.hasBasic()) {
             String x = sc.next();
@@ -25,7 +26,10 @@ public class Reader {
                 case "start:"    -> data.setStart(sc.next());
                 case "final:"    -> data.setFinal(sc.nextLine().replace(" ", "").split(","));
                 case "alphabet:" -> data.setAlphabet(sc.nextLine().replace(" ", "").split(","));
-                default          -> throw new AutomatonReaderException(Printer.automatonCheck(f.getName()));
+                default          -> {
+                    Printer.automatonCheckBasic();
+                    throw new AutomatonReaderException(Printer.exceptionMessage);
+                }
             }
         }
 
@@ -37,12 +41,16 @@ public class Reader {
     }
 
     public static AutomatonData readAutomatonString(String s) throws AutomatonReaderException {
-        AutomatonReaderException ex = new AutomatonReaderException(Printer.automatonCheck(null));
+        Printer.filename = null;
         AutomatonData data = new AutomatonData();
+
         List<String> list = Arrays.stream(s.split("\n")).toList();
         int i = 0;
         while(!data.hasBasic()){
-            if(i>=list.size()) throw ex;
+            if(i>=list.size()) {
+                Printer.automatonCheckBasic();
+                throw new AutomatonReaderException(Printer.exceptionMessage);
+            }
             String x = list.get(i);
             if(x.startsWith("states:")){
                 x = x.replace("states:","").replace(" ","");
@@ -61,7 +69,8 @@ public class Reader {
                 data.setAlphabet(x.split(","));
             }
             else if(!x.equals("")){
-                throw ex;
+                Printer.automatonCheckBasic();
+                throw new AutomatonReaderException(Printer.exceptionMessage);
             }
             i++;
         }
@@ -72,7 +81,10 @@ public class Reader {
                 for(String r : Arrays.stream(x.split(" ")).toList()){
                     if(!r.isEmpty()) rule.add(r);
                 }
-                if(rule.size()!=3) throw ex;
+                if(rule.size()!=3){
+                    Printer.automatonCheckRuleFormat(x);
+                    throw new AutomatonReaderException(Printer.exceptionMessage);
+                }
                 data.addRule(rule.get(0), rule.get(1), rule.get(2));
             }
             i++;
@@ -81,14 +93,16 @@ public class Reader {
     }
 
     public static RegularExpression readRegularExpressionFile(File f) throws FileNotFoundException, RegexReaderException {
+        Printer.filename = f.getName();
         Scanner sc = new Scanner(f);
         StringBuilder r = new StringBuilder();
         while(sc.hasNextLine()) r.append(sc.nextLine());
-        return RegexBuilder.buildRegex(r.toString().replace(" ", ""), f.getName());
+        return RegexBuilder.buildRegex(r.toString().replace(" ", ""));
     }
 
     public static RegularExpression readRegularExpressionString(String s) throws RegexReaderException {
-        return RegexBuilder.buildRegex(s.replace(" ","").replace("\n",""),null);
+        Printer.filename = null;
+        return RegexBuilder.buildRegex(s.replace(" ","").replace("\n",""));
     }
 
     public static List<String> readWordsFile(File f) throws FileNotFoundException {
@@ -105,6 +119,7 @@ public class Reader {
     }
 
     public static Cfg readGrammarFile(File f) throws FileNotFoundException, GrammarReaderException {
+        Printer.filename = f.getName();
         Scanner sc = new Scanner(f);
         GrammarData data = new GrammarData();
 
@@ -114,7 +129,10 @@ public class Reader {
                 case "terminals:" -> data.setTerminals(sc.nextLine().replace(" ", "").split(","));
                 case "variables:" -> data.setVariables(sc.nextLine().replace(" ", "").split(","));
                 case "start:"     -> data.setStart(sc.nextLine().replace(" ", ""));
-                default           -> throw new GrammarReaderException(Printer.grammarCheck(f.getName()));
+                default           -> {
+                    Printer.grammarCheckBasic();
+                    throw new GrammarReaderException(Printer.exceptionMessage);
+                }
             }
         }
 
@@ -122,18 +140,21 @@ public class Reader {
             data.addRule(sc.nextLine().split(" "));
         }
 
-        if(!data.check()) throw new GrammarReaderException(Printer.grammarCheck(f.getName()));
+        if(!data.check()) throw new GrammarReaderException(Printer.exceptionMessage);
 
         return data.getCfg();
     }
 
     public static Cfg readGrammarString(String s) throws GrammarReaderException{
-        GrammarReaderException ex = new GrammarReaderException(Printer.grammarCheck(null));
+        Printer.filename = null;
         GrammarData data = new GrammarData();
         List<String> list = Arrays.stream(s.split("\n")).toList();
         int i=0;
         while(!data.hasBasic()){
-            if(i>=list.size()) throw ex;
+            if(i>=list.size()) {
+                Printer.grammarCheckBasic();
+                throw new GrammarReaderException(Printer.exceptionMessage);
+            }
             String x = list.get(i);
             if(x.startsWith("terminals:")){
                 x = x.replace("terminals:","").replace(" ","");
@@ -148,7 +169,8 @@ public class Reader {
                 data.setStart(x);
             }
             else if(!x.isEmpty()){
-                throw ex;
+                Printer.grammarCheckBasic();
+                throw new GrammarReaderException(Printer.exceptionMessage);
             }
             i++;
         }
@@ -158,7 +180,7 @@ public class Reader {
             i++;
         }
 
-        if(!data.check()) throw ex;
+        if(!data.check()) throw new GrammarReaderException(Printer.exceptionMessage);
         return data.getCfg();
     }
 

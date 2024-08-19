@@ -20,17 +20,146 @@ import java.util.List;
 
 public class Printer {
 
-    //Output messages
+    public static String filename;
+    public static String exceptionMessage;
 
-    public static String automatonCheck(String filename) {
+    //Incorrect automaton
+
+    public static String automatonCheck() {
         if(filename == null) return "Incorrect format for the automaton";
         return "Incorrect format for the automaton in file " + filename;
     }
 
-    public static String automatonNondeterministic(String filename) {
-        if(filename == null) return "The automaton is nondeterministic";
-        return "The automaton in file " + filename + " is nondeterministic";
+    public static void automatonCheckBasic(){
+        exceptionMessage = automatonCheck() + ": [states], [start], [final] or [alphabet] not read";
     }
+
+    public static void automatonCheckRuleFormat(String rule){
+        exceptionMessage = automatonCheck() + ": the rule [" + rule + "] is incorrect";
+    }
+
+    public static void automatonCheckStates(){
+        exceptionMessage = automatonCheck() + ": [states] must be a positive number";
+    }
+
+    public static void automatonCheckStart(){
+        exceptionMessage = automatonCheck() + ": [start] must be >= 0 and < [states]";
+    }
+
+    public static void automatonCheckFinal(){
+        exceptionMessage = automatonCheck() + ": [final] must be a negative number or a list of numbers >= 0 and < [states]";
+    }
+
+    public static void automatonCheckAlphabet(String token){
+        exceptionMessage = automatonCheck() + ": unknown token [" + token + "] in [alphabet]";
+    }
+
+    public static void automatonCheckRuleOrigin(String rule){
+        exceptionMessage = automatonCheck() + ": the origin of the rule [" + rule + "] is not valid";
+    }
+
+    public static void automatonCheckRuleDestiny(String rule){
+        exceptionMessage = automatonCheck() + ": the destiny of the rule [" + rule + "] is not valid";
+    }
+
+    public static void automatonCheckRuleTransitionUnknown(String rule){
+        exceptionMessage = automatonCheck() + ": the transition of the rule [" + rule + "] is an unknown token";
+    }
+
+    public static void automatonCheckRuleTransitionNotInAlphabet(String rule, String t){
+        exceptionMessage = automatonCheck() + ": the alphabet does not contain the character [" + t + "] of the rule [" + rule + "]";
+    }
+
+    public static void automatonCheckEmptyChar(){
+        if(filename == null) exceptionMessage = "The nondeterministic automaton must contain the empty char " + TokenFactory.getAEmptyChar() + " in the alphabet";
+        else exceptionMessage = "The nondeterministic automaton in file " + filename + " must contain the empty char " + TokenFactory.getAEmptyChar() + " in the alphabet.";
+    }
+
+    public static void automatonNondeterministic() {
+        if(filename == null) exceptionMessage = "The automaton is nondeterministic";
+        else exceptionMessage = "The automaton in file " + filename + " is nondeterministic";
+    }
+
+    //Incorrect regex
+
+    public static String regexCheck(){
+        if(filename == null) return "Incorrect format for the regular expression";
+        return "Incorrect format for the regular expression in file " + filename;
+    }
+
+    public static void regexCheckParenthesis(){
+        exceptionMessage = regexCheck() + ": the parentheses are wrong";
+    }
+
+    public static void regexCheckUnknownToken(String token){
+        exceptionMessage = regexCheck() + ": unknown token [" + token + "]";
+    }
+
+    //Incorrect grammar
+
+    public static String grammarCheck() {
+        if(filename == null) return "Incorrect format for the grammar";
+        return "Incorrect format for the grammar in file " + filename;
+    }
+
+    public static void grammarCheckBasic(){
+        exceptionMessage = grammarCheck() + ": [terminals], [variables] or [start] not read";
+    }
+
+    public static void grammarCheckTerminal(String token){
+        exceptionMessage = grammarCheck() + ": unknown token [" + token + "] in [terminals]";
+    }
+
+    public static void grammarCheckVariable(String token){
+        exceptionMessage = grammarCheck() + ": unknown token [" + token + "] in [variables]";
+    }
+
+    public static void grammarCheckStart(){
+        exceptionMessage = grammarCheck() + ": [start] must be a variable contained in [variables]";
+    }
+
+    public static void grammarCheckRule(String rule){
+        exceptionMessage = grammarCheck() + ": the rule [" + rule + "] is wrong";
+    }
+
+    public static void grammarCheckUnknownToken(String rule, String token){
+        exceptionMessage = grammarCheck() + ": unknown token [" + token + "] in rule [" + rule + "]";
+    }
+
+    public static void grammarCheckVariableNotInSet(String var){
+        exceptionMessage = grammarCheck() + ": [variables] does not contain [" + var + "]";
+    }
+
+    public static void grammarCheckTerminalNotInSet(String ter){
+        exceptionMessage = grammarCheck() + ": [terminals] does not contain [" + ter + "]";
+    }
+
+    public static void grammarCheckTerminalGroupNotInSet(String token){
+        exceptionMessage = grammarCheck() + ": [terminals] does not contain all the elements of [" + token + "]";
+    }
+
+    public static void grammarCheckWrongConcatGroup(String rule, String token){
+        exceptionMessage = grammarCheck() + ": concatenated token of group [" + token + "] in rule [" + rule + "]";
+    }
+
+    public static void grammarCheckUnionStartOrEnd(String rule){
+        exceptionMessage = grammarCheck() + ": found [" + TokenFactory.getGUnion() + "] at the start or end in rule [" + rule + "]";
+    }
+
+    public static void grammarCheckUnionUnion(String rule){
+        String u = TokenFactory.getGUnion();
+        exceptionMessage = grammarCheck() + ": found double union [" + u + " " + u + "] in the rule [" + rule + "]";
+    }
+
+    public static void grammarCheckEmptyCharNotInTerminals(){
+        exceptionMessage = grammarCheck() + ": the alphabet does not contain [" + TokenFactory.getAEmptyChar() + "]";
+    }
+
+    public static void grammarCheckWrongConcatEmpty(String rule){
+        exceptionMessage = grammarCheck() + ": the empty char [/] is concatenated in rule [" + rule + "]";
+    }
+
+    //Output messages
 
     public static String equal(String fa, String fb) {
         if(fa == null || fb == null) return "EQUAL";
@@ -52,16 +181,6 @@ public class Printer {
 
     public static String counterexampleNotFound(){
         return "Counter-example not found";
-    }
-
-    public static String grammarCheck(String filename) {
-        if(filename == null) return "Incorrect format for the grammar";
-        return "Incorrect format for the grammar in file " + filename;
-    }
-
-    public static String regexCheck(String filename){
-        if(filename == null) return "Incorrect format for the regular expression";
-        return "Incorrect format for the regular expression in file " + filename;
     }
 
     public static String ambiguous(String filename) {
