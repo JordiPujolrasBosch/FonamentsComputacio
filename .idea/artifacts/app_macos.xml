@@ -1,0 +1,29 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="app_macos">
+    <output-path>$PROJECT_DIR$/out/artifacts/app_macos</output-path>
+    <root id="archive" name="FonamentsComputacio.jar">
+      <element id="module-output" name="FonamentsComputacio" />
+      <element id="extracted-dir" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/javafx-swt.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/javafx.base.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/javafx.controls.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/javafx.fxml.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/javafx.graphics.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/javafx.media.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/javafx.swing.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/javafx.web.jar" path-in-jar="/" />
+      <element id="file-copy" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/libdecora_sse.dylib" />
+      <element id="file-copy" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/libfxplugins.dylib" />
+      <element id="file-copy" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/libglass.dylib" />
+      <element id="file-copy" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/libglib-lite.dylib" />
+      <element id="file-copy" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/libgstreamer-lite.dylib" />
+      <element id="file-copy" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/libjavafx_font.dylib" />
+      <element id="file-copy" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/libjavafx_iio.dylib" />
+      <element id="file-copy" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/libjfxmedia.dylib" />
+      <element id="file-copy" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/libjfxmedia_avf.dylib" />
+      <element id="file-copy" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/libjfxwebkit.dylib" />
+      <element id="file-copy" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/libprism_common.dylib" />
+      <element id="file-copy" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/libprism_es2.dylib" />
+      <element id="file-copy" path="$USER_HOME$/.jdks/openjfx-21.0.4_osx-x64_bin-sdk/javafx-sdk-21.0.4/lib/libprism_sw.dylib" />
+    </root>
+  </artifact>
+</component>
