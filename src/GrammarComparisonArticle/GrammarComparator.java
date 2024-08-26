@@ -111,6 +111,7 @@ public class GrammarComparator {
         public Gramex gamma;
         public Gvar leftVar;
         public boolean everyBetaIsNonEmpty;
+        public String x;
     }
 
     private static class TestcasesData{
@@ -306,24 +307,20 @@ public class GrammarComparator {
         data.split.gamma = gamma;
         data.split.leftVar = v;
         data.split.everyBetaIsNonEmpty = everyBetaIsNonEmpty;
+        data.split.x = shortWord;
         return everyOmegaCanDeriveShort;
     }
 
     private static Set<Comparison> verifySplit(Comparison comp, Set<Comparison> context, GrammarComparatorDataAux data){
         Set<Comparison> set = new HashSet<>();
+        //gamma op d(x,Right)
+        set.add(new Comparison(data.split.gamma, derivativeOfSet(data.split.x, comp.getRight(), data.getCfgRight()) , comp.isEquivalence()));
         for(SplitElement spe : data.split.list){
-            boolean betaIsEmpty = spe.beta.type() == TypesGramex.EMPTY;
             boolean roIsEmpty = spe.ro.type() == TypesGramex.EMPTY;
-            GramexNonEmpty beta = null;
             GramexNonEmpty ro = null;
-            if(!betaIsEmpty) beta = spe.beta.toGramexNonEmpty();
             if(!roIsEmpty) ro = spe.ro.toGramexNonEmpty();
             boolean op = comp.isEquivalence();
 
-            // gamma op ro-beta
-            if(betaIsEmpty) set.add(new Comparison(data.split.gamma, ro, op));
-            else if(roIsEmpty) set.add(new Comparison(data.split.gamma, beta, op));
-            else set.add(new Comparison(data.split.gamma, new GramexConcat(ro, beta), op));
             //var-ro op omega
             if(roIsEmpty) set.add(new Comparison(new GramexVar(data.split.leftVar), spe.omega, op));
             else set.add(new Comparison(new GramexConcat(new GramexVar(data.split.leftVar), ro) , spe.omega, op));

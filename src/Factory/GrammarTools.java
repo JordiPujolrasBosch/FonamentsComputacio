@@ -628,7 +628,7 @@ public class GrammarTools {
     }
 
     public static int recommendedBagSize(CfgNonEmpty cfg) {
-        return 5 * cfg.getVariables().size() * cfg.getRules().size();
+        return Math.min(5 * cfg.getVariables().size() * cfg.getRules().size(), 200);
     }
 
 }
