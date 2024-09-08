@@ -59,6 +59,15 @@ public class Comparison {
         return !opEq;
     }
 
+    //Methods
+
+    public int size(){
+        int n = 0;
+        for(Gramex g : left) n += g.length();
+        for(Gramex g : right) n += g.length();
+        return n;
+    }
+
     //Equals
 
     @Override

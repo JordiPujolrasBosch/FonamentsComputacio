@@ -2,6 +2,7 @@ package Factory;
 
 import Automatons.Pda;
 import Elements.Grammars.*;
+import Factory.Constructors.CfgConstructor;
 import Factory.Constructors.CfgNonEmptyConstructor;
 import Grammars.*;
 import Utils.Pair;
@@ -439,6 +440,20 @@ public class GrammarTools {
         return accepts;
     }
 
+    public static boolean setAcceptsAllWords(CfgNonEmpty cfg, Set<Gramex> set, List<String> words){
+        CfgConstructor aux = cfg.toCfg().getConstructor();
+        Gvar newStart = aux.generate(aux.start);
+        aux.start = newStart;
+        for(Gramex g : set) aux.rules.add(new Grule(newStart, g));
+        Pda parser = aux.getCfg().simplify().toCfg().toPda();
+
+        boolean accepts = true;
+        Iterator<String> it = words.iterator();
+        while (it.hasNext() && accepts) accepts = parser.checkWord(it.next());
+
+        return accepts;
+    }
+
     public static String shortestWordOfGramex(Cfg cfg, Gramex g) {
         if(!containsVar(g)) return makeWord(g);
 
@@ -625,10 +640,6 @@ public class GrammarTools {
 
         if(varRight != null) return cfgb.getVariables().contains(varRight);
         return true;
-    }
-
-    public static int recommendedBagSize(CfgNonEmpty cfg) {
-        return Math.min(5 * cfg.getVariables().size() * cfg.getRules().size(), 200);
     }
 
 }

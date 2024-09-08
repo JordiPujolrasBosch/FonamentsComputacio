@@ -1988,19 +1988,11 @@ public class Algorithms {
                     if(tuple.getPop() != e) out.stack.pop();
                     if(tuple.getPush() != e) out.stack.push(tuple.getPush());
 
-                    if(shortWordInStack(out.stack, word, pc)) exit.list.add(out);
+                    if(out.stack.size() < word.length()+3) exit.list.add(out);
                     if(pc.finalStates.contains(out.act) && out.stack.empty() && out.pos == word.length()) exit.accept = true;
                 }
             }
             return exit;
-        }
-
-        static boolean shortWordInStack(Stack<Integer> stack, String word, PdaConstructor pc){
-            int charsCounter = 0;
-            for(int i : stack){
-                if(pc.mapperChar.containsValue(i)) charsCounter++;
-            }
-            return charsCounter < word.length()+2;
         }
 
         private static class PdaRunningInstance {
@@ -2110,7 +2102,7 @@ public class Algorithms {
 
     //BUILD CFG WORDS OF LENGTH
 
-    private static CfgNonEmpty buildCfgLengthFromTo(CfgNonEmpty x, int lengthStart, int lengthFinish){
+    public static CfgNonEmpty buildCfgLengthFromTo(CfgNonEmpty x, int lengthStart, int lengthFinish){
         if(lengthStart < 0 || lengthFinish < 0 || lengthStart >= lengthFinish) return new CfgNonEmpty();
         CfgNonEmptyConstructor ccx = x.getConstructor();
         Map<Gvar, Map<Integer, Gvar>> originalToNew = new HashMap<>();

@@ -1,14 +1,16 @@
 package GrammarComparisonArticle;
 
+import Automatons.Pda;
+import Elements.Grammars.Grule;
+import Elements.Grammars.GruleNonEmpty;
 import Elements.Grammars.Gvar;
+import Factory.Algorithms;
+import Factory.Constructors.CfgConstructor;
+import Factory.Constructors.CfgNonEmptyConstructor;
 import Factory.GrammarTools;
 import Grammars.*;
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 
 public class GrammarComparator {
     public static boolean compare(CfgNonEmpty a, CfgNonEmpty b) {
@@ -17,7 +19,7 @@ public class GrammarComparator {
         if(a.acceptsEmpty() != b.acceptsEmpty()) return false;
         if(!a.getTerminals().equals(b.getTerminals())) return false;
 
-        GrammarComparatorDataAux data = new GrammarComparatorDataAux(a,b);
+        GrammarComparatorData data = new GrammarComparatorData(a,b);
         Comparison start = new Comparison(new GramexVar(data.cfga.getStart()), new GramexVar(data.cfgb.getStart()), true);
         Set<Comparison> context = new HashSet<>();
         Set<Comparison> toProve = new HashSet<>();
@@ -29,19 +31,22 @@ public class GrammarComparator {
             Comparison act = toProve.iterator().next();
             toProve.remove(act);
 
-            if(data.counter > 100000)                                        stop = true;
-            else if(canApplyLengthFilter(act) && !lengthFilter(act, data))   stop = true;
-            else if(canApplyEmptyOne(act))                                   toProve.addAll(verifyEmpty());
-            else if(canApplyEmptyTwo(act))                                   toProve.addAll(verifyEmpty());
-            else if(canApplyInduct(act, context))                            toProve.addAll(verifyInduct());
-            else if(canApplyEpsilon(act))                                    toProve.add(verifyEpsilon(act));
-            else if(canApplyTestcases(act) && checkTestcasesData(act, data)) toProve.add(verifyTestcases(data));
-            else if(canApplyInclusion(act) && previousCheckInclusion(act))   toProve.addAll(verifyInclusion(act));
-            else if(canApplySplit(act) && checkSplitData(act,data))          toProve.addAll(verifySplit(act, context, data));
-            else if(canApplyDist(act))                                       toProve.addAll(verifyDist(act));
-            else if(canApplyBranch(act, data))                               toProve.addAll(verifyBranch(act, context, data));
-            else if(canApplyInclusion(act))                                  toProve.addAll(verifyInclusion(act));
-            else                                                             stop = true;
+            if(data.counter > 100000)                                         stop = true;
+            else if(canApplyLengthFilter(act) && !lengthFilter(act, data))    stop = true;
+            else if(emptyCorrect(act))                                        nothing();
+            else if(emptyNotCorrect(act))                                     stop = true;
+            else if(epsilonCorrect(act))                                      toProve.add(verifyEpsilon(act));
+            else if(epsilonNotCorrect(act))                                   stop = true;
+            else if(canApplyInduct(act, context))                             nothing();
+            else if(canApplySelf(act))                                        nothing();
+            else if(canApplyTail(act,context))                                nothing();
+            else if(canApplyLong(act) && checkLongData(act,data))             nothing();
+            else if(canApplyLong(act))                                        stop = true;
+            else if(canApplyInclusion(act) && previousCheckInclusion(act))    toProve.addAll(verifyInclusion(act));
+            else if(canApplySplit(act) && checkSplitData(act,data))           toProve.addAll(verifySplit(act, context, data));
+            else if(canApplyDist(act))                                        toProve.addAll(verifyDist(act));
+            else if(canApplyTestcases(act) && checkTestcasesData(act, data))  toProve.add(verifyTestcases(data));
+            else                                                              toProve.addAll(verifyBranch(act, context, data));
 
             data.counter++;
             if(toProve.isEmpty() && !stop){
@@ -53,55 +58,43 @@ public class GrammarComparator {
         return equal;
     }
 
-    private static class GrammarComparatorDataAux {
+    private static class GrammarComparatorData {
         public CfgNonEmpty cfga;
         public CfgNonEmpty cfgb;
-        public WordsGenerator wga;
-        public WordsGenerator wgb;
-
+        public CfgNonEmpty cfgfusion;
+        public WordsGenerator wgfusion;
         public int counter;
-        public boolean leftIsA;
-
         public SplitData split;
         public TestcasesData testcases;
-        public BranchData branch;
 
-        public GrammarComparatorDataAux(CfgNonEmpty a, CfgNonEmpty b){
+        public GrammarComparatorData(CfgNonEmpty a, CfgNonEmpty b){
             cfga = GrammarTools.renameVars(a,b);
             cfgb = b;
-            wga = new WordsGenerator(cfga);
-            wgb = new WordsGenerator(cfgb);
-
+            cfgfusion = fusion(cfga,cfgb);
+            wgfusion = new WordsGenerator(cfgfusion);
             counter = 0;
-            leftIsA = true;
-
             split = new SplitData();
             testcases = new TestcasesData();
-            branch = new BranchData();
         }
 
-        public void calculate(Comparison comp) {
-            leftIsA = GrammarTools.correctVars(cfga, cfgb, comp.getLeft(), comp.getRight());
-        }
+        public CfgNonEmpty fusion(CfgNonEmpty a, CfgNonEmpty b){
+            int v = 0;
+            while(a.getVariables().contains(new Gvar('Z',v)) || b.getVariables().contains(new Gvar('Z',v))) v++;
 
-        public CfgNonEmpty getCfgLeft() {
-            if(leftIsA) return cfga;
-            return cfgb;
-        }
+            Gvar start = new Gvar('Z',v);
 
-        public CfgNonEmpty getCfgRight() {
-            if(leftIsA) return cfgb;
-            return cfga;
-        }
+            Set<Gvar> vars = new HashSet<>();
+            vars.addAll(a.getVariables());
+            vars.addAll(b.getVariables());
+            vars.add(start);
 
-        public WordsGenerator getWordsGeneratorLeft() {
-            if(leftIsA) return wga;
-            return wgb;
-        }
+            Set<GruleNonEmpty> rules = new HashSet<>();
+            rules.addAll(a.getRules());
+            rules.addAll(b.getRules());
+            rules.add(new GruleNonEmpty(start, new GramexVar(a.getStart())));
+            rules.add(new GruleNonEmpty(start, new GramexVar(b.getStart())));
 
-        public WordsGenerator getWordsGeneratorRight(){
-            if(leftIsA) return wgb;
-            return wga;
+            return new CfgNonEmpty(a.getTerminals(), vars, start, rules, a.acceptsEmpty());
         }
     }
 
@@ -109,7 +102,7 @@ public class GrammarComparator {
         public SplitData(){}
         public List<SplitElement> list;
         public Gramex gamma;
-        public Gvar leftVar;
+        public GramexNonEmpty alpha;
         public boolean everyBetaIsNonEmpty;
         public String x;
     }
@@ -119,36 +112,51 @@ public class GrammarComparator {
         public Comparison result;
     }
 
-    private static class BranchData{
-        public BranchData(){}
-        public Set<Comparison> result;
+    private static void nothing(){}
+
+    //Rule empty
+
+    private static boolean emptyCorrect(Comparison comp){
+        // {} == {}, {} in {}, {} in {x}
+        boolean a = comp.getLeft().isEmpty() && comp.getRight().isEmpty()  && comp.isEquivalence();
+        boolean b = comp.getLeft().isEmpty() && comp.getRight().isEmpty()  && comp.isInclusion();
+        boolean c = comp.getLeft().isEmpty() && !comp.getRight().isEmpty() && comp.isInclusion();
+        return a || b || c;
     }
 
-    //Rules empty
-
-    private static boolean canApplyEmptyOne(Comparison comp){
-        //{} == {}
-        return comp.isEquivalence() && comp.getLeft().isEmpty() && comp.getRight().isEmpty();
-    }
-
-    private static boolean canApplyEmptyTwo(Comparison comp){
-        // {} in x
-        return comp.isInclusion() && comp.getLeft().isEmpty();
-    }
-
-    private static Set<Comparison> verifyEmpty(){
-        return new HashSet<>();
+    private static boolean emptyNotCorrect(Comparison comp){
+        // {} == {x}, {x} == {}, {x} in {}
+        boolean a = comp.getLeft().isEmpty()  && !comp.getRight().isEmpty() && comp.isEquivalence();
+        boolean b = !comp.getLeft().isEmpty() && comp.getRight().isEmpty()  && comp.isEquivalence();
+        boolean c = !comp.getLeft().isEmpty() && comp.getRight().isEmpty()  && comp.isInclusion();
+        return a || b || c;
     }
 
     //Rule epsilon
 
-    private static boolean canApplyEpsilon(Comparison comp){
-        // {/} op {/}
-        return comp.getLeft().contains(GramexEmpty.getInstance()) && comp.getRight().contains(GramexEmpty.getInstance());
+    private static boolean epsilonCorrect(Comparison comp){
+        // {/} == {/}, {/} in {/}, {x} in {/}
+        boolean l = comp.getLeft().contains(GramexEmpty.getInstance());
+        boolean r = comp.getRight().contains(GramexEmpty.getInstance());
+
+        boolean a = l  && r && comp.isEquivalence();
+        boolean b = l  && r && comp.isInclusion();
+        boolean c = !l && r && comp.isInclusion();
+        return a || b || c;
+    }
+
+    private static boolean epsilonNotCorrect(Comparison comp){
+        // {/} == {x}, {x} == {/}, {/} in {x}
+        boolean l = comp.getLeft().contains(GramexEmpty.getInstance());
+        boolean r = comp.getRight().contains(GramexEmpty.getInstance());
+
+        boolean a = l  && !r && comp.isEquivalence();
+        boolean b = !l && r  && comp.isEquivalence();
+        boolean c = l  && !r && comp.isInclusion();
+        return a || b || c;
     }
 
     private static Comparison verifyEpsilon(Comparison comp){
-        // {/} op {/}
         Set<Gramex> left  = new HashSet<>(comp.getLeft());
         left.remove(GramexEmpty.getInstance());
         Set<Gramex> right = new HashSet<>(comp.getRight());
@@ -171,8 +179,30 @@ public class GrammarComparator {
         return context.contains(xeqy) || context.contains(yeqx) || context.contains(xiny);
     }
 
-    private static Set<Comparison> verifyInduct(){
-        return new HashSet<>();
+    //Rule self
+
+    private static boolean canApplySelf(Comparison comp){
+        // {x} in {x}, {x} in {x,y}
+        boolean ok = comp.getLeft().size() == 1 && comp.isInclusion() && !comp.getRight().isEmpty();
+        ok = ok && comp.getRight().contains(comp.getLeft().iterator().next());
+        return ok;
+    }
+
+    //Rule tail
+
+    private static boolean canApplyTail(Comparison comp, Set<Comparison> context){
+        //{a} in {c,d} act
+        //{a} in {d}   context
+        boolean found = false;
+        Iterator<Comparison> it = context.iterator();
+        while (it.hasNext() && !found){
+            Comparison aux = it.next();
+            found = comp.getLeft().equals(aux.getLeft())
+                    && comp.isInclusion()
+                    && aux.isInclusion()
+                    && comp.getRight().containsAll(aux.getRight());
+        }
+        return found;
     }
 
     //Rule dist
@@ -208,25 +238,43 @@ public class GrammarComparator {
 
     //Rule branch
 
-    private static boolean canApplyBranch(Comparison comp, GrammarComparatorDataAux data){
-        data.calculate(comp);
-        CfgNonEmpty cfgl = data.getCfgLeft();
-        CfgNonEmpty cfgr = data.getCfgRight();
-
+    private static Set<Comparison> verifyBranch(Comparison comp, Set<Comparison> context, GrammarComparatorData data){
         Set<Comparison> set = new HashSet<>();
-        for(char c : cfgl.getTerminals().getSet()){
-            Set<Gramex> dl = derivativeOfSet(Character.toString(c), comp.getLeft(), cfgl);
-            Set<Gramex> dr = derivativeOfSet(Character.toString(c), comp.getRight(), cfgr);
-            if(!dl.isEmpty() && !dr.isEmpty()) set.add(new Comparison(dl, dr, comp.isEquivalence()));
+        for(char c : data.cfga.getTerminals().getSet()){
+            Set<Gramex> dl = derivativeOfSet(Character.toString(c), comp.getLeft(), data.cfgfusion);
+            Set<Gramex> dr = derivativeOfSet(Character.toString(c), comp.getRight(), data.cfgfusion);
+            set.add(new Comparison(dl, dr, comp.isEquivalence()));
         }
-
-        data.branch.result = set;
-        return !set.isEmpty();
+        context.add(comp);
+        return set;
     }
 
-    private static Set<Comparison> verifyBranch(Comparison comp, Set<Comparison> context, GrammarComparatorDataAux data){
-        context.add(comp);
-        return data.branch.result;
+    //Rule long
+
+    private static boolean canApplyLong(Comparison comp){
+        boolean found = false;
+        Iterator<Gramex> it = comp.getLeft().iterator();
+        while (it.hasNext() && !found) found = it.next().length() > 6;
+        return (comp.size() > 30 || found) && comp.isInclusion();
+    }
+
+    private static boolean checkLongData(Comparison comp, GrammarComparatorData data){
+        Set<String> wordsBag = new HashSet<>();
+        int n = 100;
+        if(comp.getLeft().size() < 4) n = 200;
+        for(Gramex g : comp.getLeft()) wordsBag.addAll(data.wgfusion.generateWords(n, g.toGramexNonEmpty()));
+
+        CfgConstructor aux = data.cfgfusion.toCfg().getConstructor();
+        Gvar newStart = aux.generate(aux.start);
+        aux.start = newStart;
+        for(Gramex g : comp.getRight()) aux.rules.add(new Grule(newStart, g));
+        Pda parser = aux.getCfg().simplify().toCfg().toPda();
+
+        boolean accepts = true;
+        Iterator<String> it = wordsBag.iterator();
+        while (it.hasNext() && accepts) accepts = parser.checkWord(it.next());
+
+        return accepts;
     }
 
     //Rule testcases
@@ -238,52 +286,89 @@ public class GrammarComparator {
                 && comp.getLeft().iterator().next().type() != TypesGramex.EMPTY;
     }
 
-    private static boolean checkTestcasesData(Comparison comp, GrammarComparatorDataAux data){
-        data.calculate(comp);
-        CfgNonEmpty cfgr = data.getCfgRight();
-        CfgNonEmpty cfgl = data.getCfgLeft();
-        WordsGenerator alphal = data.getWordsGeneratorLeft();
-
+    private static boolean checkTestcasesData(Comparison comp, GrammarComparatorData data){
+        //words
         Gramex left = comp.getLeft().iterator().next();
-        List<String> wordsBag = alphal.generateWords(GrammarTools.recommendedBagSize(cfgl), left.toGramexNonEmpty());
+        List<String> wordsBag = new ArrayList<>();
+        if(left.length() < 6) wordsBag.addAll(generateShortWords(left.toGramexNonEmpty(),data));
+        wordsBag.addAll(data.wgfusion.generateWords(200, left.toGramexNonEmpty()));
 
-        Iterator<Gramex> it = comp.getRight().iterator();
-        boolean found = false;
-        while(it.hasNext() && !found){
-            Gramex g = it.next();
-            if(g.type() != TypesGramex.EMPTY){
-                GramexNonEmpty s = g.toGramexNonEmpty();
-                found = GrammarTools.acceptsAllWords(cfgr, s, wordsBag);
-                if(found) data.testcases.result = new Comparison(comp.getLeft(), s, false);
+        //search var
+        boolean foundVar = false;
+        GramexVar var = null;
+        Iterator<Gramex> it1 = comp.getRight().iterator();
+        while (it1.hasNext() && !foundVar) {
+            Gramex g = it1.next();
+            foundVar = g.type() == TypesGramex.VAR;
+            if(foundVar) var = g.toGramexVar();
+        }
+
+        //check var
+        if(foundVar){
+            if (GrammarTools.acceptsAllWords(data.cfgfusion, var, wordsBag)){
+                data.testcases.result = new Comparison(comp.getLeft(), var, false);
+                return true;
             }
+        }
+
+        //sort gramex
+        List<Gramex> list = new ArrayList<>(comp.getRight().stream().toList());
+        list.sort(Comparator.comparingInt(Gramex::length));
+
+        //check for length
+        int i = list.size()-1;
+        boolean found = false;
+        while(i>=0 && !found){
+            Gramex g = list.get(i);
+            Set<Gramex> aux = new HashSet<>(comp.getRight());
+            aux.remove(g);
+            found = GrammarTools.setAcceptsAllWords(data.cfgfusion, aux, wordsBag);
+            if(found) data.testcases.result = new Comparison(comp.getLeft(), aux, false);
+            i--;
         }
 
         return found;
     }
 
-    private static Comparison verifyTestcases(GrammarComparatorDataAux data){
+    private static List<String> generateShortWords(GramexNonEmpty g, GrammarComparatorData data){
+        CfgNonEmptyConstructor cc = data.cfgfusion.getConstructor();
+        Gvar newStart = cc.generate(cc.start);
+        cc.start = newStart;
+        cc.rules.add(new GruleNonEmpty(newStart, g));
+        CfgNonEmpty aux = cc.getCfgNonEmpty().toCfg().simplify();
+
+        String x = GrammarTools.shortestWordOfGramex(data.cfgfusion, g);
+        CfgNonEmpty shortCfg = Algorithms.buildCfgLengthFromTo(aux.toChomsky(), x.length(), x.length()+2);
+        WordsGenerator wg = new WordsGenerator(shortCfg);
+        return wg.generateAllWordsStart();
+    }
+
+    private static Comparison verifyTestcases(GrammarComparatorData data){
         return data.testcases.result;
     }
 
     //Rule split
 
     private static boolean canApplySplit(Comparison comp){
-        boolean ok = comp.getLeft().size() == 1;
+        boolean ok = comp.getLeft().size() == 1
+                && comp.getRight().size() > 0
+                && comp.getLeft().iterator().next().length() > 1;
         if(ok){
-            Gramex left = comp.getLeft().iterator().next();
-            ok = left.length() > 1 && GrammarTools.startsWithVar(left);
+            boolean found = false;
+            Iterator<Gramex> it = comp.getRight().iterator();
+            while (it.hasNext() && !found) {
+                Gramex x = it.next();
+                found = (x.length() < 2 || !GrammarTools.startsWithVar(x));
+            }
+            if(found) ok = false;
         }
         return ok;
     }
 
-    private static boolean checkSplitData(Comparison comp, GrammarComparatorDataAux data){
-        data.calculate(comp);
-        CfgNonEmpty cfgl = data.getCfgLeft();
-        CfgNonEmpty cfgr = data.getCfgRight();
-
+    private static boolean checkSplitData(Comparison comp, GrammarComparatorData data){
         Gramex r = comp.getLeft().iterator().next();
-        Gvar v = GrammarTools.getLeftMostVar(r.toGramexNonEmpty());
-        String shortWord = GrammarTools.shortestWordOfGramex(cfgl, new GramexVar(v));
+        GramexNonEmpty a = GrammarTools.getLeftMostElement(r.toGramexNonEmpty()).toGramexNonEmpty();
+        String shortWord = GrammarTools.shortestWordOfGramex(data.cfgfusion, a);
         Gramex gamma = GrammarTools.cut(r, 1).getB();
 
         boolean everyOmegaCanDeriveShort = true;
@@ -294,9 +379,8 @@ public class GrammarComparator {
 
         Iterator<Gramex> it = comp.getRight().iterator();
         while(it.hasNext() && everyOmegaCanDeriveShort){
-            Gramex w = it.next();
-            SplitElement spe = new SplitElement(w);
-            everyOmegaCanDeriveShort = findOmegaBetaRo(spe, shortWord, cfgr);
+            SplitElement spe = new SplitElement(it.next());
+            everyOmegaCanDeriveShort = findOmegaBetaRo(spe, shortWord, data.cfgfusion);
             if(everyOmegaCanDeriveShort){
                 list.add(spe);
                 everyBetaIsNonEmpty = everyBetaIsNonEmpty && (spe.beta.type() != TypesGramex.EMPTY);
@@ -305,40 +389,42 @@ public class GrammarComparator {
 
         data.split.list = list;
         data.split.gamma = gamma;
-        data.split.leftVar = v;
+        data.split.alpha = a;
         data.split.everyBetaIsNonEmpty = everyBetaIsNonEmpty;
         data.split.x = shortWord;
         return everyOmegaCanDeriveShort;
     }
 
-    private static Set<Comparison> verifySplit(Comparison comp, Set<Comparison> context, GrammarComparatorDataAux data){
+    private static Set<Comparison> verifySplit(Comparison comp, Set<Comparison> context, GrammarComparatorData data){
         Set<Comparison> set = new HashSet<>();
         //gamma op d(x,Right)
-        set.add(new Comparison(data.split.gamma, derivativeOfSet(data.split.x, comp.getRight(), data.getCfgRight()) , comp.isEquivalence()));
+        set.add(new Comparison(data.split.gamma, derivativeOfSet(data.split.x, comp.getRight(), data.cfgfusion) , comp.isEquivalence()));
         for(SplitElement spe : data.split.list){
             boolean roIsEmpty = spe.ro.type() == TypesGramex.EMPTY;
             GramexNonEmpty ro = null;
             if(!roIsEmpty) ro = spe.ro.toGramexNonEmpty();
             boolean op = comp.isEquivalence();
 
-            //var-ro op omega
-            if(roIsEmpty) set.add(new Comparison(new GramexVar(data.split.leftVar), spe.omega, op));
-            else set.add(new Comparison(new GramexConcat(new GramexVar(data.split.leftVar), ro) , spe.omega, op));
+            //alpha-ro op omega
+            if(roIsEmpty) set.add(new Comparison(data.split.alpha, spe.omega, op));
+            else set.add(new Comparison(new GramexConcat(data.split.alpha, ro) , spe.omega, op));
         }
 
         if(data.split.everyBetaIsNonEmpty) context.add(comp);
         return set;
     }
 
-    private static boolean findOmegaBetaRo(SplitElement spe, String x, CfgNonEmpty gtr){
+    private static boolean findOmegaBetaRo(SplitElement spe, String x, CfgNonEmpty cfg){
         // w = omega-beta
         // d(x,w) = ro-beta
-        Set<Gramex> set = derivative(x, spe.w, gtr);
+        Set<Gramex> set = derivative(x, spe.w, cfg);
         if(set.isEmpty()) return false;
 
         int state = 0; //0=not-read, 1=found-beta-empty, 2=found-beta-non-empty
         for(Gramex roBetaCandidate : set){
             Gramex betaCandidate = GrammarTools.commonSuffix(roBetaCandidate, spe.w);
+            if(spe.w.equals(betaCandidate)) betaCandidate = GramexEmpty.getInstance();
+
             if(state == 0){
                 spe.beta = betaCandidate;
                 spe.ro = GrammarTools.cut(roBetaCandidate, roBetaCandidate.length() - betaCandidate.length()).getA();
@@ -385,19 +471,13 @@ public class GrammarComparator {
         return comp.getLeft().size() == 1 && comp.getRight().size() == 1 && comp.isEquivalence();
     }
 
-    private static boolean lengthFilter(Comparison comp, GrammarComparatorDataAux data){
-        data.calculate(comp);
-        CfgNonEmpty cfgl = data.getCfgLeft();
-        CfgNonEmpty cfgr = data.getCfgRight();
-
+    private static boolean lengthFilter(Comparison comp, GrammarComparatorData data){
         Gramex l = comp.getLeft().iterator().next();
         Gramex r = comp.getRight().iterator().next();
 
-        String shortl = GrammarTools.shortestWordOfGramex(cfgl, l);
-        String shortr = GrammarTools.shortestWordOfGramex(cfgr, r);
+        String shortl = GrammarTools.shortestWordOfGramex(data.cfgfusion, l);
+        String shortr = GrammarTools.shortestWordOfGramex(data.cfgfusion, r);
 
-        if(shortl.length() < r.length()) return false;
-        if(shortr.length() < l.length()) return false;
-        return true;
+        return shortl.length() >= r.length() && shortr.length() >= l.length();
     }
 }
