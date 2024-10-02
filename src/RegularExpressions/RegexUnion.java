@@ -66,6 +66,11 @@ public class RegexUnion implements RegularExpression {
         return a + TokenFactory.getRUnion() + b;
     }
 
+    /**
+     * Compares if two objects are equal.
+     * @param o The object to compare.
+     * @return True if this and o are equal. False otherwise.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -74,6 +79,9 @@ public class RegexUnion implements RegularExpression {
         return (a.equals(that.a) && b.equals(that.b)) || (a.equals(that.b) && b.equals(that.a));
     }
 
+    /**
+     * @return A hash code for this object.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(a, b);

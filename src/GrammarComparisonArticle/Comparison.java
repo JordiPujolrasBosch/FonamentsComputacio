@@ -70,6 +70,11 @@ public class Comparison {
 
     //Equals
 
+    /**
+     * Compares if two objects are equal.
+     * @param o The object to compare.
+     * @return True if this and o are equal. False otherwise.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -78,6 +83,9 @@ public class Comparison {
         return opEq == that.opEq && left.equals(that.left) && right.equals(that.right);
     }
 
+    /**
+     * @return A hash code for this object.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(left, right, opEq);

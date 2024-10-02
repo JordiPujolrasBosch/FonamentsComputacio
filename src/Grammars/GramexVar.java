@@ -47,6 +47,11 @@ public class GramexVar implements GramexNonEmpty {
         return null;
     }
 
+    /**
+     * Compares if two objects are equal.
+     * @param o The object to compare.
+     * @return True if this and o are equal. False otherwise.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -55,6 +60,9 @@ public class GramexVar implements GramexNonEmpty {
         return v.equals(that.v);
     }
 
+    /**
+     * @return A hash code for this object.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(v);

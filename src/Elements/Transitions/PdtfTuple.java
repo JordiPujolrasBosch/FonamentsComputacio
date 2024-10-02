@@ -43,6 +43,11 @@ public class PdtfTuple {
 
     //Equals
 
+    /**
+     * Compares if two objects are equal.
+     * @param o The object to compare.
+     * @return True if this and o are equal. False otherwise.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -51,6 +56,9 @@ public class PdtfTuple {
         return character == that.character && pop == that.pop && push == that.push && origin.equals(that.origin) && destiny.equals(that.destiny);
     }
 
+    /**
+     * @return A hash code for this object.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(origin, character, pop, destiny, push);

@@ -9,6 +9,10 @@ import Factory.Printer;
 
 import java.util.Set;
 
+/**
+ * Nondeterministic finite automaton. A nfa is used to transform a regex to a dfa and to transform a dfa to a regex.
+ */
+
 public class Nfa {
     private final Set<State> states;
     private final Alphabet alphabet;
@@ -24,18 +28,32 @@ public class Nfa {
         this.transition = transition;
     }
 
+    /**
+     * @return A constructor of this nfa.
+     */
     public NfaConstructor getConstructor() {
         return new NfaConstructor(states, alphabet, start, finalStates, transition);
     }
 
+    /**
+     * Transforms the nfa to a dfa.
+     * @return A dfa that is equivalent to this.
+     */
     public Dfa toDfa(){
         return Algorithms.nfaToDfa(this);
     }
 
+    /**
+     * Transforms the nfa to a gnfa.
+     * @return A gnfa that is equivalent to this.
+     */
     public Gnfa toGnfa(){
         return Algorithms.nfaToGnfa(this);
     }
 
+    /**
+     * @return A string that represents this nfa in the defined format.
+     */
     @Override
     public String toString(){
         return Printer.stringOfNfa(this);

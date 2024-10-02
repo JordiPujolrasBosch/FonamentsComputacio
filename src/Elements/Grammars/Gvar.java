@@ -2,6 +2,10 @@ package Elements.Grammars;
 
 import java.util.Objects;
 
+/**
+ * Grammar variable. A non-terminal used is context free grammars.
+ */
+
 public class Gvar {
     private final char c;
     private final int n;
@@ -13,21 +17,35 @@ public class Gvar {
 
     //Getters
 
+    /**
+     * @return The charcter of this gvar.
+     */
     public char getC(){
         return c;
     }
 
+    /**
+     * @return The number of this gvar.
+     */
     public int getN(){
         return n;
     }
 
     //String and equals
 
+    /**
+     * @return A string that represents this grule in the defined format.
+     */
     @Override
     public String toString() {
         return Character.toString(c) + n;
     }
 
+    /**
+     * Compares if two objects are equal.
+     * @param o The object to compare.
+     * @return True if this and o are equal. False otherwise.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -36,6 +54,9 @@ public class Gvar {
         return c == that.c && n == that.n;
     }
 
+    /**
+     * @return A hash code for this object.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(c, n);

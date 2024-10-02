@@ -74,6 +74,11 @@ public class IntegerInf {
 
     //Equals
 
+    /**
+     * Compares if two objects are equal.
+     * @param o The object to compare.
+     * @return True if this and o are equal. False otherwise.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -82,6 +87,9 @@ public class IntegerInf {
         return n == that.n && inf == that.inf;
     }
 
+    /**
+     * @return A hash code for this object.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(n, inf);

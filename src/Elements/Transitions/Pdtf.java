@@ -72,6 +72,11 @@ public class Pdtf {
             pop = s;
         }
 
+        /**
+         * Compares if two objects are equal.
+         * @param o The object to compare.
+         * @return True if this and o are equal. False otherwise.
+         */
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -80,6 +85,9 @@ public class Pdtf {
             return character == that.character && pop == that.pop && origin.equals(that.origin);
         }
 
+        /**
+         * @return A hash code for this object.
+         */
         @Override
         public int hashCode() {
             return Objects.hash(origin, character, pop);
@@ -95,6 +103,11 @@ public class Pdtf {
             push = s;
         }
 
+        /**
+         * Compares if two objects are equal.
+         * @param o The object to compare.
+         * @return True if this and o are equal. False otherwise.
+         */
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -103,6 +116,9 @@ public class Pdtf {
             return push == that.push && destiny.equals(that.destiny);
         }
 
+        /**
+         * @return A hash code for this object.
+         */
         @Override
         public int hashCode() {
             return Objects.hash(destiny, push);

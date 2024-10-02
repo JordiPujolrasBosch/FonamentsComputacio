@@ -62,7 +62,11 @@ public class GramexConcat implements GramexNonEmpty {
         return list;
     }
 
-
+    /**
+     * Compares if two objects are equal.
+     * @param o The object to compare.
+     * @return True if this and o are equal. False otherwise.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -82,6 +86,9 @@ public class GramexConcat implements GramexNonEmpty {
         return equal;
     }
 
+    /**
+     * @return A hash code for this object.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(toList());
