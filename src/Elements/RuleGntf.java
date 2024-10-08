@@ -4,6 +4,10 @@ import RegularExpressions.RegularExpression;
 
 import java.util.Objects;
 
+/**
+ * Transition of a gnfa.
+ */
+
 public class RuleGntf {
     private final State origin;
     private final State destiny;
@@ -17,14 +21,23 @@ public class RuleGntf {
 
     //Getters
 
+    /**
+     * @return The origin state.
+     */
     public State getOrigin(){
         return origin;
     }
 
+    /**
+     * @return The destiny state.
+     */
     public State getDestiny(){
         return destiny;
     }
 
+    /**
+     * @return The regular expression.
+     */
     public RegularExpression getRegex(){
         return regex;
     }

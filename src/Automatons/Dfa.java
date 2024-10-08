@@ -70,7 +70,7 @@ public class Dfa {
     }
 
     /**
-     * Build a dfa which language is the complement of this. The result accepts the words that aren't accepted by this.
+     * Build a dfa which language is the complement of this. The result dfa accepts the words that aren't accepted by this.
      * @return A dfa that represents the complement of this.
      */
     public Dfa complement(){
@@ -78,7 +78,7 @@ public class Dfa {
     }
 
     /**
-     * Build a nfa which language is the reverse of this. The result accepts the words of the original language but reversed.
+     * Build a nfa which language is the reverse of this. The result nfa accepts the words of the original language but reversed.
      * @return A nfa that represents the reverse of this.
      */
     public Nfa reverse(){

@@ -2,6 +2,10 @@ package Elements;
 
 import java.util.Objects;
 
+/**
+ * Transition of a dfa and a nfa.
+ */
+
 public class Rule {
     private final State origin;
     private final State destiny;
@@ -15,14 +19,23 @@ public class Rule {
 
     //Getters
 
+    /**
+     * @return The origin state.
+     */
     public State getOrigin(){
         return origin;
     }
 
+    /**
+     * @return The destiny state.
+     */
     public State getDestiny(){
         return destiny;
     }
 
+    /**
+     * @return The character.
+     */
     public char getCharacter(){
         return character;
     }

@@ -8,6 +8,10 @@ import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Objects;
 
+/**
+ * Pushdown transition function. The transitions for a pda. t(state origin, character word, character pop) = (state destiny, character push)
+ */
+
 public class Pdtf {
     private final Map<PdtfInput, Set<PdtfOutput>> rules;
 
@@ -19,6 +23,14 @@ public class Pdtf {
 
     //Add
 
+    /**
+     * Adds the transition: t(origin, c, pop) = (destiny, push).
+     * @param origin State origin.
+     * @param c Value of character word.
+     * @param pop Value of character pop.
+     * @param destiny State destiny.
+     * @param push Value of character push.
+     */
     public void add(State origin, int c, int pop, State destiny, int push){
         PdtfInput input = new PdtfInput(origin, c, pop);
         PdtfOutput output = new PdtfOutput(destiny, push);
@@ -28,12 +40,27 @@ public class Pdtf {
 
     //Consult
 
+    /**
+     * Checks if this contains the rule t(origin, c, pop).
+     * @param origin State origin.
+     * @param c Value of character word.
+     * @param pop Value of character pop.
+     * @return True if this contains t(origin, c, pop). False otherwise.
+     */
     public boolean hasRule(State origin, int c, int pop){
         return rules.containsKey(new PdtfInput(origin, c, pop));
     }
 
     //Step
 
+    /**
+     * Finds the set of states of the inputs: t(origin,c,pop) + t(origin,e,pop) + t(origin,c,e) + t(origin,e,e)
+     * @param origin State origin.
+     * @param c Value of character word.
+     * @param pop Value of character pop.
+     * @param e Value of character empty.
+     * @return The set of transitions of t(origin,c/e,pop/e).
+     */
     public Set<PdtfTuple> stepWithEmpty(State origin, int c, int pop, int e){
         Set<PdtfTuple> res = new HashSet<>();
         if(hasRule(origin,e,e)){

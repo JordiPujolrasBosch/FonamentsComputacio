@@ -1,5 +1,9 @@
 package Elements;
 
+/**
+ * A state of an automaton.
+ */
+
 public class State {
     public State(){}
 

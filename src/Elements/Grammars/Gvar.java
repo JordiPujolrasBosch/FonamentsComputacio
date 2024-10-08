@@ -3,7 +3,7 @@ package Elements.Grammars;
 import java.util.Objects;
 
 /**
- * Grammar variable. A non-terminal used is context free grammars.
+ * Grammar variable. A non-terminal used in context free grammars. Is defined by an upper letter and a positive number.
  */
 
 public class Gvar {
@@ -18,7 +18,7 @@ public class Gvar {
     //Getters
 
     /**
-     * @return The charcter of this gvar.
+     * @return The character of this gvar.
      */
     public char getC(){
         return c;
@@ -34,7 +34,7 @@ public class Gvar {
     //String and equals
 
     /**
-     * @return A string that represents this grule in the defined format.
+     * @return A string that represents this gvar in the defined format.
      */
     @Override
     public String toString() {

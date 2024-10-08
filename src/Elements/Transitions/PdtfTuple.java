@@ -4,6 +4,10 @@ import Elements.State;
 
 import java.util.Objects;
 
+/**
+ * Transition of a pda.
+ */
+
 public class PdtfTuple {
     private final State origin;
     private final int character;
@@ -21,22 +25,37 @@ public class PdtfTuple {
 
     //Getters
 
+    /**
+     * @return The origin state.
+     */
     public State getOrigin(){
         return origin;
     }
 
+    /**
+     * @return The value of character word.
+     */
     public int getCharacter(){
         return character;
     }
 
+    /**
+     * @return The value of character pop.
+     */
     public int getPop(){
         return pop;
     }
 
+    /**
+     * @return The destiny state.
+     */
     public State getDestiny(){
         return destiny;
     }
 
+    /**
+     * @return The value of character push.
+     */
     public int getPush(){
         return push;
     }
